@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">PawsomePals</string>
+    <string name="app_name">Pawsome Pals</string>
+    <string name="login">Login</string>
+    <string name="feed">Feed</string>
+    <string name="search">Search</string>
+    <string name="chat">Chat</string>
+    <string name="profile">Profile</string>
+    <string name="map">Map</string>
 </resources>
