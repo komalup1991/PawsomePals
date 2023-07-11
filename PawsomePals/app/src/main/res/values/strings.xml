@@ -6,4 +6,7 @@
     <string name="chat">Chat</string>
     <string name="profile">Profile</string>
     <string name="map">Map</string>
+    <string name="all">ALL</string>
+    <string name="friends">Friends</string>
+    <string name="recipes">Recipes</string>
 </resources>
