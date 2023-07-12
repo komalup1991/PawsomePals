@@ -13,6 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.database.Query;
+
 import org.checkerframework.checker.units.qual.C;
 
 import edu.northeastern.pawsomepals.R;
@@ -55,10 +58,15 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupSearchRecyclerView(String searchTerm) {
-//        adapter = new ChatUserRecyclerAdapter(,this.getContext());
-//        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
-//        chatRecyclerview.setAdapter(adapter);
-//        adapter.startListening();
+        Query query = ChatFirebaseUtil.allUserCollectionReference()
+                .whereGreaterThanOrEqualTo("username",searchTerm);
+
+        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
+                .setQuery(query,UserModel.class).build();
+        adapter = new ChatUserRecyclerAdapter(,this.getContext());
+        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        chatRecyclerview.setAdapter(adapter);
+        adapter.startListening();
     }
 //
 //    @Override

@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.ui;
 
+import android.content.Intent;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -15,6 +17,12 @@ public class ChatFirebaseUtil {
             return true;
         }
         return false;
+    }
+
+    public static void passUserModelAsIntent(Intent intent, UserModel model){
+        intent.putExtra("username",model.getUserName());
+        intent.putExtra("userId",model.getUserId());
+
     }
 
     public static DocumentReference currentUserDetails(){

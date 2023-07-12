@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,55 +8,54 @@
     tools:context=".ui.ChatRoomActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chatToolBar"
+        android:id="@+id/chatRoomToolBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#FFC107"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/white"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_scrollFlags="scroll|enterAlways"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:titleTextColor="@color/black">
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <ImageButton
-            android:id="@+id/message_back_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_gravity="start"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp"
-            android:src="@drawable/back_button" />
+    <ImageButton
+        android:id="@+id/message_back_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="start"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:background="@color/white"
+        android:src="@drawable/chat_back_icon" />
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/message_edit_button"-->
-<!--            android:layout_width="40dp"-->
-<!--            android:layout_height="40dp"-->
-<!--            android:layout_gravity="end"-->
-<!--            android:clickable="true"-->
-<!--            android:focusable="true"-->
-<!--            android:padding="8dp"-->
-<!--            android:src="@drawable/three_dots_icon"-->
-<!--            app:itemIconTint="@color/tab_item_foreground"-->
-<!--            app:itemTextColor="@color/tab_item_foreground" />-->
+    <TextView
+        android:id="@+id/userName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/chat_profile_pic"
+        android:text="User Name"
+        android:textColor="@color/black"
+        android:textSize="20dp" />
 
-
-    </androidx.appcompat.widget.Toolbar>
+    <ImageView
+        android:id="@+id/chat_profile_pic"
+        android:layout_toRightOf="@id/message_back_button"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:padding="4dp"
+        tools:srcCompat="@tools:sample/avatars" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_below="@id/message_recycler_view">
 
         <EditText
             android:id="@+id/message_input"
-            android:layout_width="292dp"
+            android:layout_width="314dp"
             android:layout_height="40dp"
             android:ems="10"
             android:hint="Write message here"
@@ -66,14 +65,13 @@
             android:id="@+id/function_btn"
             android:layout_width="50dp"
             android:layout_height="40dp"
-            android:src="@drawable/add_button" />
+            android:src="@drawable/chat_add_icon" />
 
         <ImageButton
             android:id="@+id/message_send_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/send_button" />
+            android:src="@drawable/chat_send_icon" />
 
     </LinearLayout>
 
@@ -81,26 +79,19 @@
         android:id="@+id/message_recycler_view"
         android:layout_width="409dp"
         android:layout_height="625dp"
-        android:layout_marginStart="1dp"
-        android:layout_marginTop="1dp"
-        android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatToolBar" />
+        android:layout_below="@id/chatRoomToolBar"/>
 
-    <TextView
-        android:id="@+id/other_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="10dp"
-        android:text="username"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/chatToolBar" />
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/message_edit_button"-->
+    <!--            android:layout_width="40dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:layout_gravity="end"-->
+    <!--            android:clickable="true"-->
+    <!--            android:focusable="true"-->
+    <!--            android:padding="8dp"-->
+    <!--            android:src="@drawable/three_dots_icon"-->
+    <!--            app:itemIconTint="@color/tab_item_foreground"-->
+    <!--            app:itemTextColor="@color/tab_item_foreground" />-->
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+</RelativeLayout>
