@@ -9,7 +9,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.sql.Timestamp;
+import java.util.Arrays;
+
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.ChatRoomModel;
 
 public class ChatRoomActivity extends AppCompatActivity {
     EditText messageInput;
@@ -21,6 +25,8 @@ public class ChatRoomActivity extends AppCompatActivity {
 
 //    User otherUser;
     String chatRoomId;
+    ChatRoomModel chatRoomModel;
+    Timestamp currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +53,22 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void getOrCreateChatRoomModel() {
 //        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
-//            if()
+//            if(task.isSuccessful()){
+//                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
+//
+//                if (chatRoomModel == null){
+//                    currentTime = new Timestamp(System.currentTimeMillis());
+//                    //first time chat
+//                    chatRoomModel = new ChatRoomModel(
+//                            chatRoomId,
+//                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId),
+//                            currentTime,
+//                            ""
+//
+//                    );
+//                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+//                }
+//            }
 //        });
     }
 }
