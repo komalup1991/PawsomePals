@@ -23,7 +23,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     TextView otherUserName;
     RecyclerView chatRoomRecyclerView;
 
-//    User otherUser;
+//    UserModel otherUser;
     String chatRoomId;
     ChatRoomModel chatRoomModel;
     Timestamp currentTime;
@@ -40,6 +40,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         sendMessageBtn = findViewById(R.id.message_send_btn);
         functionBtn = findViewById(R.id.function_btn);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
+        backBtn = findViewById(R.id.message_back_button);
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -58,15 +58,15 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupSearchRecyclerView(String searchTerm) {
-        Query query = ChatFirebaseUtil.allUserCollectionReference()
-                .whereGreaterThanOrEqualTo("username",searchTerm);
-
-        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
-                .setQuery(query,UserModel.class).build();
-        adapter = new ChatUserRecyclerAdapter(,this.getContext());
-        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        chatRecyclerview.setAdapter(adapter);
-        adapter.startListening();
+//        Query query = ChatFirebaseUtil.allUserCollectionReference()
+//                .whereGreaterThanOrEqualTo("username",searchTerm);
+//
+//        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
+//                .setQuery(query,UserModel.class).build();
+//        adapter = new ChatUserRecyclerAdapter(,this.getContext());
+//        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
+//        chatRecyclerview.setAdapter(adapter);
+//        adapter.startListening();
     }
 //
 //    @Override

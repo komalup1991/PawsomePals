@@ -19,11 +19,11 @@ public class ChatFirebaseUtil {
         return false;
     }
 
-    public static void passUserModelAsIntent(Intent intent, UserModel model){
-        intent.putExtra("username",model.getUserName());
-        intent.putExtra("userId",model.getUserId());
-
-    }
+//    public static void passUserModelAsIntent(Intent intent, UserModel model){
+//        intent.putExtra("username",model.getUserName());
+//        intent.putExtra("userId",model.getUserId());
+//
+//    }
 
     public static DocumentReference currentUserDetails(){
         return FirebaseFirestore.getInstance().collection("users").document(currentUserId());
