@@ -9,4 +9,6 @@
     <string name="all">ALL</string>
     <string name="friends">Friends</string>
     <string name="recipes">Recipes</string>
+    <string name="create_feeds">Create feeds</string>
+    <string name="create_icon">create_icon</string>
 </resources>
