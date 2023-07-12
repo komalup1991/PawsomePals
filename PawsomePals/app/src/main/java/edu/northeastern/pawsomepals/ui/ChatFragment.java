@@ -16,13 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.checkerframework.checker.units.qual.C;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
+//import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
 
 public class ChatFragment extends Fragment {
     EditText searchInput;
     ImageButton searchButton;
     RecyclerView chatRecyclerview;
-    ChatUserRecyclerAdapter adapter;
+//    ChatUserRecyclerAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,11 +55,33 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupSearchRecyclerView(String searchTerm) {
-        adapter = new ChatUserRecyclerAdapter(,this.getContext());
-        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
-        chatRecyclerview.setAdapter(adapter);
-        adapter.startListening();
+//        adapter = new ChatUserRecyclerAdapter(,this.getContext());
+//        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
+//        chatRecyclerview.setAdapter(adapter);
+//        adapter.startListening();
     }
-
-
+//
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        if (adapter != null){
+//            adapter.startListening();
+//        }
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (adapter != null){
+//            adapter.startListening();
+//        }
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        if (adapter != null){
+//            adapter.stopListening();
+//        }
+//    }
 }
