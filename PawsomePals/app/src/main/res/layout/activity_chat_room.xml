@@ -11,7 +11,7 @@
         android:id="@+id/chatRoomToolBar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/black"
+        android:background="@color/backgroundColor"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_scrollFlags="scroll|enterAlways"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
@@ -24,6 +24,7 @@
         android:clickable="true"
         android:focusable="true"
         android:padding="8dp"
+        android:background="@null"
         android:src="@drawable/chat_back_icon"
         app:tint="@color/white" />
 
@@ -31,7 +32,7 @@
         android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="65dp"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/chat_profile_pic"
         android:text="User Name"
@@ -50,8 +51,9 @@
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/message_recycler_view">
+        android:layout_below="@id/message_recycler_view"
+        android:background="@color/backgroundColor"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/message_input"
@@ -59,18 +61,22 @@
             android:layout_height="40dp"
             android:ems="10"
             android:hint="Write message here"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textColor="@color/white"
+            android:textColorHint="@color/headingTextColor" />
 
         <ImageButton
             android:id="@+id/function_btn"
             android:layout_width="50dp"
             android:layout_height="40dp"
+            android:background="@null"
             android:src="@drawable/chat_add_icon" />
 
         <ImageButton
             android:id="@+id/message_send_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:background="@null"
             android:src="@drawable/chat_send_icon" />
 
     </LinearLayout>
