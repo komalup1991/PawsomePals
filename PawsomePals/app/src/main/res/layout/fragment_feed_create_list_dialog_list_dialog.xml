@@ -5,7 +5,7 @@
     android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.FeedCreateListDialogFragment"
+    tools:context=".ui.feed.FeedCreateListDialogFragment"
     tools:listitem="@layout/fragment_feed_create_list_dialog_list_dialog_item"
     />
 

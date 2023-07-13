@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +12,11 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
+import edu.northeastern.pawsomepals.ui.map.MapFragment;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
+import edu.northeastern.pawsomepals.ui.search.SearchFragment;
 
 public class HomeActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;

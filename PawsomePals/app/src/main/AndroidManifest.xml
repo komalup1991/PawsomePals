@@ -22,31 +22,31 @@
         android:theme="@style/Theme.PawsomePals"
         tools:targetApi="31">
         <activity
-            android:name=".ui.CreateNewChatActivity"
+            android:name=".ui.chat.CreateNewChatActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.ChatRoomActivity"
+            android:name=".ui.chat.ChatRoomActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.CreateEventsActivity"
+            android:name=".ui.feed.CreateEventsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.CreatePhotoVideoActivity"
+            android:name=".ui.feed.CreatePhotoVideoActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.CreatePostActivity"
+            android:name=".ui.feed.CreatePostActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.CreateRecipeActivity"
+            android:name=".ui.feed.CreateRecipeActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.HomeActivity"
+            android:name=".ui.login.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.login.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

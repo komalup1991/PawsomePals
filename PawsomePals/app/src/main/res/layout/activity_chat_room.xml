@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FBFAFA"
-    tools:context=".ui.ChatRoomActivity">
+    tools:context=".ui.chat.ChatRoomActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/chatRoomToolBar"

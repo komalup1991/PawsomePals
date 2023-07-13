@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.feed;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,11 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import edu.northeastern.pawsomepals.R;
 
-public class MapFragment extends Fragment {
+public class FeedFriendsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_map, container, false);
+        return inflater.inflate(R.layout.fragment_feed_friends, container, false);
     }
 
     @Override

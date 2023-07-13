@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageView;
 
 import edu.northeastern.pawsomepals.R;
