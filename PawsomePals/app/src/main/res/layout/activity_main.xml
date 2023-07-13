@@ -6,11 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <Button
-        android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/login"
+    <ImageView
+        android:id="@+id/login_image"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/dogpawheart"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

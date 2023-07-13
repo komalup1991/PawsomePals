@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+
+    <color name="pastelPink">#FFB6C1</color>
+    <color name="pastelBlue">#AED6F1</color>
+    <color name="pastelGreen">#98FB98</color>
+    <color name="pastelPurple">#B19CD9</color>
+    <color name="pastelYellow">#FDFD96</color>
+    <color name="pastelOrange">#FFB74D</color>
+    <color name="pastelMint">#98FF98</color>
+    <color name="pastelLavender">#E6E6FA</color>
+    <color name="pastelPeach">#FFDAB9</color>
+    <color name="pastelAqua">#00FFFF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="white_opacity">#40FFFFFF</color>
+    <color name="purple">#959fef</color>
+    <color name="pink">#f1a3bb</color>
+    <color name="orange">#f4c4a9</color>
+    <color name="green">#96d470</color>
+    <color name="darkPink">#E97D93</color>
+    <color name="yellow">#F6C01E</color>
+
+    <color name="primaryColor">@color/darkPink</color>
+    <color name="colorSecondary">@color/darkPink</color>
+    <color name="primaryText">@color/black</color>
+    <color name="primaryButtonColor">@color/darkPink</color>
+    <color name="accentColor">@color/pink</color>
+    <color name="backgroundColor">@color/pastelPink</color>
+    <color name="headingTextColor">@color/pastelLavender</color>
+    <color name="bodyTextColor">@color/black</color>
+    <color name="statusBarColor">@color/pastelPink</color>
+    <color name="text_color">@color/white</color>
 </resources>

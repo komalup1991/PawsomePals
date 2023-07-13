@@ -14,9 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.databinding.FragmentFeedCreateListDialogListDialogBinding;
@@ -25,7 +26,7 @@ import edu.northeastern.pawsomepals.databinding.FragmentFeedCreateListDialogList
 public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
 
     private FragmentFeedCreateListDialogListDialogBinding binding;
-    private Toolbar toolbar;
+    private ItemAdapter itemAdapter;
 
     public static FeedCreateListDialogFragment newInstance() {
         return new FeedCreateListDialogFragment();
@@ -34,17 +35,15 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_feed_create_list_dialog_list_dialog, container, false);
         binding = FragmentFeedCreateListDialogListDialogBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        toolbar = view.findViewById(R.id.toolbar);
-        final RecyclerView recyclerView = (RecyclerView) view;
+        final RecyclerView recyclerView =  (RecyclerView) view;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        ItemAdapter itemAdapter = new ItemAdapter(getActivity());
+        itemAdapter = new ItemAdapter(getActivity());
         recyclerView.setAdapter(itemAdapter);
     }
 
@@ -52,6 +51,12 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    public void setOnItemClickListener(ItemAdapter.OnItemClickListener listener) {
+        if (itemAdapter != null) {
+            itemAdapter.setOnItemClickListener(listener);
+        }
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
@@ -65,13 +70,23 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
         }
     }
 
-    private class ItemAdapter extends RecyclerView.Adapter<ViewHolder> {
-        private  Activity activity;
+    class ItemAdapter extends RecyclerView.Adapter<ViewHolder> {
+        private Activity activity;
         private final String[] actions = {"Recipe", "Post", "Photo/Video", "Services", "Events"};
         private final int[] icons = {R.drawable.dogbowl, R.drawable.socialmedia,
                 R.drawable.media, R.drawable.groomingcolor, R.drawable.planner};
+        private OnItemClickListener listener;
+
         ItemAdapter(Activity activity) {
             this.activity = activity;
+        }
+
+        interface OnItemClickListener {
+            void onItemClick(int position);
+        }
+
+        void setOnItemClickListener(OnItemClickListener listener) {
+            this.listener = listener;
         }
 
         @NonNull
@@ -81,7 +96,7 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
             FragmentFeedCreateListDialogListDialogItemBinding binding = FragmentFeedCreateListDialogListDialogItemBinding.inflate(inflater, parent, false);
             View view = binding.getRoot();
             ImageView icon = view.findViewById(R.id.icon);
-            return new ViewHolder(binding,icon);
+            return new ViewHolder(binding, icon);
         }
 
         @Override
@@ -91,8 +106,8 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                String action = actions[holder.getBindingAdapterPosition()];
-                Intent intent;
+                    String action = actions[holder.getBindingAdapterPosition()];
+                    Intent intent;
                     switch (action) {
                         case "Recipe":
                             intent = new Intent(activity, CreateRecipeActivity.class);
@@ -112,17 +127,16 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
                         default:
                             return;
                     }
-                activity.startActivity(intent);
-                FeedCreateListDialogFragment.this.dismiss();
+                    activity.startActivity(intent);
+                    FeedCreateListDialogFragment.this.dismiss();
 
-            }
-        });
+                }
+            });
         }
 
         @Override
         public int getItemCount() {
             return actions.length;
         }
-
     }
 }

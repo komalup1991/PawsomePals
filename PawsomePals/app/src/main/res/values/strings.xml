@@ -11,4 +11,7 @@
     <string name="recipes">Recipes</string>
     <string name="create_feeds">Create feeds</string>
     <string name="create_icon">create_icon</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="give_your_recipe_a_name">Give your recipe a name</string>
+    <string name="recipe_photo">Recipe Photo</string>
 </resources>

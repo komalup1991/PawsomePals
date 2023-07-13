@@ -1,0 +1,41 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorSecondary">@color/bodyTextColor</item>
+        <item name="colorAccent">@color/accentColor</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="android:statusBarColor">@color/statusBarColor</item>
+        <item name="android:actionButtonStyle">@color/primaryColor</item>
+    </style>
+
+    <style name="HeadingTextStyle">
+        <item name="android:textColor">@color/headingTextColor</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="BodyTextStyle">
+        <item name="android:textColor">@color/bodyTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+
+    <drawable name="customButtonBackground">#FF4081</drawable>
+    <drawable name="customSelector">
+        <item android:state_pressed="true" android:drawable="@color/accentColor" />
+        <item android:drawable="@color/primaryColor" />
+    </drawable>
+
+    <style name="CustomButtonTheme" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/primaryColor</item>
+        <item name="android:textColor">@color/backgroundColor</item>
+    </style>
+
+    <style name="CustomCheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="android:buttonTint">@color/accentColor</item>
+    </style>
+
+    <dimen name="marginSmall">8dp</dimen>
+    <dimen name="paddingMedium">16dp</dimen>
+
+</resources>
