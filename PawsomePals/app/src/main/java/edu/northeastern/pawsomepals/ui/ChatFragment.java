@@ -1,9 +1,11 @@
 package edu.northeastern.pawsomepals.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
@@ -24,6 +26,7 @@ import edu.northeastern.pawsomepals.R;
 public class ChatFragment extends Fragment {
     EditText searchInput;
     ImageButton searchButton;
+    Button createNewChatButton;
     RecyclerView chatRecyclerview;
 //    ChatUserRecyclerAdapter adapter;
     @Nullable
@@ -36,9 +39,10 @@ public class ChatFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        searchInput = view.findViewById(R.id.search_username_input);
-        searchButton = view.findViewById(R.id.search_user_btn);
+        searchInput = view.findViewById(R.id.chat_search_chat);
+        searchButton = view.findViewById(R.id.chat_search_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
+        createNewChatButton = view.findViewById(R.id.new_chat_btn);
 
         searchInput.requestFocus();
 
@@ -53,6 +57,14 @@ public class ChatFragment extends Fragment {
                 }
                 
                 setupSearchRecyclerView(searchTerm);
+            }
+        });
+
+        createNewChatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), CreateNewChatActivity.class);
+                startActivity(intent);
             }
         });
     }
