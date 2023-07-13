@@ -14,4 +14,13 @@
     <string name="upload_photo">Upload Photo</string>
     <string name="give_your_recipe_a_name">Give your recipe a name</string>
     <string name="recipe_photo">Recipe Photo</string>
+
+    <!--Login-->
+    <string name="login_header">Login</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_button_login">Login</string>
+    <string name="login_create_new_account">Create new Account?</string>
+    <string name="login_text_or">OR</string>
+    <string name="login_button_google">Google</string>
+    <string name="login_button_facebook">Facebook</string>
 </resources>
