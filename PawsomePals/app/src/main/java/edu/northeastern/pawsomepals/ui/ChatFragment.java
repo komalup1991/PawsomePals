@@ -44,8 +44,6 @@ public class ChatFragment extends Fragment {
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewChatButton = view.findViewById(R.id.new_chat_btn);
 
-        searchInput.requestFocus();
-
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
