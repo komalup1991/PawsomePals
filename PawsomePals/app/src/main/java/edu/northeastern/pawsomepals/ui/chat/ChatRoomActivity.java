@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.chat;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;

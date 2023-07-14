@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/wd"
-    tools:context=".ui.login.LoginActivity">
+    tools:context=".ui.login.SignUpActivity">
 
     <View
         android:id="@+id/backgroundView"
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="100dp"
                 android:fontFamily="@font/belgrano"
-                android:text="@string/login_header"
+                android:text="@string/signup_header"
                 android:textColor="@color/white"
                 android:textSize="44sp"
                 android:textStyle="bold"
@@ -91,40 +91,51 @@
                 app:layout_constraintStart_toStartOf="@+id/inputEmail"
                 app:layout_constraintTop_toBottomOf="@+id/inputEmail" />
 
-            <TextView
-                android:id="@+id/forgotPassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/login_forgot_password"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="@+id/inputPassword"
-                app:layout_constraintTop_toBottomOf="@+id/inputPassword" />
-
-            <Button
-                android:id="@+id/btnLogin"
+            <EditText
+                android:id="@+id/inputConfirmPassword"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/input_bg"
-                android:text="@string/login_button_login"
+                android:drawableLeft="@drawable/baseline_security_24"
+                android:drawablePadding="10dp"
+                android:ems="10"
+                android:hint="Confirm Password"
+                android:inputType="textPassword"
+                android:paddingLeft="20dp"
+                android:paddingTop="13dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="13dp"
                 android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="@+id/forgotPassword"
+                android:textColorHint="@color/white"
+                app:layout_constraintEnd_toEndOf="@+id/inputPassword"
                 app:layout_constraintStart_toStartOf="@+id/inputPassword"
-                app:layout_constraintTop_toBottomOf="@+id/forgotPassword" />
+                app:layout_constraintTop_toBottomOf="@+id/inputPassword" />
+
+
+            <Button
+                android:id="@+id/btnSignUp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/input_bg"
+                android:text="@string/signup_button_register"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="@+id/inputConfirmPassword"
+                app:layout_constraintStart_toStartOf="@+id/inputConfirmPassword"
+                app:layout_constraintTop_toBottomOf="@+id/inputConfirmPassword" />
 
             <TextView
                 android:id="@+id/alreadyExistingAccount"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/login_create_new_account"
+                android:text="@string/login_existing_account"
                 android:textColor="@color/white"
                 android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="@+id/btnLogin"
-                app:layout_constraintStart_toStartOf="@+id/btnLogin"
-                app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
+                app:layout_constraintEnd_toEndOf="@+id/btnSignUp"
+                app:layout_constraintStart_toStartOf="@+id/btnSignUp"
+                app:layout_constraintTop_toBottomOf="@+id/btnSignUp" />
 
             <TextView
                 android:id="@+id/textViewOr"
@@ -146,7 +157,7 @@
                 android:layout_marginStart="32dp"
                 android:background="@color/white"
                 app:layout_constraintBottom_toBottomOf="@+id/textViewOr"
-                app:layout_constraintEnd_toEndOf="@+id/btnLogin"
+                app:layout_constraintEnd_toEndOf="@+id/btnSignUp"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="@+id/textViewOr"
                 app:layout_constraintTop_toTopOf="@+id/textViewOr" />
@@ -160,7 +171,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/textViewOr"
                 app:layout_constraintEnd_toStartOf="@+id/textViewOr"
                 app:layout_constraintHorizontal_bias="1.0"
-                app:layout_constraintStart_toStartOf="@+id/btnLogin"
+                app:layout_constraintStart_toStartOf="@+id/btnSignUp"
                 app:layout_constraintTop_toTopOf="@+id/textViewOr" />
 
             <Button
@@ -177,7 +188,7 @@
                 android:textAllCaps="false"
                 app:layout_constraintEnd_toStartOf="@+id/btnFacebook"
                 app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toStartOf="@+id/btnLogin"
+                app:layout_constraintStart_toStartOf="@+id/btnSignUp"
                 app:layout_constraintTop_toBottomOf="@+id/textViewOr" />
 
             <Button
@@ -192,12 +203,11 @@
                 android:text="@string/login_button_facebook"
                 android:textAlignment="textStart"
                 android:textAllCaps="false"
-                app:layout_constraintEnd_toEndOf="@+id/btnLogin"
+                app:layout_constraintEnd_toEndOf="@+id/btnSignUp"
                 app:layout_constraintStart_toEndOf="@+id/btnGoogle"
                 app:layout_constraintTop_toTopOf="@+id/btnGoogle" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

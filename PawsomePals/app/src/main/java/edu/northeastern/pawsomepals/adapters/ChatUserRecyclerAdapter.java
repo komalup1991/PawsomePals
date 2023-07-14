@@ -1,23 +1,5 @@
 package edu.northeastern.pawsomepals.adapters;
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-
-import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.ChatRoomModel;
-import edu.northeastern.pawsomepals.ui.ChatFirebaseUtil;
-import edu.northeastern.pawsomepals.ui.ChatRoomActivity;
-
 //public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<UserModel,ChatUserRecyclerAdapter.UserModelViewHolder> {
 //
 //    Context context;

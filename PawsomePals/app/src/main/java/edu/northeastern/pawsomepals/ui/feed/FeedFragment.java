@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.feed;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,6 +16,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.FragmentAdapter;
+import edu.northeastern.pawsomepals.ui.feed.FeedCreateListDialogFragment;
 
 public class FeedFragment extends Fragment {
     private TabLayout tabLayout;

@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.feed;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,8 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
-import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.databinding.FragmentFeedCreateListDialogListDialogBinding;

@@ -1,4 +1,4 @@
-package edu.northeastern.pawsomepals.ui;
+package edu.northeastern.pawsomepals.ui.map;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,11 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import edu.northeastern.pawsomepals.R;
 
-public class SearchFragment extends Fragment {
+public class MapFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_search, container, false);
+        return inflater.inflate(R.layout.fragment_map, container, false);
     }
 
     @Override
@@ -23,3 +23,4 @@ public class SearchFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
     }
 }
+
