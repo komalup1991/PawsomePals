@@ -10,26 +10,24 @@ import android.widget.TextView;
 
 import edu.northeastern.pawsomepals.R;
 
-public class LoginActivity extends AppCompatActivity {
+public class SignUpActivity extends AppCompatActivity {
 
-    private TextView createNewAccount;
+    private TextView alreadyExistingAccount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_signup);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        createNewAccount = findViewById(R.id.alreadyExistingAccount);
-        createNewAccount.setOnClickListener(new View.OnClickListener() {
+        alreadyExistingAccount = findViewById(R.id.alreadyExistingAccount);
+        alreadyExistingAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+                startActivity(new Intent(SignUpActivity.this, LoginActivity.class));
                 finish();
             }
         });
-
-
     }
 }
