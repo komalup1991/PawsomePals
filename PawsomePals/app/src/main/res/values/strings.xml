@@ -25,6 +25,8 @@
     <string name="login_button_facebook">Facebook</string>
     <string name="login_successful_login">Login is successful.</string>
     <string name="login_unsuccessful_login">Email or password is incorrect.</string>
+    <string name="login_unsuccessful_google_login">Google sign in failed.</string>
+
     <!--SignUp-->
     <string name="signup_header">SignUp</string>
     <string name="login_existing_account">Already have an Account?</string>

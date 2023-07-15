@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextView createNewAccount;
     private EditText inputEmail, inputPassword;
-    private Button btnLogin;
+    private Button btnLogin, btnGoogle, btnFacebook;
     private ProgressBar progressBar;
     private FirebaseAuth auth;
     private FirebaseUser user;
@@ -43,7 +43,9 @@ public class LoginActivity extends AppCompatActivity {
         inputEmail = findViewById(R.id.inputEmail);
         inputPassword = findViewById(R.id.inputPassword);
         btnLogin = findViewById(R.id.btnLogin);
-        progressBar = new ProgressBar(this);
+        btnGoogle = findViewById(R.id.btnGoogle);
+        btnFacebook = findViewById(R.id.btnFacebook);
+        progressBar = findViewById(R.id.progressBar);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
@@ -60,6 +62,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loginUser();
+            }
+        });
+
+        btnGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, GoogleLoginActivity.class));
             }
         });
     }
