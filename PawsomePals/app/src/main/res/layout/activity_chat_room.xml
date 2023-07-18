@@ -21,11 +21,24 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="start"
+        android:background="@null"
         android:clickable="true"
         android:focusable="true"
         android:padding="8dp"
-        android:background="@null"
         android:src="@drawable/chat_back_icon"
+        app:tint="@color/white" />
+
+    <ImageButton
+        android:id="@+id/chatroom_more_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="90dp"
+        android:layout_toRightOf="@id/userName"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:src="@drawable/chat_more_icon"
         app:tint="@color/white" />
 
     <TextView
