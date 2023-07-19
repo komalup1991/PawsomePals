@@ -263,9 +263,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/set_time"
-                android:textSize="11sp"
+                android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/cookTimeDescTextView"
                 app:layout_constraintTop_toTopOf="@+id/cookTimeDescTextView"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/darkPink"/>
            />
 
 
@@ -275,9 +278,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/set_time"
-                android:textSize="11sp"
+                android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/prepTimeDescTextView"
                 app:layout_constraintTop_toTopOf="@+id/prepTimeDescTextView"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/darkPink"/>
                />
 
 
@@ -287,9 +293,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@string/set_servings"
-                android:textSize="11sp"
+                android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@+id/servingsDescTextView"
-                app:layout_constraintTop_toTopOf="@+id/servingsDescTextView" />
+                app:layout_constraintTop_toTopOf="@+id/servingsDescTextView"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:textColor="@color/darkPink"/>
 
 
 
