@@ -1,4 +1,5 @@
 <resources>
+    <!--Home-->
     <string name="app_name">Pawsome Pals</string>
     <string name="login">Login</string>
     <string name="feed">Feed</string>
@@ -6,15 +7,12 @@
     <string name="chat">Chat</string>
     <string name="profile">Profile</string>
     <string name="map">Map</string>
+    <!--Feed-->
     <string name="all">ALL</string>
     <string name="friends">Friends</string>
     <string name="recipes">Recipes</string>
     <string name="create_feeds">Create feeds</string>
     <string name="create_icon">create_icon</string>
-    <string name="upload_photo">Upload Photo</string>
-    <string name="give_your_recipe_a_name">Give your recipe a name</string>
-    <string name="recipe_photo">Recipe Photo</string>
-
     <!--Login-->
     <string name="login_header">Login</string>
     <string name="login_forgot_password">Forgot Password?</string>
@@ -33,4 +31,23 @@
     <string name="signup_button_register">Register</string>
     <string name="signup_successful_registration">Registration is successful.</string>
     <string name="signup_unsuccessful_registration">Registration is unsuccessful.</string>
+    <!--Create Recipe-->
+    <string name="upload_photo">Upload Photo</string>
+    <string name="give_your_recipe_a_name">Give your recipe a name</string>
+    <string name="recipe_photo">Recipe Photo</string>
+    <string name="description">Description</string>
+    <string name="recipe_description_hint">Introduce your recipe, add notes, cooking tips, serving suggestions, etc...</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="ingredients_hint">Add one or paste multiple steps</string>
+    <string name="servings">Servings</string>
+    <string name="serving_desc">Set the number of servings</string>
+    <string name="prep_time">Prep Time</string>
+    <string name="prep_desc">How long does it take to prepare this recipe?</string>
+    <string name="cook_time_desc">How long does it take to cook this recipe?</string>
+    <string name="cook_time">Cook Time</string>
+    <string name="set_time">Set Time</string>
+    <string name="set_servings">Set Servings</string>
+    <string name="save">Save</string>
+    <string name="servings_placeholder">%d servings</string>
+    <string name="select_the_number_of_portions_this_recipe_makes">Select the number of portions this recipe makes</string>
 </resources>
