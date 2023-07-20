@@ -101,7 +101,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                         Toast.makeText(SignUpActivity.this, R.string.signup_successful_registration, Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(SignUpActivity.this, HomeActivity.class);
+                        Intent intent = new Intent(SignUpActivity.this, AddNewProfileActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();

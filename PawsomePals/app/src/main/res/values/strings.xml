@@ -30,6 +30,14 @@
     <string name="signup_button_register">Register</string>
     <string name="signup_successful_registration">Registration is successful.</string>
     <string name="signup_unsuccessful_registration">Registration is unsuccessful.</string>
+
+    <!--New Profile-->
+    <string name="new_profile_male">Male</string>
+    <string name="new_profile_female">Female</string>
+    <string name="new_profile_other">Other</string>
+    <string name="new_profile_DOB">Date of Birth</string>
+    <string name="new_profile_save_button">Save</string>
+
     <!--Create Recipe-->
     <string name="upload_photo">Upload Photo</string>
     <string name="give_your_recipe_a_name">Give your recipe a name</string>
