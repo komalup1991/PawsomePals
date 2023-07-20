@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
@@ -8,14 +9,21 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
+
+
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
+import edu.northeastern.pawsomepals.models.Users;
+
 
 public class CreateNewChatActivity extends AppCompatActivity {
     EditText searchInput;
     ImageButton searchButton;
     ImageButton backButton;
     RecyclerView chatRecyclerview;
-//    ChatUserRecyclerAdapter adapter;
+    ChatUserRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,38 +52,38 @@ public class CreateNewChatActivity extends AppCompatActivity {
     }
 
     private void setupSearchRecyclerView(String searchTerm) {
-//        Query query = ChatFirebaseUtil.allUserCollectionReference()
-//                .whereGreaterThanOrEqualTo("username",searchTerm);
-//
-//        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
-//                .setQuery(query,UserModel.class).build();
-//        adapter = new ChatUserRecyclerAdapter(,this.getContext());
-//        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
-//        chatRecyclerview.setAdapter(adapter);
-//        adapter.startListening();
+        Query query = ChatFirebaseUtil.allUserCollectionReference()
+                .whereGreaterThanOrEqualTo("username",searchTerm);
+
+        FirestoreRecyclerOptions<Users> options = new FirestoreRecyclerOptions.Builder<Users>()
+                .setQuery(query,Users.class).build();
+        adapter = new ChatUserRecyclerAdapter(options,getApplicationContext());
+        chatRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        chatRecyclerview.setAdapter(adapter);
+        adapter.startListening();
     }
-//
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        if (adapter != null){
-//            adapter.startListening();
-//        }
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (adapter != null){
-//            adapter.startListening();
-//        }
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        if (adapter != null){
-//            adapter.stopListening();
-//        }
-//    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter != null){
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null){
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (adapter != null){
+            adapter.stopListening();
+        }
+    }
 }

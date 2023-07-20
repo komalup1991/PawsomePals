@@ -10,11 +10,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.auth.User;
+
 import java.sql.Timestamp;
 import java.util.Arrays;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
+import edu.northeastern.pawsomepals.models.Users;
 
 public class ChatRoomActivity extends AppCompatActivity {
     EditText messageInput;
@@ -25,7 +28,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     TextView otherUserName;
     RecyclerView chatRoomRecyclerView;
 
-//    UserModel otherUser;
+    Users otherUser;
     String chatRoomId;
     ChatRoomModel chatRoomModel;
     Timestamp currentTime;
@@ -35,8 +38,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-//        otherUser = AndroidUtil.getUserModelFromIntent(getIntent());
-//        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
+        otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
+        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
 
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
@@ -65,23 +68,23 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void getOrCreateChatRoomModel() {
-//        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
-//            if(task.isSuccessful()){
-//                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
-//
-//                if (chatRoomModel == null){
-//                    currentTime = new Timestamp(System.currentTimeMillis());
-//                    //first time chat
-//                    chatRoomModel = new ChatRoomModel(
-//                            chatRoomId,
-//                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId),
-//                            currentTime,
-//                            ""
-//
-//                    );
-//                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
-//                }
-//            }
-//        });
+        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
+            if(task.isSuccessful()){
+                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
+
+                if (chatRoomModel == null){
+                    currentTime = new Timestamp(System.currentTimeMillis());
+                    //first time chat
+                    chatRoomModel = new ChatRoomModel(
+                            chatRoomId,
+                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
+                            currentTime,
+                            ""
+
+                    );
+                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+                }
+            }
+        });
     }
 }

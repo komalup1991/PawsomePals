@@ -1,6 +1,6 @@
 package edu.northeastern.pawsomepals.models;
 
-import com.google.protobuf.Timestamp;
+import java.sql.Timestamp;
 
 import java.util.List;
 

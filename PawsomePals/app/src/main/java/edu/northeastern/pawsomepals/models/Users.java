@@ -9,8 +9,12 @@ public class Users {
 
     public Users() {
     }
-
-    public Users(String userId,String email){
+    public Users(String name,String userId, String email) {
+        this.name = name;
+        this.userId = userId;
+        this.email = email;
+    }
+    public Users(String userId, String email) {
         this.userId = userId;
         this.email = email;
 
@@ -38,5 +42,9 @@ public class Users {
 
     public void setRecipeId(String recipeId) {
         this.recipeId = recipeId;
+    }
+
+    public String getName() {
+        return name;
     }
 }

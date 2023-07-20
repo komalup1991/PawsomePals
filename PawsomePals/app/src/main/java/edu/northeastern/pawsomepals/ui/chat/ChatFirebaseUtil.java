@@ -7,6 +7,8 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import edu.northeastern.pawsomepals.models.Users;
+
 public class ChatFirebaseUtil {
     public static String currentUserId(){
         return FirebaseAuth.getInstance().getUid();
@@ -19,11 +21,11 @@ public class ChatFirebaseUtil {
         return false;
     }
 
-//    public static void passUserModelAsIntent(Intent intent, UserModel model){
-//        intent.putExtra("username",model.getUserName());
-//        intent.putExtra("userId",model.getUserId());
-//
-//    }
+    public static void passUserModelAsIntent(Intent intent, Users model){
+        intent.putExtra("username",model.getName());
+        intent.putExtra("userId",model.getUserId());
+
+    }
 
     public static DocumentReference currentUserDetails(){
         return FirebaseFirestore.getInstance().collection("users").document(currentUserId());
@@ -42,5 +44,11 @@ public class ChatFirebaseUtil {
         } else {
             return userId2 + "_" + userId1;
         }
+    }
+
+    public static Users getUserModelFromIntent(Intent intent) {
+        String userName = intent.getStringExtra("name");
+        String userId =  intent.getStringExtra("userId");
+        return new Users(userName,userId);
     }
 }
