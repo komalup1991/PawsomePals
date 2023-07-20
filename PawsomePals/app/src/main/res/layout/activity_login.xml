@@ -106,11 +106,12 @@
                 android:id="@+id/btnLogin"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="26dp"
                 android:background="@drawable/input_bg"
                 android:text="@string/login_button_login"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="@+id/forgotPassword"
+                app:layout_constraintEnd_toEndOf="@+id/inputPassword"
                 app:layout_constraintStart_toStartOf="@+id/inputPassword"
                 app:layout_constraintTop_toBottomOf="@+id/forgotPassword" />
 
@@ -163,39 +164,24 @@
                 app:layout_constraintStart_toStartOf="@+id/btnLogin"
                 app:layout_constraintTop_toTopOf="@+id/textViewOr" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnGoogle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
                 android:background="@drawable/input_bg"
-                android:drawableLeft="@drawable/google"
-                android:drawablePadding="10dp"
-                android:paddingLeft="20dp"
-                android:text="@string/login_button_google"
-                android:textAlignment="textStart"
+                android:gravity="center"
                 android:textAllCaps="false"
-                app:layout_constraintEnd_toStartOf="@+id/btnFacebook"
-                app:layout_constraintHorizontal_chainStyle="spread"
-                app:layout_constraintStart_toStartOf="@+id/btnLogin"
-                app:layout_constraintTop_toBottomOf="@+id/textViewOr" />
+                android:textSize="16sp"
+                app:icon="@drawable/google"
+                app:iconGravity="textStart"
 
-            <Button
-                android:id="@+id/btnFacebook"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:background="@drawable/input_bg"
-                android:drawableLeft="@drawable/facebook"
-                android:drawablePadding="10dp"
-                android:paddingLeft="20dp"
-                android:text="@string/login_button_facebook"
-                android:textAlignment="textStart"
-                android:textAllCaps="false"
-                app:layout_constraintEnd_toEndOf="@+id/btnLogin"
-                app:layout_constraintStart_toEndOf="@+id/btnGoogle"
-                app:layout_constraintTop_toTopOf="@+id/btnGoogle" />
+                app:layout_constraintEnd_toEndOf="@id/inputPassword"
+                app:layout_constraintStart_toStartOf="@id/inputPassword"
+                app:layout_constraintTop_toBottomOf="@+id/textViewOr"
+                android:text="@string/login_button_google">
 
+            </com.google.android.material.button.MaterialButton>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

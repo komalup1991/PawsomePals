@@ -44,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
         inputPassword = findViewById(R.id.inputPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoogle = findViewById(R.id.btnGoogle);
-        btnFacebook = findViewById(R.id.btnFacebook);
         progressBar = findViewById(R.id.progressBar);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();

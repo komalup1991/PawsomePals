@@ -20,7 +20,6 @@
     <string name="login_create_new_account">Create new Account?</string>
     <string name="login_text_or">OR</string>
     <string name="login_button_google">Google</string>
-    <string name="login_button_facebook">Facebook</string>
     <string name="login_successful_login">Login is successful.</string>
     <string name="login_unsuccessful_login">Email or password is incorrect.</string>
     <string name="login_unsuccessful_google_login">Google sign in failed.</string>
