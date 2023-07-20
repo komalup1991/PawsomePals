@@ -54,6 +54,21 @@
             android:layout_height="wrap_content">
 
             <!-- Recipe Name -->
+
+            <TextView
+                android:id="@+id/recipeNameMandatoryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="*"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/recipeNameEditText"
+                app:layout_constraintEnd_toEndOf="@+id/recipeNameEditText"
+                app:layout_constraintStart_toStartOf="@+id/recipeNameEditText"
+                app:layout_constraintTop_toTopOf="@+id/recipeNameEditText" />
+
             <EditText
                 android:id="@+id/recipeNameEditText"
                 android:layout_width="0dp"
@@ -67,7 +82,8 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/cl" />
+                app:layout_constraintTop_toTopOf="@+id/cl"
+                />
 
             <!-- Recipe Image -->
             <ImageView

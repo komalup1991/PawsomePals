@@ -93,6 +93,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private int selectedPrepMinutes;
     private int selectedCookHours;
     private int selectedCookMinutes;
+    TextView recipeNameMandatoryTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +107,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         //UI
         toolbar = findViewById(R.id.toolbar);
         recipeNameEditText = findViewById(R.id.recipeNameEditText);
+        recipeNameMandatoryTextView = findViewById(R.id.recipeNameMandatoryTextView);
 
         //photo upload
         recipeImageView = findViewById(R.id.recipeImageView);
@@ -129,7 +131,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
             actionBar.setTitle("Add Recipe");
         }
 
-        saveButton.setEnabled(false);
+     //   saveButton.setEnabled(false);
 
         recipeNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -142,7 +144,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                saveButton.setEnabled(!editable.toString().isEmpty());
+              //  saveButton.setEnabled(!editable.toString().isEmpty());
+
+                if (editable.toString().isEmpty()) {
+                    // Show the recipeNameMandatoryTextView (red asterisk) if the field is empty
+                    recipeNameMandatoryTextView.setVisibility(View.VISIBLE);
+                } else {
+                    // Hide the recipeNameMandatoryTextView if the field has content
+                    recipeNameMandatoryTextView.setVisibility(View.GONE);
+                }
             }
         });
 
@@ -195,8 +205,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(recipeNameEditText.getText().toString().isEmpty())
-                    Toast.makeText(CreateRecipeActivity.this, "This field is mandatory.", Toast.LENGTH_SHORT).show();
+                if(recipeNameEditText.getText().toString().isEmpty()){
+                    recipeNameMandatoryTextView.setVisibility(View.VISIBLE);
+                    Toast.makeText(CreateRecipeActivity.this, "This field is mandatory.", Toast.LENGTH_SHORT).show();}
                 else{
                 uploadToFireStore();
                 uploadImageToStorage();
