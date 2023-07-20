@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -18,19 +20,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        login = findViewById(R.id.login_image);
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.scale);
-        animation.setRepeatMode(Animation.REVERSE);
-        animation.setRepeatCount(Animation.INFINITE);
 
-        login.startAnimation(animation);
-        login.setOnClickListener(new View.OnClickListener() {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onClick(View v) {
+            public void run() {
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
-
             }
-        });
+        }, 2000);
     }
 }

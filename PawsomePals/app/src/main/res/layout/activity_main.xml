@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".ui.login.MainActivity">
 
-    <ImageView
+
+    <pl.droidsonroids.gif.GifImageView
         android:id="@+id/login_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -15,4 +16,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
