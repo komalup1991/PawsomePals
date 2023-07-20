@@ -7,15 +7,14 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
 import android.text.InputFilter;
-import android.text.util.Linkify;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,26 +24,17 @@ import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DecodeFormat;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -52,18 +42,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -89,7 +77,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private StorageReference storageRef;
     private Bitmap cameraImage;
-    private Uri selectedImageUri;
+    private Uri galleryImageUri,cameraImageUri;
     private TextView setServingSizeTextView,setPrepTextView,setCookTextView,valueTextView;
     private Button saveButton,cancelButton;
 
@@ -141,6 +129,23 @@ public class CreateRecipeActivity extends AppCompatActivity {
             actionBar.setTitle("Add Recipe");
         }
 
+        saveButton.setEnabled(false);
+
+        recipeNameEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                saveButton.setEnabled(!editable.toString().isEmpty());
+            }
+        });
+
 
         selectPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,8 +195,12 @@ public class CreateRecipeActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(recipeNameEditText.getText().toString().isEmpty())
+                    Toast.makeText(CreateRecipeActivity.this, "This field is mandatory.", Toast.LENGTH_SHORT).show();
+                else{
                 uploadToFireStore();
                 uploadImageToStorage();
+                }
 
 
             }
@@ -271,8 +280,8 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private void deleteImage() {
                             recipeImageView.setImageDrawable(null);
                             selectPhoto.setVisibility(View.VISIBLE);
-                            selectedImageUri = null;
-                            cameraImage = null;
+                            galleryImageUri = null;
+                            cameraImageUri = null;
     }
 
 
@@ -310,7 +319,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     public void onSuccess(DocumentReference documentReference) {
                          recipeDocId = documentReference.getId();
                         Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        finish();
+                      //  finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -455,7 +464,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
     }
 
     private void openCamera() {
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         try {
             startActivityForResult(takePictureIntent, REQUEST_CODE_CAMERA);
@@ -463,17 +471,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
             // display error state to the user
         }
     }
-
-
-    private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(null);
-        File imageFile = File.createTempFile(imageFileName, ".jpg", storageDir);
-        currentPhotoPath = imageFile.getAbsolutePath();
-        return imageFile;
-    }
-
     private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(galleryIntent, REQUEST_CODE_GALLERY);
@@ -484,17 +481,38 @@ public class CreateRecipeActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA ) {
-                selectedImageUri = null;
-                cameraImage = (Bitmap) data.getExtras().get("data");
+                galleryImageUri = null;
+                cameraImageUri=saveCameraImageToFile(data);
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(cameraImage).centerCrop().into(recipeImageView);
+                Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
-                cameraImage = null;
-                selectedImageUri = data.getData();
+                cameraImageUri = null;
+                galleryImageUri = data.getData();
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(selectedImageUri).centerCrop().into(recipeImageView);
+                Glide.with(this).load(galleryImageUri).centerCrop().into(recipeImageView);
             }
         }
+    }
+
+    private Uri saveCameraImageToFile(Intent data) {
+        Bundle extras = data.getExtras();
+        Bitmap cameraImageBitmap = (Bitmap) extras.get("data");
+
+        // Save the cameraImageBitmap to a file and return its URI
+        String imageFileName = "IMG_" + System.currentTimeMillis() + ".jpg";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File imageFile = new File(storageDir, imageFileName);
+        try {
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        return Uri.fromFile(imageFile);
     }
 
     @Override
@@ -594,7 +612,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
         dialog.show();
     }
     private void uploadImageToStorage() {
-        if (selectedImageUri != null) {
+        Uri uploadImageUri = null;
+        if (cameraImageUri!=null) uploadImageUri=cameraImageUri;
+        else if(galleryImageUri!=null) uploadImageUri=galleryImageUri;
+
+        if (uploadImageUri != null) {
             // Create a unique filename for the image
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String imageName = "recipe_image_" + timestamp + ".jpg";
@@ -603,7 +625,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
             StorageReference imageRef = storageRef.child("recipe_images/" + imageName);
 
             // Upload the image file to Firebase Storage
-            UploadTask uploadTask = imageRef.putFile(selectedImageUri);
+            UploadTask uploadTask = imageRef.putFile(uploadImageUri);
 
             // Retrieve the download URL of the uploaded image
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
@@ -612,8 +634,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     if (!task.isSuccessful()) {
                         throw task.getException();
                     }
-
-                    // Continue with the task to get the download URL
                     return imageRef.getDownloadUrl();
                 }
             }).addOnCompleteListener(new OnCompleteListener<Uri>() {
@@ -622,15 +642,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         Uri downloadUri = task.getResult();
                         if (downloadUri != null) {
-                            // Save the download URL in the recipe object or Firestore document
                             String imageUrl = downloadUri.toString();
-                            // Update the 'img' field of the recipe object or Firestore document
                             updateDbWithImg(imageUrl);
-
-
-
-                            // You can display the image or perform further actions here
-                            Glide.with(CreateRecipeActivity.this).load(downloadUri).into(recipeImageView);
+                          //  Glide.with(CreateRecipeActivity.this).load(downloadUri).into(recipeImageView);
                         }
                     } else {
                         // Handle errors
@@ -657,6 +671,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d("yoo", "DocumentSnapshot successfully updated!");
+                        finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -679,8 +694,8 @@ public class CreateRecipeActivity extends AppCompatActivity {
         outState.putString("ingredients", ingredients);
 
         // Save the selected image URI
-        outState.putParcelable("selectedImageUri", selectedImageUri);
-        outState.putParcelable("cameraImage", cameraImage);
+        outState.putParcelable("selectedImageUri", galleryImageUri);
+        outState.putParcelable("cameraImageUri", cameraImageUri);
 
         //visibility restore
         outState.putInt("addPhotoImageViewVisibility",selectPhoto.getVisibility());
@@ -719,15 +734,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
         ingredientsEditTextView.setText(ingredients);
 
         // Restore the selected image URI
-        selectedImageUri = savedInstanceState.getParcelable("selectedImageUri");
-        cameraImage = savedInstanceState.getParcelable("cameraImage");
+        galleryImageUri = savedInstanceState.getParcelable("selectedImageUri");
+        cameraImageUri = savedInstanceState.getParcelable("cameraImageUri");
 
-        if (selectedImageUri != null) {
-            Glide.with(this).load(selectedImageUri).centerCrop().into(recipeImageView);
+        if (galleryImageUri != null) {
+            Glide.with(this).load(galleryImageUri).centerCrop().into(recipeImageView);
         }
 
-        else if (cameraImage != null) {
-            Glide.with(this).load(cameraImage).centerCrop().into(recipeImageView);
+        else if (cameraImageUri != null) {
+            Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
         }
 
         //Restore visibility
