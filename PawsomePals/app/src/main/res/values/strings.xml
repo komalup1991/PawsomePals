@@ -32,6 +32,7 @@
     <string name="signup_unsuccessful_registration">Registration is unsuccessful.</string>
 
     <!--New Profile-->
+    <string name="new_profile_header">Create User Profile</string>
     <string name="new_profile_male">Male</string>
     <string name="new_profile_female">Female</string>
     <string name="new_profile_other">Other</string>
