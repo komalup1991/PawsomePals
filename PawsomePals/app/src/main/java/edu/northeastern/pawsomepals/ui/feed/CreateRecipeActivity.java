@@ -7,6 +7,9 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,7 +50,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import android.graphics.Bitmap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -62,26 +64,21 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
 
 public class CreateRecipeActivity extends AppCompatActivity {
-    private Toolbar toolbar;
-    private ActionBar actionBar;
-    private ImageView recipeImageView,selectPhoto,deleteImageView,editImageView;
     private static final int REQUEST_CODE_CAMERA = 1;
     private static final int REQUEST_CODE_GALLERY = 2;
     private static final int REQUEST_CODE_PERMISSIONS = 3;
+    TextView recipeNameMandatoryTextView;
+    private ImageView recipeImageView;
+    private ImageView selectPhoto;
     private EditText recipeNameEditText;
     private EditText descriptionEditTextView;
     private EditText ingredientsEditTextView;
     private String currentPhotoPath;
-    private FirebaseStorage storage;
     private FirebaseFirestore db;
-    private FirebaseAuth auth;
     private StorageReference storageRef;
     private Bitmap cameraImage;
-    private Uri galleryImageUri,cameraImageUri;
-    private TextView setServingSizeTextView,setPrepTextView,setCookTextView,valueTextView;
-    private Button saveButton,cancelButton;
-
-    private Recipe recipe;
+    private Uri galleryImageUri, cameraImageUri;
+    private TextView setServingSizeTextView, setPrepTextView, setCookTextView, valueTextView;
     private String recipeDocId;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
@@ -89,31 +86,33 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private int selectedValue;
     private boolean isPrepTimeDialogVisible = false;
     private boolean isCookTimeDialogVisible = false;
-    private int selectedPrepHours ;
+    private int selectedPrepHours;
     private int selectedPrepMinutes;
     private int selectedCookHours;
     private int selectedCookMinutes;
-    TextView recipeNameMandatoryTextView;
+    private Dialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_recipe);
 
+
         //Firebase
-        storage = FirebaseStorage.getInstance();
+        FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
 
         //UI
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         recipeNameEditText = findViewById(R.id.recipeNameEditText);
         recipeNameMandatoryTextView = findViewById(R.id.recipeNameMandatoryTextView);
 
         //photo upload
         recipeImageView = findViewById(R.id.recipeImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
-        deleteImageView = findViewById(R.id.deleteImageView);
-        editImageView = findViewById(R.id.editImageView);
+        ImageView deleteImageView = findViewById(R.id.deleteImageView);
+        ImageView editImageView = findViewById(R.id.editImageView);
+
 
         descriptionEditTextView = findViewById(R.id.descriptionEditTextView);
         ingredientsEditTextView = findViewById(R.id.ingredientsEditTextView);
@@ -121,17 +120,17 @@ public class CreateRecipeActivity extends AppCompatActivity {
         setPrepTextView = findViewById(R.id.setPrepTextView);
         setCookTextView = findViewById(R.id.setCookTextView);
 
-        saveButton = findViewById(R.id.saveButton);
-        cancelButton = findViewById(R.id.cancelButton);
+        Button saveButton = findViewById(R.id.saveButton);
+        Button cancelButton = findViewById(R.id.cancelButton);
 
         setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Add Recipe");
         }
 
-     //   saveButton.setEnabled(false);
+        //   saveButton.setEnabled(false);
 
         recipeNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -144,7 +143,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-              //  saveButton.setEnabled(!editable.toString().isEmpty());
+                //  saveButton.setEnabled(!editable.toString().isEmpty());
 
                 if (editable.toString().isEmpty()) {
                     // Show the recipeNameMandatoryTextView (red asterisk) if the field is empty
@@ -205,12 +204,13 @@ public class CreateRecipeActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(recipeNameEditText.getText().toString().isEmpty()){
+                if (recipeNameEditText.getText().toString().isEmpty()) {
                     recipeNameMandatoryTextView.setVisibility(View.VISIBLE);
-                    Toast.makeText(CreateRecipeActivity.this, "This field is mandatory.", Toast.LENGTH_SHORT).show();}
-                else{
-                uploadToFireStore();
-                uploadImageToStorage();
+                    Toast.makeText(CreateRecipeActivity.this, "This field is mandatory.", Toast.LENGTH_SHORT).show();
+                } else {
+                    uploadToFireStore();
+                    uploadImageToStorage();
+                    showProgressDialog("Your recipe is being saved...");
                 }
 
 
@@ -226,6 +226,22 @@ public class CreateRecipeActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void showProgressDialog(String s) {
+        if (progressDialog == null) {
+            progressDialog = new Dialog(this);
+            progressDialog.setContentView(R.layout.custom_progress_dialog);
+            progressDialog.setCancelable(false);
+            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        TextView progressMessageTextView = progressDialog.findViewById(R.id.progressMessageTextView);
+        if (progressMessageTextView != null) {
+            progressMessageTextView.setText(s);
+        }
+
+        progressDialog.show();
     }
 
     private void showEditImageDialog() {
@@ -289,16 +305,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
     }
 
     private void deleteImage() {
-                            recipeImageView.setImageDrawable(null);
-                            selectPhoto.setVisibility(View.VISIBLE);
-                            galleryImageUri = null;
-                            cameraImageUri = null;
+        recipeImageView.setImageDrawable(null);
+        selectPhoto.setVisibility(View.VISIBLE);
+        galleryImageUri = null;
+        cameraImageUri = null;
     }
 
 
     private void uploadToFireStore() {
         db = FirebaseFirestore.getInstance();
-        auth = FirebaseAuth.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
 
         FirebaseUser currentUser = auth.getCurrentUser();
         assert currentUser != null;
@@ -312,25 +328,25 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeCookTime = setCookTextView.getText().toString();
 
 
-        recipe = new Recipe(recipeTitle,recipeImg, recipeDescription, recipeIngredients,recipeServing,recipePrepTime,recipeCookTime);
-        Map<String,Object> recipeCollection = new HashMap<>();
-        recipeCollection.put("createdBy",loggedInUserId);
-        recipeCollection.put("title",recipe.getName());
-        recipeCollection.put("img",recipe.getImg());
-        recipeCollection.put("desc",recipe.getDesc());
-        recipeCollection.put("ingredients",recipe.getIngredients());
-        recipeCollection.put("serving",recipe.getServingSize());
-        recipeCollection.put("prepTime",recipe.getPrepTime());
-        recipeCollection.put("cookTime",recipe.getCookTime());
+        Recipe recipe = new Recipe(recipeTitle, recipeImg, recipeDescription, recipeIngredients, recipeServing, recipePrepTime, recipeCookTime);
+        Map<String, Object> recipeCollection = new HashMap<>();
+        recipeCollection.put("createdBy", loggedInUserId);
+        recipeCollection.put("title", recipe.getName());
+        recipeCollection.put("img", recipe.getImg());
+        recipeCollection.put("desc", recipe.getDesc());
+        recipeCollection.put("ingredients", recipe.getIngredients());
+        recipeCollection.put("serving", recipe.getServingSize());
+        recipeCollection.put("prepTime", recipe.getPrepTime());
+        recipeCollection.put("cookTime", recipe.getCookTime());
         //Add a new document with a generated ID
         db.collection("recipes")
                 .add(recipeCollection)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                         recipeDocId = documentReference.getId();
+                        recipeDocId = documentReference.getId();
                         Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                      //  finish();
+                        //  finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -352,7 +368,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         Button saveButton = dialog.findViewById(R.id.saveButton);
         hourTimePicker.setMinValue(0);
         hourTimePicker.setMaxValue(23);
-     //   hourTimePicker.setValue(1);
+        //   hourTimePicker.setValue(1);
 
         View editView = hourTimePicker.getChildAt(0);
 
@@ -482,6 +498,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
             // display error state to the user
         }
     }
+
     private void openGallery() {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(galleryIntent, REQUEST_CODE_GALLERY);
@@ -491,9 +508,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CODE_CAMERA ) {
+            if (requestCode == REQUEST_CODE_CAMERA) {
                 galleryImageUri = null;
-                cameraImageUri=saveCameraImageToFile(data);
+                cameraImageUri = saveCameraImageToFile(data);
                 selectPhoto.setVisibility(View.GONE);
                 Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
@@ -550,6 +567,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     private void showQuantityPickerDialog() {
         Dialog dialog = new Dialog(CreateRecipeActivity.this);
         dialog.setContentView(R.layout.dialog_quantity_picker);
@@ -622,10 +640,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     private void uploadImageToStorage() {
         Uri uploadImageUri = null;
-        if (cameraImageUri!=null) uploadImageUri=cameraImageUri;
-        else if(galleryImageUri!=null) uploadImageUri=galleryImageUri;
+        if (cameraImageUri != null) uploadImageUri = cameraImageUri;
+        else if (galleryImageUri != null) uploadImageUri = galleryImageUri;
 
         if (uploadImageUri != null) {
             // Create a unique filename for the image
@@ -655,7 +674,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                         if (downloadUri != null) {
                             String imageUrl = downloadUri.toString();
                             updateDbWithImg(imageUrl);
-                          //  Glide.with(CreateRecipeActivity.this).load(downloadUri).into(recipeImageView);
+                            //  Glide.with(CreateRecipeActivity.this).load(downloadUri).into(recipeImageView);
                         }
                     } else {
                         // Handle errors
@@ -668,20 +687,18 @@ public class CreateRecipeActivity extends AppCompatActivity {
         }
 
 
-
-
-
     }
 
     private void updateDbWithImg(String imageUrl) {
         DocumentReference recipeRef = db.collection("recipes").document(recipeDocId);
 
         recipeRef
-                .update("img",imageUrl )
+                .update("img", imageUrl)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d("yoo", "DocumentSnapshot successfully updated!");
+                        hideProgressDialog();
                         finish();
                     }
                 })
@@ -691,6 +708,12 @@ public class CreateRecipeActivity extends AppCompatActivity {
                         Log.w("yoo", "Error updating document", e);
                     }
                 });
+    }
+
+    private void hideProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 
     @Override
@@ -709,7 +732,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         outState.putParcelable("cameraImageUri", cameraImageUri);
 
         //visibility restore
-        outState.putInt("addPhotoImageViewVisibility",selectPhoto.getVisibility());
+        outState.putInt("addPhotoImageViewVisibility", selectPhoto.getVisibility());
 
         outState.putBoolean("isEditImageDialogVisible", isEditImageDialogVisible);
         outState.putBoolean("isDeleteConfirmationDialogVisible", isDeleteConfirmationDialogVisible);
@@ -727,7 +750,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
         outState.putInt("selectedPrepMinutes", selectedPrepMinutes);
         outState.putInt("selectedCookHours", selectedCookHours);
         outState.putInt("selectedCookMinutes", selectedCookMinutes);
-
 
 
     }
@@ -750,9 +772,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
         if (galleryImageUri != null) {
             Glide.with(this).load(galleryImageUri).centerCrop().into(recipeImageView);
-        }
-
-        else if (cameraImageUri != null) {
+        } else if (cameraImageUri != null) {
             Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
         }
 
@@ -770,8 +790,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
         isQuantityPickerDialogVisible = savedInstanceState.getBoolean("isQuantityPickerDialogVisible", false);
         selectedValue = savedInstanceState.getInt("selectedValue");
         if (isQuantityPickerDialogVisible) {
-            showQuantityPickerDialog();}
-            // Restore the value displayed in the valueTextView
+            showQuantityPickerDialog();
+        }
+        // Restore the value displayed in the valueTextView
         String savedValueText = savedInstanceState.getString("valueTextViewText");
         if (savedValueText != null && valueTextView != null) {
             valueTextView.setText(savedValueText);
