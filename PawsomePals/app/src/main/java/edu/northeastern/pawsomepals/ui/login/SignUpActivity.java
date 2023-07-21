@@ -30,6 +30,7 @@ import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.profile.EditUserProfileActivity;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -53,7 +54,7 @@ public class SignUpActivity extends AppCompatActivity {
         inputPassword = findViewById(R.id.inputPassword);
         inputConfirmPassword = findViewById(R.id.inputConfirmPassword);
         btnSignUp = findViewById(R.id.btnSignUp);
-        progressBar = new ProgressBar(this);
+        progressBar = findViewById(R.id.progressBar);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
 
@@ -101,7 +102,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                         Toast.makeText(SignUpActivity.this, R.string.signup_successful_registration, Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(SignUpActivity.this, AddNewProfileActivity.class);
+                        Intent intent = new Intent(SignUpActivity.this, EditUserProfileActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
