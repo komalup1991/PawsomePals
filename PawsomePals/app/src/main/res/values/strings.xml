@@ -31,12 +31,16 @@
     <string name="signup_successful_registration">Registration is successful.</string>
     <string name="signup_unsuccessful_registration">Registration is unsuccessful.</string>
 
-    <!--New Profile-->
+    <!--User Profile-->
+    <string name="new_profile_header">Create User Profile</string>
     <string name="new_profile_male">Male</string>
     <string name="new_profile_female">Female</string>
     <string name="new_profile_other">Other</string>
     <string name="new_profile_DOB">Date of Birth</string>
     <string name="new_profile_save_button">Save</string>
+
+    <!--Dog Profile-->
+    <string name="new_dog_profile_header">Create Pal\'s Profile</string>
 
     <!--Create Recipe-->
     <string name="upload_photo">Upload Photo</string>
@@ -57,4 +61,5 @@
     <string name="save">Save</string>
     <string name="servings_placeholder">%d servings</string>
     <string name="select_the_number_of_portions_this_recipe_makes">Select the number of portions this recipe makes</string>
+
 </resources>
