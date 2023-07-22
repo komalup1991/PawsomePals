@@ -61,7 +61,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Recipe;
 
 public class CreateRecipeActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CAMERA = 1;
@@ -328,16 +327,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeCookTime = setCookTextView.getText().toString();
 
 
-        Recipe recipe = new Recipe(recipeTitle, recipeImg, recipeDescription, recipeIngredients, recipeServing, recipePrepTime, recipeCookTime);
+//        Recipe recipe = new Recipe(recipeTitle, recipeImg, recipeDescription, recipeIngredients, recipeServing, recipePrepTime, recipeCookTime, "test");
         Map<String, Object> recipeCollection = new HashMap<>();
         recipeCollection.put("createdBy", loggedInUserId);
-        recipeCollection.put("title", recipe.getName());
-        recipeCollection.put("img", recipe.getImg());
-        recipeCollection.put("desc", recipe.getDesc());
-        recipeCollection.put("ingredients", recipe.getIngredients());
-        recipeCollection.put("serving", recipe.getServingSize());
-        recipeCollection.put("prepTime", recipe.getPrepTime());
-        recipeCollection.put("cookTime", recipe.getCookTime());
+        recipeCollection.put("title", recipeTitle);
+        recipeCollection.put("img", recipeImg);
+        recipeCollection.put("desc", recipeDescription);
+        recipeCollection.put("ingredients", recipeIngredients);
+        recipeCollection.put("serving", recipeServing);
+        recipeCollection.put("prepTime", recipePrepTime);
+        recipeCollection.put("cookTime", recipeCookTime);
         //Add a new document with a generated ID
         db.collection("recipes")
                 .add(recipeCollection)

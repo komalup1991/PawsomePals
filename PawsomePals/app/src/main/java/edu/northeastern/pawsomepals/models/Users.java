@@ -6,6 +6,7 @@ public class Users {
     private String email;
     private String name;
     private String recipeId;
+    private String userImg;
 
     public Users() {
     }
@@ -18,6 +19,26 @@ public class Users {
         this.userId = userId;
         this.email = email;
 
+    }
+
+    public Users(String userId, String email, String name, String recipeId, String userImg) {
+        this.userId = userId;
+        this.email = email;
+        this.name = name;
+        this.recipeId = recipeId;
+        this.userImg = userImg;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getUserImg() {
+        return userImg;
+    }
+
+    public void setUserImg(String userImg) {
+        this.userImg = userImg;
     }
 
     public String getEmail() {

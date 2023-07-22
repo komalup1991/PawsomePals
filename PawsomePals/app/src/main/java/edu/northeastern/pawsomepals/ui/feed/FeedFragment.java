@@ -40,9 +40,7 @@ public class FeedFragment extends Fragment {
         FragmentAdapter fragmentAdapter = new FragmentAdapter(this.getActivity());
         viewPager.setAdapter(fragmentAdapter);
 
-        // Connect the TabLayout with the ViewPager
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-            // Set the tab text based on the position
             switch (position) {
                 case 0 -> tab.setText("All");
                 case 1 -> tab.setText("Friends");
