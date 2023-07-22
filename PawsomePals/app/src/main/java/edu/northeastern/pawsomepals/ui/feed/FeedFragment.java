@@ -44,15 +44,9 @@ public class FeedFragment extends Fragment {
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             // Set the tab text based on the position
             switch (position) {
-                case 0:
-                    tab.setText("All");
-                    break;
-                case 1:
-                    tab.setText("Friends");
-                    break;
-                case 2:
-                    tab.setText("Recipes");
-                    break;
+                case 0 -> tab.setText("All");
+                case 1 -> tab.setText("Friends");
+                case 2 -> tab.setText("Recipes");
             }
         }).attach();
 

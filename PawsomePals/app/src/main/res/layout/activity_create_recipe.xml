@@ -1,42 +1,45 @@
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
-
-
+    <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
+        style="@style/AppToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:elevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        style="@style/AppToolbar">
+        app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/cancelButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cancel"
-            android:visibility="visible"
-            style="@style/Widget.AppCompat.Button.Borderless" />
-    <Button
-        android:id="@+id/saveButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/save"
-        android:visibility="visible"
-        style="@style/Widget.AppCompat.Button.Borderless" />
-        </LinearLayout>
+            <Button
+                android:id="@+id/cancelButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancel"
+                android:visibility="visible" />
 
+            <Button
+                android:id="@+id/saveButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/save"
+                android:visibility="visible" />
+        </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -50,13 +53,27 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!-- Recipe Name -->
+
+            <TextView
+                android:id="@+id/recipeNameMandatoryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:text="*"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="16sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@+id/recipeNameEditText"
+                app:layout_constraintEnd_toEndOf="@+id/recipeNameEditText"
+                app:layout_constraintStart_toStartOf="@+id/recipeNameEditText"
+                app:layout_constraintTop_toTopOf="@+id/recipeNameEditText" />
+
             <EditText
                 android:id="@+id/recipeNameEditText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_margin="8dp"
                 android:autofillHints="RecipeName"
                 android:background="@drawable/border"
                 android:ems="10"
@@ -65,26 +82,22 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/cl" />
+                app:layout_constraintTop_toTopOf="@+id/cl"
+                />
 
+            <!-- Recipe Image -->
             <ImageView
                 android:id="@+id/recipeImageView"
                 android:layout_width="0dp"
                 android:layout_height="200dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_margin="8dp"
                 android:background="@drawable/border"
                 android:contentDescription="@string/recipe_photo"
-                android:padding="8sp"
-                android:scaleType="fitCenter"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recipeNameEditText"
+                app:layout_constraintTop_toBottomOf="@+id/recipeNameEditText" />
 
-                />
-
+            <!-- Add Photo Button -->
             <ImageView
                 android:id="@+id/addPhotoImageView"
                 android:layout_width="0dp"
@@ -93,9 +106,9 @@
                 app:layout_constraintBottom_toBottomOf="@id/recipeImageView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/recipeImageView"
-                tools:layout_editor_absoluteY="144dp" />
+                app:layout_constraintTop_toTopOf="@id/recipeImageView" />
 
+            <!-- Delete and Edit Icons -->
             <ImageView
                 android:id="@+id/deleteImageView"
                 android:layout_width="36dp"
@@ -116,17 +129,14 @@
                 app:layout_constraintBottom_toBottomOf="@id/recipeImageView"
                 app:layout_constraintEnd_toEndOf="@id/recipeImageView" />
 
+            <!-- Description -->
             <TextView
                 android:id="@+id/descriptionTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/description"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/recipeImageView" />
 
@@ -134,9 +144,7 @@
                 android:id="@+id/descriptionEditTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_margin="8dp"
                 android:autofillHints="string"
                 android:background="@drawable/border"
                 android:hint="@string/recipe_description_hint"
@@ -146,17 +154,14 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/descriptionTitleTextView" />
 
+            <!-- Ingredients -->
             <TextView
                 android:id="@+id/ingredientsTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/ingredients"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/descriptionEditTextView" />
 
@@ -164,9 +169,7 @@
                 android:id="@+id/ingredientsEditTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_margin="8dp"
                 android:autofillHints="string"
                 android:background="@drawable/border"
                 android:hint="@string/ingredients_hint"
@@ -176,46 +179,34 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ingredientsTitleTextView" />
 
+            <!-- Servings -->
             <TextView
                 android:id="@+id/servingsTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/servings"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/ingredientsEditTextView" />
-
 
             <TextView
                 android:id="@+id/servingsDescTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:text="@string/serving_desc"
-                app:layout_constraintEnd_toStartOf="@+id/setServingSizeTextView"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/servingsTitleTextView" />
-            <!--                android:background="@drawable/border"-->
-            <!--                android:backgroundTint="@color/white"-->
 
+            <!-- Prep Time -->
             <TextView
                 android:id="@+id/prepTimeTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/prep_time"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/servingsDescTextView" />
 
@@ -224,24 +215,34 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:text="@string/prep_desc"
-                app:layout_constraintEnd_toStartOf="@+id/setPrepTextView"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/prepTimeTitleTextView" />
 
+            <TextView
+                android:id="@+id/setPrepTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:text="@string/set_time"
+                android:textAllCaps="true"
+                android:textColor="@color/darkPink"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/prepTimeDescTextView"
+                app:layout_constraintTop_toTopOf="@+id/prepTimeDescTextView" />
+
+            <!-- Cook Time -->
             <TextView
                 android:id="@+id/cookTimeTitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
                 android:text="@string/cook_time"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/prepTimeDescTextView" />
 
@@ -250,10 +251,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:text="@string/cook_time_desc"
-                app:layout_constraintEnd_toStartOf="@+id/setCookTextView"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cookTimeTitleTextView" />
 
@@ -262,49 +260,32 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:text="@string/set_time"
+                android:textAllCaps="true"
+                android:textColor="@color/darkPink"
                 android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/cookTimeDescTextView"
-                app:layout_constraintTop_toTopOf="@+id/cookTimeDescTextView"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:textColor="@color/darkPink"/>
-           />
+                app:layout_constraintTop_toTopOf="@+id/cookTimeDescTextView" />
 
-
-            <TextView
-                android:id="@+id/setPrepTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/set_time"
-                android:textSize="14sp"
-                app:layout_constraintStart_toEndOf="@+id/prepTimeDescTextView"
-                app:layout_constraintTop_toTopOf="@+id/prepTimeDescTextView"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:textColor="@color/darkPink"/>
-               />
-
-
+            <!-- Set Servings Button -->
             <TextView
                 android:id="@+id/setServingSizeTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
                 android:text="@string/set_servings"
-                android:textSize="14sp"
-                app:layout_constraintStart_toEndOf="@+id/servingsDescTextView"
-                app:layout_constraintTop_toTopOf="@+id/servingsDescTextView"
-                android:textStyle="bold"
                 android:textAllCaps="true"
-                android:textColor="@color/darkPink"/>
-
-
-
+                android:textColor="@color/darkPink"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toEndOf="@+id/servingsDescTextView"
+                app:layout_constraintTop_toTopOf="@+id/servingsDescTextView" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-
-
 </LinearLayout>
