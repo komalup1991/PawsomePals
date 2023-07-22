@@ -3,6 +3,7 @@ package edu.northeastern.pawsomepals.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,13 +16,23 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
+import edu.northeastern.pawsomepals.models.Users;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder> {
     private List<Recipe> recipes;
-
-    public RecipeAdapter(List<Recipe> recipes) {
-        this.recipes = recipes;
+    private OnItemActionListener onItemActionListener;
+    public interface OnItemActionListener {
+        void onRecipeClick(Recipe recipe);
+        void onUserClick(Recipe recipe);
     }
+
+    public RecipeAdapter(List<Recipe> recipes,OnItemActionListener onItemActionListener) {
+        this.recipes = recipes;
+        this.onItemActionListener = onItemActionListener;
+    }
+
+
+
 
     @NonNull
     @Override
@@ -44,6 +55,33 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         Glide.with(holder.itemView.getContext())
                 .load(recipe.getImg())
                 .into(holder.userProfilePic);
+
+        holder.recipeImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onRecipeClick(recipes.get(position));
+            }
+        });
+
+        holder.recipeName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onRecipeClick(recipes.get(position));
+            }
+        });
+
+        holder.username.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(recipes.get(position));
+            }
+        });
+        holder.userProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(recipes.get(position));
+            }
+        });
 
     }
 
@@ -75,6 +113,9 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             recipeName = itemView.findViewById(R.id.recipeName);
             username = itemView.findViewById(R.id.username);
 
+
         }
+
+
     }
 }

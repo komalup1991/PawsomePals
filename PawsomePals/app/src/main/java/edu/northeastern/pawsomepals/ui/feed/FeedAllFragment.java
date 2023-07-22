@@ -1,10 +1,12 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,10 +24,12 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
 
 public class FeedAllFragment extends Fragment {
     private RecyclerView recipeRecyclerView;
     private RecipeAdapter recipeAdapter;
+    private RecipeAdapter.OnItemActionListener onItemActionListener;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -35,38 +39,58 @@ public class FeedAllFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initializeItemActionListener();
         recipeRecyclerView = view.findViewById(R.id.recipeRecyclerView);
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         recipeRecyclerView.setLayoutManager(horizontalLayoutManager);
 
-        recipeAdapter = new RecipeAdapter(new ArrayList<>());
+        recipeAdapter = new RecipeAdapter(new ArrayList<>(),onItemActionListener);
         recipeRecyclerView.setAdapter(recipeAdapter);
         fetchRecipesFromFirestore();
 
+    }
 
+    private void initializeItemActionListener() {
+        onItemActionListener = new RecipeAdapter.OnItemActionListener() {
+            @Override
+            public void onRecipeClick(Recipe recipe) {
+                Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
+                intent.putExtra("recipeId",recipe.getTitle());
+                startActivity(intent);
+            }
 
+            @Override
+            public void onUserClick(Recipe recipe) {
+                Intent intent = new Intent(getActivity(), UserProfileActivity.class);
+                intent.putExtra("userId",recipe.getCreatedBy());
+                startActivity(intent);
+
+            }
+        };
     }
 
     private void fetchRecipesFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("recipes")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<Recipe> recipeList = new ArrayList<>();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Recipe recipe = document.toObject(Recipe.class);
-                            Log.d("yoooo", "" + recipe);
-                            String userId = recipe.getCreatedBy();
-                            fetchUserNameFromFirestore(userId, recipe, recipeList);
-                            recipeList.add(recipe);
-                        }
-                        recipeAdapter.setRecipes(recipeList);
-                    } else {
-                        Log.e("FeedAllFragment", "Error getting recipes.", task.getException());
+                .addSnapshotListener((querySnapshot, error) -> {
+                    if (error != null) {
+                        Log.e("FeedAllFragment", "Error getting recipes.", error);
+                        return;
                     }
+
+                    List<Recipe> recipeList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        Recipe recipe = document.toObject(Recipe.class);
+                        Log.d("yoooo", "" + recipe);
+                        String userId = recipe.getCreatedBy();
+                        fetchUserNameFromFirestore(userId, recipe,recipeList);
+                        recipeList.add(recipe);
+                    }
+                    recipeAdapter.setRecipes(recipeList);
+                    recipeAdapter.notifyDataSetChanged(); // Notify the adapter of data changes
                 });
     }
+
 
     private void fetchUserNameFromFirestore(String userId, Recipe recipe, List<Recipe> recipeList) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -79,16 +103,15 @@ public class FeedAllFragment extends Fragment {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
                             recipe.setUsername(user.getName());
-                            recipeList.add(recipe);
                         }
                     } else {
                         Log.e("FeedAllFragment", "Error getting user's name.", task.getException());
                     }
 
                     recipeAdapter.notifyDataSetChanged();
-
                 });
     }
+
 
 }
 
