@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
@@ -34,6 +35,12 @@ public class ChatFirebaseUtil {
     public static CollectionReference allUserCollectionReference(){
         return FirebaseFirestore.getInstance().collection("users");
     }
+
+    public static CollectionReference allRecipeCollectionReference(){
+        Log.i("coll", FirebaseFirestore.getInstance().collection("recipes").getClass().toString());
+        return FirebaseFirestore.getInstance().collection("recipes");
+    }
+
     public static DocumentReference getChatroomReference(String chatroomId){
         return FirebaseFirestore.getInstance().collection("chatrooms").document(chatroomId);
     }
