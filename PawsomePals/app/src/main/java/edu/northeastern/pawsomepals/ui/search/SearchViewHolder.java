@@ -20,7 +20,7 @@ public class SearchViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindThisData(Recipe recipe) {
-        title.setText(recipe.getName());
+        title.setText(recipe.getTitle());
 
     }
 }
