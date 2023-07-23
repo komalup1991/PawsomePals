@@ -61,5 +61,21 @@
     <string name="save">Save</string>
     <string name="servings_placeholder">%d servings</string>
     <string name="select_the_number_of_portions_this_recipe_makes">Select the number of portions this recipe makes</string>
+    <string name="cancel">Cancel</string>
+    <string name="write_a_caption">Write a caption...</string>
+    <string name="photoVideo">Post Photo Video</string>
+    <string name="tag_people">Tag People</string>
+    <string name="add_location">Add Location</string>
+    <string name="give_your_event_a_name">Give your event a name...</string>
+    <string name="date_of_birth">Date Of Birth</string>
+    <string name="event_date">Event Date</string>
+    <string name="event_date_desc">Select a date for your event</string>
+    <string name="event_time">Event Time</string>
+    <string name="event_time_desc">Set a time for your event</string>
+    <string name="set_date">Set Date</string>
+    <string name="give_your_post_a_caption">Give your post a caption...</string>
+    <string name="share_your_ideas_here">Share your ideas here...</string>
+    <string name="what_service_are_you_providing">What service are you providing?</string>
+    <string name="spinner_prompt">Select an option</string>
 
 </resources>

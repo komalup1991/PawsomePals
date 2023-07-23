@@ -6,4 +6,118 @@
     android:layout_height="match_parent"
     tools:context=".ui.feed.CreatePhotoVideoActivity">
 
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/AppToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/userProfilePic"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/dog_paw"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <EditText
+        android:id="@+id/captionEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:autofillHints="Caption"
+        android:background="@drawable/border"
+        android:ems="10"
+        android:hint="@string/write_a_caption"
+        android:inputType="text"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/userProfilePic"
+        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+    <ImageView
+        android:id="@+id/photoVideoImageView"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/border"
+        android:contentDescription="@string/photoVideo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userProfilePic" />
+
+    <!-- Add Photo Button -->
+    <ImageView
+        android:id="@+id/addPhotoImageView"
+        android:layout_width="0dp"
+        android:layout_height="43dp"
+        android:src="@drawable/addphoto"
+        app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/photoVideoImageView" />
+
+    <!-- Delete and Edit Icons -->
+    <ImageView
+        android:id="@+id/deleteImageView"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/delete48px"
+        app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/editImageView"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/edit48px"
+        app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+        app:layout_constraintEnd_toEndOf="@id/photoVideoImageView" />
+
+    <TextView
+        android:id="@+id/tagPeopleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/tag_people"
+        android:textAllCaps="true"
+        android:textColor="@color/darkPink"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.025"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/photoVideoImageView"
+         />
+
+    <TextView
+        android:id="@+id/addLocationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/add_location"
+        android:textAllCaps="true"
+        android:textColor="@color/darkPink"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.025"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tagPeopleTextView"
+         />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
