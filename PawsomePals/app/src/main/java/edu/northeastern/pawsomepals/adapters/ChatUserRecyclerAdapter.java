@@ -35,7 +35,7 @@ public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,Chat
         holder.userNameText.setText(model.getName());
         //set up image
         Glide.with(this.context)
-                .load(model.getUserImg())
+                .load(model.getProfileImage())
                 .into(holder.profilePic);
         //Check if the result is "me"
         if (model.getUserId().equals(ChatFirebaseUtil.currentUserId())){
