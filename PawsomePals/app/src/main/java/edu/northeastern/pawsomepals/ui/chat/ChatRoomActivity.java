@@ -39,7 +39,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
-        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
+//        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
 
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
@@ -64,27 +64,27 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-        getOrCreateChatRoomModel();
+//        getOrCreateChatRoomModel();
     }
-
-    private void getOrCreateChatRoomModel() {
-        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
-            if(task.isSuccessful()){
-                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
-
-                if (chatRoomModel == null){
-                    currentTime = new Timestamp(System.currentTimeMillis());
-                    //first time chat
-                    chatRoomModel = new ChatRoomModel(
-                            chatRoomId,
-                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
-                            currentTime,
-                            ""
-
-                    );
-                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
-                }
-            }
-        });
-    }
+//
+//    private void getOrCreateChatRoomModel() {
+//        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
+//            if(task.isSuccessful()){
+//                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
+//
+//                if (chatRoomModel == null){
+//                    currentTime = new Timestamp(System.currentTimeMillis());
+//                    //first time chat
+//                    chatRoomModel = new ChatRoomModel(
+//                            chatRoomId,
+//                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
+//                            currentTime,
+//                            ""
+//
+//                    );
+//                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+//                }
+//            }
+//        });
+//    }
 }

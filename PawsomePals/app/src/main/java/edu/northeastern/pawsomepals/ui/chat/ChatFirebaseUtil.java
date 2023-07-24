@@ -41,20 +41,20 @@ public class ChatFirebaseUtil {
         return FirebaseFirestore.getInstance().collection("recipes");
     }
 
-    public static DocumentReference getChatroomReference(String chatroomId){
-        return FirebaseFirestore.getInstance().collection("chatrooms").document(chatroomId);
-    }
+//    public static DocumentReference getChatroomReference(String chatroomId){
+//        return FirebaseFirestore.getInstance().collection("chatrooms").document(chatroomId);
+//    }
 
-    public static String getChatroomId(String userId1,String userId2){
-        if (userId1.hashCode() < userId2.hashCode()){
-            return userId1 + "_" + userId2;
-        } else {
-            return userId2 + "_" + userId1;
-        }
-    }
+//    public static String getChatroomId(String userId1,String userId2){
+//        if (userId1.hashCode() < userId2.hashCode()){
+//            return userId1 + "_" + userId2;
+//        } else {
+//            return userId2 + "_" + userId1;
+//        }
+//    }
 
     public static Users getUserModelFromIntent(Intent intent) {
-        String userName = intent.getStringExtra("name");
+        String userName = intent.getStringExtra("username");
         String userId =  intent.getStringExtra("userId");
         return new Users(userName,userId);
     }
