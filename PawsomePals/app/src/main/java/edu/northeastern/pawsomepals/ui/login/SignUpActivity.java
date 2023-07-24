@@ -22,6 +22,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -96,8 +97,13 @@ public class SignUpActivity extends AppCompatActivity {
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
-                        createUserDetails(email);
+                    if (task.isSuccessful()) {
+                        FirebaseUser currentUser = auth.getCurrentUser();
+                        if (currentUser != null) {
+                            String loggedInUserId = currentUser.getUid();
+                            createUserDetails(email, loggedInUserId);
+                        }
+
                         progressBar.setVisibility(View.GONE);
 
                         Toast.makeText(SignUpActivity.this, R.string.signup_successful_registration, Toast.LENGTH_SHORT).show();
@@ -106,43 +112,33 @@ public class SignUpActivity extends AppCompatActivity {
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();
-                    }
-                    else {
+                    } else {
                         Toast.makeText(SignUpActivity.this, R.string.signup_unsuccessful_registration, Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
                     }
                 }
             });
         }
     }
 
-    private void createUserDetails(String email) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = auth.getCurrentUser();
-        assert currentUser != null;
-        String loggedInUserId = currentUser.getUid();
+    private void createUserDetails(String email, String loggedInUserId) {
+        FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-        Users user = new Users(loggedInUserId,email);
-        Map<String,Object> userInfo = new HashMap<>();
-        userInfo.put("userId",user.getUserId());
-        userInfo.put("email",user.getEmail());
-        db.collection("user")
-                .add(userInfo)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("Create User", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        finish();
-                    }
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("userId", loggedInUserId);
+        userInfo.put("email", email);
+
+        firebaseFirestore.collection("user")
+                .document(loggedInUserId)
+                .set(userInfo)
+                .addOnSuccessListener(aVoid -> {
+                    progressBar.setVisibility(View.GONE);
+                    finish();
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("Create User", "Error adding document", e);
-                    }
+                .addOnFailureListener(e -> {
+                    progressBar.setVisibility(View.GONE);
+                    Log.w("Create User", "Error adding document", e);
                 });
-
-
 
     }
 
