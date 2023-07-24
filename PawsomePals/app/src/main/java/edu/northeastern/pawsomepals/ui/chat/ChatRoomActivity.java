@@ -51,6 +51,15 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         otherUserName.setText(otherUser.getName());
 
+        sendMessageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = messageInput.getText().toString().trim();
+                if(message.isEmpty()) return;
+                sendMessageToUser(message);
+            }
+        });
+
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +77,9 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
 
         getOrCreateChatRoomModel();
+    }
+
+    private void sendMessageToUser(String message) {
     }
 
     private void getOrCreateChatRoomModel() {
