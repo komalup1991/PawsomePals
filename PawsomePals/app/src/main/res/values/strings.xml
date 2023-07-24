@@ -31,6 +31,12 @@
     <string name="signup_successful_registration">Registration is successful.</string>
     <string name="signup_unsuccessful_registration">Registration is unsuccessful.</string>
 
+    <!-- Logout -->
+    <string name="logout_title">Logout</string>
+    <string name="logout_message">Are you sure you want to logout?</string>
+    <string name="logout_yes">Yes</string>
+    <string name="logout_no">No</string>
+
     <!--User Profile-->
     <string name="new_profile_header">Create User Profile</string>
     <string name="new_profile_male">Male</string>
@@ -77,5 +83,7 @@
     <string name="share_your_ideas_here">Share your ideas here...</string>
     <string name="what_service_are_you_providing">What service are you providing?</string>
     <string name="spinner_prompt">Select an option</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

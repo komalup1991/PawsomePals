@@ -7,14 +7,19 @@ public class Users {
     private String name;
     private String recipeId;
     private String userImg;
+    private String gender;
+    private String dob;
+
 
     public Users() {
     }
-    public Users(String name,String userId, String email) {
+
+    public Users(String name, String userId, String email) {
         this.name = name;
         this.userId = userId;
         this.email = email;
     }
+
     public Users(String userId, String email) {
         this.userId = userId;
         this.email = email;
@@ -40,6 +45,7 @@ public class Users {
     public void setUserImg(String userImg) {
         this.userImg = userImg;
     }
+
 
     public String getEmail() {
         return email;
@@ -68,4 +74,22 @@ public class Users {
     public String getName() {
         return name;
     }
+
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getDob() {
+        return dob;
+    }
+
+    public void setDob(String dob) {
+        this.dob = dob;
+    }
 }
+

@@ -1,5 +1,6 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -141,4 +142,6 @@ public class EditDogProfileActivity extends AppCompatActivity {
 
 
     }
+
+
 }
