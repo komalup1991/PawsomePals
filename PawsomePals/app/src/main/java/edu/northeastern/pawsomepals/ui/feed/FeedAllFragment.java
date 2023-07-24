@@ -44,7 +44,7 @@ public class FeedAllFragment extends Fragment {
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         recipeRecyclerView.setLayoutManager(horizontalLayoutManager);
 
-        recipeAdapter = new RecipeAdapter(new ArrayList<>(),onItemActionListener);
+        recipeAdapter = new RecipeAdapter(new ArrayList<Recipe>(),new ArrayList<Users>(),onItemActionListener);
         recipeRecyclerView.setAdapter(recipeAdapter);
         fetchRecipesFromFirestore();
 
@@ -55,7 +55,7 @@ public class FeedAllFragment extends Fragment {
             @Override
             public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
-                intent.putExtra("recipeId",recipe.getTitle());
+                intent.putExtra("recipeId",recipe.getRecipeId());
                 startActivity(intent);
             }
 
@@ -81,13 +81,14 @@ public class FeedAllFragment extends Fragment {
                     List<Recipe> recipeList = new ArrayList<>();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         Recipe recipe = document.toObject(Recipe.class);
-                        Log.d("yoooo", "" + recipe);
+                        recipe.setRecipeId(document.getId());
+                        Log.d("yoooo", recipe.getRecipeId());
                         String userId = recipe.getCreatedBy();
                         fetchUserNameFromFirestore(userId, recipe,recipeList);
                         recipeList.add(recipe);
                     }
                     recipeAdapter.setRecipes(recipeList);
-                    recipeAdapter.notifyDataSetChanged(); // Notify the adapter of data changes
+                    recipeAdapter.notifyDataSetChanged();
                 });
     }
 
@@ -103,10 +104,12 @@ public class FeedAllFragment extends Fragment {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
                             recipe.setUsername(user.getName());
+                            recipe.setUserProfileImage(user.getProfileImage());
                         }
                     } else {
                         Log.e("FeedAllFragment", "Error getting user's name.", task.getException());
                     }
+
 
                     recipeAdapter.notifyDataSetChanged();
                 });

@@ -1,5 +1,6 @@
 package edu.northeastern.pawsomepals.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +27,11 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         void onUserClick(Recipe recipe);
     }
 
-    public RecipeAdapter(List<Recipe> recipes,OnItemActionListener onItemActionListener) {
+
+    public RecipeAdapter(List<Recipe> recipes,List<Users> user,OnItemActionListener onItemActionListener) {
         this.recipes = recipes;
         this.onItemActionListener = onItemActionListener;
     }
-
-
-
 
     @NonNull
     @Override
@@ -45,16 +44,19 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     @Override
     public void onBindViewHolder(@NonNull RecipeAdapter.RecipeViewHolder holder, int position) {
+
         Recipe recipe = recipes.get(position);
+        String user = recipe.getUsername();
         holder.recipeName.setText(recipe.getTitle());
         holder.username.setText(recipe.getUsername());
         Glide.with(holder.itemView.getContext())
                 .load(recipe.getImg())
                 .into(holder.recipeImage);
 
-        Glide.with(holder.itemView.getContext())
-                .load(recipe.getImg())
-                .into(holder.userProfilePic);
+
+            Glide.with(holder.itemView.getContext())
+                    .load(recipe.getUserProfileImage())
+                    .into(holder.userProfilePic);
 
         holder.recipeImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +86,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         });
 
     }
-
     public List<Recipe> getRecipes() {
         return recipes;
     }

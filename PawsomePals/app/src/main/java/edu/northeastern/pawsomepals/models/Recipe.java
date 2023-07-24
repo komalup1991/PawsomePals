@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
 public class Recipe {
+    private String recipeId;
     private String title;
     private String img;
     private String desc;
@@ -10,11 +11,14 @@ public class Recipe {
     private String prepTime;
     private String cookTime;
     private String username;
+    private String userProfileImage;
+    private String createdAt;
 
     public Recipe() {
     }
 
-    public Recipe(String title, String img, String desc, String createdBy, String ingredients, String serving, String prepTime, String cookTime) {
+    public Recipe(String recipeId, String title, String img, String desc, String createdBy, String ingredients, String serving, String prepTime, String cookTime) {
+        this.recipeId = recipeId;
         this.title = title;
         this.img = img;
         this.desc = desc;
@@ -23,6 +27,14 @@ public class Recipe {
         this.serving = serving;
         this.prepTime = prepTime;
         this.cookTime = cookTime;
+    }
+
+    public String getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(String recipeId) {
+        this.recipeId = recipeId;
     }
 
     public String getTitle() {
@@ -97,6 +109,22 @@ public class Recipe {
         this.username = username;
     }
 
+    public String getUserProfileImage() {
+        return userProfileImage;
+    }
+
+    public void setUserProfileImage(String userProfileImage) {
+        this.userProfileImage = userProfileImage;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "Recipe{" +
@@ -109,6 +137,8 @@ public class Recipe {
                 ", prepTime='" + prepTime + '\'' +
                 ", cookTime='" + cookTime + '\'' +
                 ", username='" + username + '\'' +
+                ", userProfileImage='" + userProfileImage + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }
