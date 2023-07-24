@@ -9,6 +9,7 @@ public class Event {
     private String eventDetails;
     private String userTagged;
     private String locationTagged;
+    private String createdAt;
 
     public Event() {
     }
@@ -87,6 +88,13 @@ public class Event {
     public void setLocationTagged(String locationTagged) {
         this.locationTagged = locationTagged;
     }
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
@@ -99,6 +107,7 @@ public class Event {
                 ", eventDetails='" + eventDetails + '\'' +
                 ", userTagged='" + userTagged + '\'' +
                 ", locationTagged='" + locationTagged + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }

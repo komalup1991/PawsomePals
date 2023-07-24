@@ -61,7 +61,21 @@
         android:src="@drawable/dog_paw"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/cl" />
-
+            <TextView
+                android:id="@+id/userNameTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:text="UserName"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.125"
+                app:layout_constraintStart_toEndOf="@+id/userProfilePic"
+                app:layout_constraintTop_toTopOf="@id/cl" />
     <EditText
         android:id="@+id/captionEditText"
         android:layout_width="0dp"
@@ -76,8 +90,8 @@
         android:inputType="text"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/userProfilePic"
-        app:layout_constraintTop_toTopOf="@id/cl" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userNameTextView" />
 
     <ImageView
         android:id="@+id/photoVideoImageView"
@@ -88,7 +102,7 @@
         android:contentDescription="@string/photoVideo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userProfilePic" />
+        app:layout_constraintTop_toBottomOf="@+id/captionEditText" />
 
     <!-- Add Photo Button -->
     <ImageView
