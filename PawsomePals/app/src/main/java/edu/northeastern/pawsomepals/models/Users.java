@@ -6,7 +6,8 @@ public class Users {
     private String email;
     private String name;
     private String recipeId;
-    private String userImg;
+  //  private String userImg;
+  private String profileImage;
     private String gender;
     private String dob;
 
@@ -26,24 +27,24 @@ public class Users {
 
     }
 
-    public Users(String userId, String email, String name, String recipeId, String userImg) {
+    public Users(String userId, String email, String name, String recipeId, String profileImage) {
         this.userId = userId;
         this.email = email;
         this.name = name;
         this.recipeId = recipeId;
-        this.userImg = userImg;
+        this.profileImage = profileImage;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getUserImg() {
-        return userImg;
+    public String getProfileImage() {
+        return profileImage;
     }
 
-    public void setUserImg(String userImg) {
-        this.userImg = userImg;
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 
 
