@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
     android:orientation="horizontal">
 
     <LinearLayout
@@ -15,7 +14,7 @@
         android:layout_marginTop="3dp"
         android:layout_marginEnd="1dp"
         android:background="@drawable/edit_text_round_corner"
-        android:backgroundTint="#81F8DBDB"
+        android:backgroundTint="@color/darkPink"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,5 +53,5 @@
         android:layout_height="1dp"
         android:layout_below="@id/linearLayout2"
         android:layout_marginTop="8dp"
-        android:background="#7A7676" />
+        android:background="@color/orange" />
 </RelativeLayout>

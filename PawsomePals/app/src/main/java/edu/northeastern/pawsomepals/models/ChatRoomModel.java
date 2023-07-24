@@ -5,10 +5,10 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public class ChatRoomModel {
-    String chatRoomId;
-    List<String> userIds;
-    Timestamp lastMessageTimestamp;
-    String lastMessageSenderId;
+    private String chatRoomId;
+    private List<String> userIds;
+    private Timestamp lastMessageTimestamp;
+    private String lastMessageSenderId;
 
     public ChatRoomModel(){
 

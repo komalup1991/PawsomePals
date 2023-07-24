@@ -53,11 +53,17 @@
         android:orientation="horizontal"
         android:id="@+id/new_chat_bar"
         android:layout_below="@id/search_toolbar">
+
+        <Space
+            android:layout_width="290dp"
+            android:layout_height="match_parent" />
+
         <Button
             android:id="@+id/new_chat_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="331dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="New Chat" />
+            android:text="New Chat"
+            android:textColor="@color/headingTextColor" />
     </LinearLayout>
 </RelativeLayout>

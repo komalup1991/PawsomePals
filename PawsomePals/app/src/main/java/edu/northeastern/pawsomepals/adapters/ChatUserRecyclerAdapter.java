@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,11 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 import edu.northeastern.pawsomepals.ui.chat.ChatRoomActivity;
+import com.bumptech.glide.Glide;
 
 public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,ChatUserRecyclerAdapter.UserModelViewHolder> {
 
-    Context context;
+    private Context context;
 
     public ChatUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<Users> options, Context context) {
         super(options);
@@ -32,7 +34,9 @@ public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,Chat
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull Users model) {
         holder.userNameText.setText(model.getName());
         //set up image
-
+        Glide.with(this.context)
+                .load(model.getUserImg())
+                .into(holder.profilePic);
         //Check if the result is "me"
         if (model.getUserId().equals(ChatFirebaseUtil.currentUserId())){
             holder.userNameText.setText(model.getName()+"(Me)");

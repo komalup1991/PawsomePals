@@ -33,7 +33,7 @@ public class ChatFirebaseUtil {
     }
 
     public static CollectionReference allUserCollectionReference(){
-        return FirebaseFirestore.getInstance().collection("users");
+        return FirebaseFirestore.getInstance().collection("user");
     }
 
     public static CollectionReference allRecipeCollectionReference(){

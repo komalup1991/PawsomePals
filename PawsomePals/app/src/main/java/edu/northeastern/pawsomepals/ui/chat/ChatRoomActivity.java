@@ -20,18 +20,18 @@ import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class ChatRoomActivity extends AppCompatActivity {
-    EditText messageInput;
-    ImageButton sendMessageBtn;
-    ImageButton functionBtn;
-    ImageButton backBtn;
-    ImageButton infoBtn;
-    TextView otherUserName;
-    RecyclerView chatRoomRecyclerView;
+    private EditText messageInput;
+    private ImageButton sendMessageBtn;
+    private ImageButton functionBtn;
+    private ImageButton backBtn;
+    private ImageButton infoBtn;
+    private TextView otherUserName;
+    private RecyclerView chatRoomRecyclerView;
 
-    Users otherUser;
-    String chatRoomId;
-    ChatRoomModel chatRoomModel;
-    Timestamp currentTime;
+    private Users otherUser;
+    private String chatRoomId;
+    private ChatRoomModel chatRoomModel;
+    private Timestamp currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

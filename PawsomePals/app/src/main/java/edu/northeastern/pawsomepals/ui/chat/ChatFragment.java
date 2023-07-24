@@ -12,17 +12,23 @@ import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.Query;
+
 import edu.northeastern.pawsomepals.R;
-//import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
+import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
+import edu.northeastern.pawsomepals.models.Users;
+
 
 public class ChatFragment extends Fragment {
-    EditText searchInput;
-    ImageButton searchButton;
-    Button createNewChatButton;
-    RecyclerView chatRecyclerview;
-//    ChatUserRecyclerAdapter adapter;
+    private EditText searchInput;
+    private ImageButton searchButton;
+    private Button createNewChatButton;
+    private RecyclerView chatRecyclerview;
+    private ChatUserRecyclerAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,38 +68,38 @@ public class ChatFragment extends Fragment {
     }
 
     private void setupSearchRecyclerView(String searchTerm) {
-//        Query query = ChatFirebaseUtil.allUserCollectionReference()
-//                .whereGreaterThanOrEqualTo("username",searchTerm);
-//
-//        FirestoreRecyclerOptions<UserModel> options = new FirestoreRecyclerOptions.Builder<UserModel>()
-//                .setQuery(query,UserModel.class).build();
-//        adapter = new ChatUserRecyclerAdapter(,this.getContext());
-//        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
-//        chatRecyclerview.setAdapter(adapter);
-//        adapter.startListening();
+        Query query = ChatFirebaseUtil.allUserCollectionReference()
+                .whereGreaterThanOrEqualTo("username",searchTerm);
+
+        FirestoreRecyclerOptions<Users> options = new FirestoreRecyclerOptions.Builder<Users>()
+                .setQuery(query,Users.class).build();
+        adapter = new ChatUserRecyclerAdapter(options,this.getContext());
+        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        chatRecyclerview.setAdapter(adapter);
+        adapter.startListening();
     }
-//
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        if (adapter != null){
-//            adapter.startListening();
-//        }
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        if (adapter != null){
-//            adapter.startListening();
-//        }
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        if (adapter != null){
-//            adapter.stopListening();
-//        }
-//    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (adapter != null){
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (adapter != null){
+            adapter.startListening();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (adapter != null){
+            adapter.stopListening();
+        }
+    }
 }

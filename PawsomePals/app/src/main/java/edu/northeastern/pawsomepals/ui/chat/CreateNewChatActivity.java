@@ -19,11 +19,11 @@ import edu.northeastern.pawsomepals.models.Users;
 
 
 public class CreateNewChatActivity extends AppCompatActivity {
-    EditText searchInput;
-    ImageButton searchButton;
-    ImageButton backButton;
-    RecyclerView chatRecyclerview;
-    ChatUserRecyclerAdapter adapter;
+    private EditText searchInput;
+    private ImageButton searchButton;
+    private ImageButton backButton;
+    private RecyclerView chatRecyclerview;
+    private ChatUserRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +53,7 @@ public class CreateNewChatActivity extends AppCompatActivity {
 
     private void setupSearchRecyclerView(String searchTerm) {
         Query query = ChatFirebaseUtil.allUserCollectionReference()
-                .whereGreaterThanOrEqualTo("username",searchTerm);
+                .whereGreaterThanOrEqualTo("name",searchTerm);
 
         FirestoreRecyclerOptions<Users> options = new FirestoreRecyclerOptions.Builder<Users>()
                 .setQuery(query,Users.class).build();
