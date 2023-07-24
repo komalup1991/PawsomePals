@@ -39,7 +39,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
-//        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
+        otherUserName = findViewById(R.id.userName);
+        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
 
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
@@ -47,6 +48,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         infoBtn = findViewById(R.id.chatroom_more_button);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
         backBtn = findViewById(R.id.message_back_button);
+
+        otherUserName.setText(otherUser.getName());
 
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,27 +67,27 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-//        getOrCreateChatRoomModel();
+        getOrCreateChatRoomModel();
     }
-//
-//    private void getOrCreateChatRoomModel() {
-//        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
-//            if(task.isSuccessful()){
-//                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
-//
-//                if (chatRoomModel == null){
-//                    currentTime = new Timestamp(System.currentTimeMillis());
-//                    //first time chat
-//                    chatRoomModel = new ChatRoomModel(
-//                            chatRoomId,
-//                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
-//                            currentTime,
-//                            ""
-//
-//                    );
-//                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
-//                }
-//            }
-//        });
-//    }
+
+    private void getOrCreateChatRoomModel() {
+        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
+            if(task.isSuccessful()){
+                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
+
+                if (chatRoomModel == null){
+                    currentTime = new Timestamp(System.currentTimeMillis());
+                    //first time chat
+                    chatRoomModel = new ChatRoomModel(
+                            chatRoomId,
+                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
+                            currentTime,
+                            ""
+
+                    );
+                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+                }
+            }
+        });
+    }
 }

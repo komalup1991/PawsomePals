@@ -23,13 +23,13 @@ public class ChatFirebaseUtil {
     }
 
     public static void passUserModelAsIntent(Intent intent, Users model){
-        intent.putExtra("username",model.getName());
+        intent.putExtra("name",model.getName());
         intent.putExtra("userId",model.getUserId());
-
+        intent.putExtra("email",model.getEmail());
     }
 
     public static DocumentReference currentUserDetails(){
-        return FirebaseFirestore.getInstance().collection("users").document(currentUserId());
+        return FirebaseFirestore.getInstance().collection("user").document(currentUserId());
     }
 
     public static CollectionReference allUserCollectionReference(){
@@ -41,21 +41,22 @@ public class ChatFirebaseUtil {
         return FirebaseFirestore.getInstance().collection("recipes");
     }
 
-//    public static DocumentReference getChatroomReference(String chatroomId){
-//        return FirebaseFirestore.getInstance().collection("chatrooms").document(chatroomId);
-//    }
+    public static DocumentReference getChatroomReference(String chatroomId){
+        return FirebaseFirestore.getInstance().collection("chatroom").document(chatroomId);
+    }
 
-//    public static String getChatroomId(String userId1,String userId2){
-//        if (userId1.hashCode() < userId2.hashCode()){
-//            return userId1 + "_" + userId2;
-//        } else {
-//            return userId2 + "_" + userId1;
-//        }
-//    }
+    public static String getChatroomId(String userId1,String userId2){
+        if (userId1.hashCode() < userId2.hashCode()){
+            return userId1 + "_" + userId2;
+        } else {
+            return userId2 + "_" + userId1;
+        }
+    }
 
     public static Users getUserModelFromIntent(Intent intent) {
-        String userName = intent.getStringExtra("username");
+        String userName = intent.getStringExtra("name");
         String userId =  intent.getStringExtra("userId");
-        return new Users(userName,userId);
+        String email = intent.getStringExtra("email");
+        return new Users(userName,userId,email);
     }
 }
