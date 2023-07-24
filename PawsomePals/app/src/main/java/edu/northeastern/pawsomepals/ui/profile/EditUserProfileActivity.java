@@ -390,16 +390,14 @@ public class EditUserProfileActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 // Handle image capture from the camera
-                if (photoUri != null) {
-                    Bitmap bitmap;
-                    try {
-                        bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), photoUri);
-                        imageProfile.setImageBitmap(bitmap);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                if (data != null && data.getExtras() != null) {
+                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                    imageProfile.setImageBitmap(bitmap);
+
+                    // Convert the Bitmap to a URI and set it to the photoUri
+                    photoUri = getImageUriFromBitmap(bitmap);
                 } else {
-                    // Handle the case when photoUri is null (e.g., image capture failed)
+                    // Handle the case when data is null or the image capture failed
                     Toast.makeText(this, "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == REQUEST_IMAGE_GALLERY) {
@@ -412,4 +410,12 @@ public class EditUserProfileActivity extends AppCompatActivity {
             }
         }
     }
+
+    private Uri getImageUriFromBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "TempImage", null);
+        return Uri.parse(path);
+    }
+
 }
