@@ -5,11 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
@@ -18,16 +22,29 @@ import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.ui.search.SearchFragment;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements LogoutDialogListener{
     BottomNavigationView bottomNavigationView;
     private int currentSelectedItemIndex = 0;
     private Toolbar toolbar;
 
+    private ImageView logoutImageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         toolbar=findViewById(R.id.chatToolBar);
+
+        logoutImageView = findViewById(R.id.logoutImageView);
+
+        logoutImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LogoutDialogFragment dialog = new LogoutDialogFragment();
+                dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
+                dialog.show(getSupportFragmentManager(), "logout_dialog");
+            }
+        });
+
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
@@ -112,5 +129,12 @@ public class HomeActivity extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         outState.putInt("current_selected_item_index", currentSelectedItemIndex);
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onLogoutConfirmed() {
+        FirebaseAuth.getInstance().signOut();
+        startActivity(new Intent(HomeActivity.this, LoginActivity.class));
+        finish();
     }
 }
