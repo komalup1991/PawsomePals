@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
 public class Post {
+    private String postId;
     private String createdBy;
     private String caption;
     private String postContent;
@@ -10,12 +11,21 @@ public class Post {
     public Post() {
     }
 
-    public Post(String createdBy, String caption, String postContent, String userTagged, String locationTagged) {
+    public Post(String postId, String createdBy, String caption, String postContent, String userTagged, String locationTagged) {
+        this.postId = postId;
         this.createdBy = createdBy;
         this.caption = caption;
         this.postContent = postContent;
         this.userTagged = userTagged;
         this.locationTagged = locationTagged;
+    }
+
+    public String getPostId() {
+        return postId;
+    }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 
     public String getCreatedBy() {
@@ -61,11 +71,13 @@ public class Post {
     @Override
     public String toString() {
         return "Post{" +
-                "createdBy='" + createdBy + '\'' +
+                "postId='" + postId + '\'' +
+                ", createdBy='" + createdBy + '\'' +
                 ", caption='" + caption + '\'' +
                 ", postContent='" + postContent + '\'' +
                 ", userTagged='" + userTagged + '\'' +
                 ", locationTagged='" + locationTagged + '\'' +
                 '}';
     }
+
 }
