@@ -24,7 +24,7 @@ import edu.northeastern.pawsomepals.R;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private TextView createNewAccount;
+    private TextView createNewAccount, forgotPassword;
     private EditText inputEmail, inputPassword;
     private Button btnLogin, btnGoogle, btnFacebook;
     private ProgressBar progressBar;
@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+        forgotPassword = findViewById(R.id.forgotPassword);
 
         progressBar.setVisibility(View.GONE);
         createNewAccount.setOnClickListener(new View.OnClickListener() {
@@ -68,6 +69,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, GoogleLoginActivity.class));
+            }
+        });
+
+        forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, ForgotPassword.class));
             }
         });
     }

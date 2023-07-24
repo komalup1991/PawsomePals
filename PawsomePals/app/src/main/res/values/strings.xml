@@ -31,6 +31,11 @@
     <string name="signup_successful_registration">Registration is successful.</string>
     <string name="signup_unsuccessful_registration">Registration is unsuccessful.</string>
 
+    <!--Forgot Password-->
+    <string name="forgot_password_header">Password Reset</string>
+    <string name="forgot_password_button_reset">Reset</string>
+    <string name="forgot_password_reset_email">Check your email.</string>
+    <string name="forgot_password_reset_email_unsuccessful">This account is no registered.</string>
     <!-- Logout -->
     <string name="logout_title">Logout</string>
     <string name="logout_message">Are you sure you want to logout?</string>
