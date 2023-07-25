@@ -6,6 +6,7 @@ public class PhotoVideo {
     private String img;
     private String userTagged;
     private String locationTagged;
+    private String createdAt;
 
     public PhotoVideo() {
     }
@@ -57,6 +58,13 @@ public class PhotoVideo {
     public void setLocationTagged(String locationTagged) {
         this.locationTagged = locationTagged;
     }
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
 
     @Override
     public String toString() {
@@ -66,6 +74,7 @@ public class PhotoVideo {
                 ", img='" + img + '\'' +
                 ", userTagged='" + userTagged + '\'' +
                 ", locationTagged='" + locationTagged + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }

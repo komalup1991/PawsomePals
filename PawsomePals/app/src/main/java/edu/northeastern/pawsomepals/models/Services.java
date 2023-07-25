@@ -7,6 +7,7 @@ public class Services {
     private String serviceNotes;
     private String userTagged;
     private String locationTagged;
+    private String createdAt;
 
     public Services() {
     }
@@ -68,6 +69,14 @@ public class Services {
         this.locationTagged = locationTagged;
     }
 
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "Services{" +
@@ -77,6 +86,7 @@ public class Services {
                 ", serviceNotes='" + serviceNotes + '\'' +
                 ", userTagged='" + userTagged + '\'' +
                 ", locationTagged='" + locationTagged + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }

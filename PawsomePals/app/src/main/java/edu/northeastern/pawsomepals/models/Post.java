@@ -7,6 +7,10 @@ public class Post {
     private String postContent;
     private String userTagged;
     private String locationTagged;
+    private String username;
+    private String userProfileImage;
+    private String createdAt;
+
 
     public Post() {
     }
@@ -68,6 +72,30 @@ public class Post {
         this.locationTagged = locationTagged;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserProfileImage() {
+        return userProfileImage;
+    }
+
+    public void setUserProfileImage(String userProfileImage) {
+        this.userProfileImage = userProfileImage;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
     @Override
     public String toString() {
         return "Post{" +
@@ -77,6 +105,7 @@ public class Post {
                 ", postContent='" + postContent + '\'' +
                 ", userTagged='" + userTagged + '\'' +
                 ", locationTagged='" + locationTagged + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 

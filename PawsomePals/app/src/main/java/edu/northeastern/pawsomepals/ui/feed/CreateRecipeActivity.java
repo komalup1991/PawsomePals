@@ -43,10 +43,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -60,13 +62,17 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Users;
 
 public class CreateRecipeActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CAMERA = 1;
     private static final int REQUEST_CODE_GALLERY = 2;
     private static final int REQUEST_CODE_PERMISSIONS = 3;
     TextView recipeNameMandatoryTextView;
+    private CircleImageView userProfilePic;
+    private TextView userNameTextView;
     private ImageView recipeImageView;
     private ImageView selectPhoto;
     private EditText recipeNameEditText;
@@ -90,6 +96,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private int selectedCookHours;
     private int selectedCookMinutes;
     private Dialog progressDialog;
+    private FirebaseAuth auth;
+    private FirebaseUser currentUser;
+    String loggedInUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,9 +109,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
         //Firebase
         FirebaseStorage storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
+        auth = FirebaseAuth.getInstance();
+        currentUser = auth.getCurrentUser();
+        loggedInUserId = currentUser.getUid();
+        db = FirebaseFirestore.getInstance();
 
         //UI
         Toolbar toolbar = findViewById(R.id.toolbar);
+        userProfilePic = findViewById(R.id.userProfilePic);
+        userNameTextView = findViewById(R.id.userNameTextView);
         recipeNameEditText = findViewById(R.id.recipeNameEditText);
         recipeNameMandatoryTextView = findViewById(R.id.recipeNameMandatoryTextView);
 
@@ -128,8 +143,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Add Recipe");
         }
+        fetchUserInfoFromFirestore(loggedInUserId);
 
-        //   saveButton.setEnabled(false);
+
 
         recipeNameEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -142,7 +158,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //  saveButton.setEnabled(!editable.toString().isEmpty());
 
                 if (editable.toString().isEmpty()) {
                     // Show the recipeNameMandatoryTextView (red asterisk) if the field is empty
@@ -219,12 +234,30 @@ public class CreateRecipeActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO add confirmation dialog
+                showCancelConfirmationDialog();
                 finish();
             }
         });
 
 
+    }
+    private void showCancelConfirmationDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Confirm Action")
+                .setMessage("Are you sure you want to cancel?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     private void showProgressDialog(String s) {
@@ -241,6 +274,27 @@ public class CreateRecipeActivity extends AppCompatActivity {
         }
 
         progressDialog.show();
+    }
+    private void fetchUserInfoFromFirestore(String userId) {
+        db.collection("user")
+                .whereEqualTo("userId", userId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
+                            Users user = userDocument.toObject(Users.class);
+                            Log.d("yoo",user.getProfileImage());
+                            Glide.with(this)
+                                    .load(user.getProfileImage())
+                                    .into(userProfilePic);
+
+                            userNameTextView.setText(user.getName());
+
+                        }
+                    } else {
+                        Log.e("yoo", "Error getting user's info.", task.getException());
+                    }
+                });
     }
 
     private void showEditImageDialog() {
@@ -312,12 +366,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
 
     private void uploadToFireStore() {
-        db = FirebaseFirestore.getInstance();
-        FirebaseAuth auth = FirebaseAuth.getInstance();
 
-        FirebaseUser currentUser = auth.getCurrentUser();
-        assert currentUser != null;
-        String loggedInUserId = currentUser.getUid();
         String recipeTitle = recipeNameEditText.getText().toString();
         String recipeImg = "";
         String recipeDescription = descriptionEditTextView.getText().toString();
@@ -326,8 +375,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipePrepTime = setPrepTextView.getText().toString();
         String recipeCookTime = setCookTextView.getText().toString();
 
-
-//        Recipe recipe = new Recipe(recipeTitle, recipeImg, recipeDescription, recipeIngredients, recipeServing, recipePrepTime, recipeCookTime, "test");
         Map<String, Object> recipeCollection = new HashMap<>();
         recipeCollection.put("createdBy", loggedInUserId);
         recipeCollection.put("title", recipeTitle);
@@ -337,6 +384,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         recipeCollection.put("serving", recipeServing);
         recipeCollection.put("prepTime", recipePrepTime);
         recipeCollection.put("cookTime", recipeCookTime);
+
         //Add a new document with a generated ID
         db.collection("recipes")
                 .add(recipeCollection)
@@ -345,7 +393,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     public void onSuccess(DocumentReference documentReference) {
                         recipeDocId = documentReference.getId();
                         Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        //  finish();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -673,10 +720,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
                         if (downloadUri != null) {
                             String imageUrl = downloadUri.toString();
                             updateDbWithImg(imageUrl);
-                            //  Glide.with(CreateRecipeActivity.this).load(downloadUri).into(recipeImageView);
                         }
                     } else {
-                        // Handle errors
+
                         Toast.makeText(CreateRecipeActivity.this, "Error uploading image: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -684,29 +730,39 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
 
         }
+        else{
+            hideProgressDialog();
+            finish();
+        }
 
 
     }
 
     private void updateDbWithImg(String imageUrl) {
-        DocumentReference recipeRef = db.collection("recipes").document(recipeDocId);
+        if (imageUrl != null) {
+            DocumentReference recipeRef = db.collection("recipes").document(recipeDocId);
 
-        recipeRef
-                .update("img", imageUrl)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("yoo", "DocumentSnapshot successfully updated!");
-                        hideProgressDialog();
-                        finish();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("yoo", "Error updating document", e);
-                    }
-                });
+            recipeRef
+                    .update("img", imageUrl)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("yoo", "DocumentSnapshot successfully updated!");
+                            hideProgressDialog();
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("yoo", "Error updating document", e);
+                        }
+                    });
+        }
+        else{
+            hideProgressDialog();
+            finish();
+        }
     }
 
     private void hideProgressDialog() {
