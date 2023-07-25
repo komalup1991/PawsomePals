@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -8,14 +10,20 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.firestore.auth.User;
-
-import java.sql.Timestamp;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.Query;
 import java.util.Arrays;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
+import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.Users;
 
@@ -31,7 +39,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private Users otherUser;
     private String chatRoomId;
     private ChatRoomModel chatRoomModel;
-    private Timestamp currentTime;
+    private ChatMessageRecyclerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +85,39 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
 
         getOrCreateChatRoomModel();
+        setupChatRecyclerView();
+    }
+
+    private void setupChatRecyclerView() {
+        Query query = ChatFirebaseUtil.getChatroomMessageReference(chatRoomId)
+                .orderBy("timestamp",Query.Direction.DESCENDING);
+
+        FirestoreRecyclerOptions<ChatMessageModel> options = new FirestoreRecyclerOptions.Builder<ChatMessageModel>()
+                .setQuery(query,ChatMessageModel.class).build();
+        adapter = new ChatMessageRecyclerAdapter(options,getApplicationContext());
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        manager.setReverseLayout(true);
+        chatRoomRecyclerView.setLayoutManager(manager);
+        chatRoomRecyclerView.setAdapter(adapter);
+        adapter.startListening();
     }
 
     private void sendMessageToUser(String message) {
+        chatRoomModel.setLastMessageTimestamp(Timestamp.now());
+        chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
+        chatRoomModel.setLastMessage(message);
+        ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+
+        ChatMessageModel chatMessageModel = new ChatMessageModel(message,ChatFirebaseUtil.currentUserId(), Timestamp.now());
+        ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()){
+                            messageInput.setText("");
+                        }
+                    }
+                });
     }
 
     private void getOrCreateChatRoomModel() {
@@ -88,14 +126,12 @@ public class ChatRoomActivity extends AppCompatActivity {
                 chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
 
                 if (chatRoomModel == null){
-                    currentTime = new Timestamp(System.currentTimeMillis());
                     //first time chat
                     chatRoomModel = new ChatRoomModel(
                             chatRoomId,
                             Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
-                            currentTime,
+                            Timestamp.now(),
                             ""
-
                     );
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }

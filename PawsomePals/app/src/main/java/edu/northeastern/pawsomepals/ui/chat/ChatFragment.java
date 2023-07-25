@@ -20,6 +20,8 @@ import com.google.firebase.firestore.Query;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
+import edu.northeastern.pawsomepals.adapters.RecentChatRecyclerAdapter;
+import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.Users;
 
 
@@ -28,7 +30,7 @@ public class ChatFragment extends Fragment {
     private ImageButton searchButton;
     private Button createNewChatButton;
     private RecyclerView chatRecyclerview;
-    private ChatUserRecyclerAdapter adapter;
+    private RecentChatRecyclerAdapter adapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,6 +45,8 @@ public class ChatFragment extends Fragment {
         searchButton = view.findViewById(R.id.chat_search_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewChatButton = view.findViewById(R.id.new_chat_btn);
+        chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
+        setupRecyclerView();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,7 +58,7 @@ public class ChatFragment extends Fragment {
                     return;
                 }
                 
-                setupSearchRecyclerView(searchTerm);
+                setupRecyclerView();
             }
         });
 
@@ -67,14 +71,15 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    private void setupSearchRecyclerView(String searchTerm) {
-        Query query = ChatFirebaseUtil.allUserCollectionReference()
-                .whereGreaterThanOrEqualTo("username",searchTerm);
+    private void setupRecyclerView() {
+        Query query = ChatFirebaseUtil.allChatRoomCollectionReference()
+                .whereArrayContains("userIds",ChatFirebaseUtil.currentUserId())
+                .orderBy("lastMessageTimestamp",Query.Direction.DESCENDING);
 
-        FirestoreRecyclerOptions<Users> options = new FirestoreRecyclerOptions.Builder<Users>()
-                .setQuery(query,Users.class).build();
-        adapter = new ChatUserRecyclerAdapter(options,this.getContext());
-        chatRecyclerview.setLayoutManager(new LinearLayoutManager(this.getContext()));
+        FirestoreRecyclerOptions<ChatRoomModel> options = new FirestoreRecyclerOptions.Builder<ChatRoomModel>()
+                .setQuery(query,ChatRoomModel.class).build();
+        adapter = new RecentChatRecyclerAdapter(options,getContext());
+        chatRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
         chatRecyclerview.setAdapter(adapter);
         adapter.startListening();
     }

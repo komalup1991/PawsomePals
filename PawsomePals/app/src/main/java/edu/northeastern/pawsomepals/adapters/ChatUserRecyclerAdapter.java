@@ -2,7 +2,6 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +66,7 @@ public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,Chat
 
         public UserModelViewHolder(@NonNull View itemView) {
             super(itemView);
-            userNameText = itemView.findViewById(R.id.chat_user_name_text);
+            userNameText = itemView.findViewById(R.id.chat_name_text);
             profilePic = itemView.findViewById(R.id.chat_profile_pic);
         }
     }

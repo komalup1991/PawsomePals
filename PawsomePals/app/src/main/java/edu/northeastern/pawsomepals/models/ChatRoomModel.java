@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
-import java.sql.Timestamp;
+
+import com.google.firebase.Timestamp;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ public class ChatRoomModel {
     private List<String> userIds;
     private Timestamp lastMessageTimestamp;
     private String lastMessageSenderId;
+    private String lastMessage;
 
     public ChatRoomModel(){
 
@@ -51,5 +53,13 @@ public class ChatRoomModel {
 
     public void setLastMessageSenderId(String lastMessageSenderId) {
         this.lastMessageSenderId = lastMessageSenderId;
+    }
+
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
     }
 }
