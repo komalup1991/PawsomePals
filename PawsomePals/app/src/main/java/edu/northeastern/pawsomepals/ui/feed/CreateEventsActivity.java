@@ -46,6 +46,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -61,6 +62,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -95,6 +97,8 @@ public class CreateEventsActivity extends AppCompatActivity {
     private Uri galleryImageUri, cameraImageUri;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
+    int selectedHour = 0;
+    int selectedMinute = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -225,14 +229,29 @@ public class CreateEventsActivity extends AppCompatActivity {
     }
 
     private void showTimePicker() {
-        MaterialTimePicker picker = new MaterialTimePicker.Builder().setInputMode(INPUT_MODE_CLOCK).build();
+
+        //    MaterialTimePicker picker = new MaterialTimePicker.Builder().setInputMode(INPUT_MODE_CLOCK).build();
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(selectedHour)
+                .setMinute(selectedMinute)
+                .build();
+
         picker.show(getSupportFragmentManager(), "TIME_PICKER");
         picker.addOnPositiveButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StringBuilder time = new StringBuilder();
-                time.append(picker.getHour()).append(picker.getMinute());
-                setEventTimeTextView.setText(time);
+                selectedHour = picker.getHour();
+                selectedMinute = picker.getMinute();
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                calendar.set(Calendar.MINUTE, selectedMinute);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a z", Locale.US);
+                String formattedTime = sdf.format(calendar.getTime());
+
+                setEventTimeTextView.setText(formattedTime);
             }
         });
 
@@ -246,10 +265,9 @@ public class CreateEventsActivity extends AppCompatActivity {
         materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
             @Override
             public void onPositiveButtonClick(Long selection) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
                 String date = sdf.format(selection);
                 setEventDateTextView.setText(date);
-
             }
         });
 
