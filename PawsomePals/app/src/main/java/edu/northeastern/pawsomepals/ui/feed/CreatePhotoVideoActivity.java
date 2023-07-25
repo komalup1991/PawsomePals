@@ -72,7 +72,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CAMERA = 1;
     private static final int REQUEST_CODE_GALLERY = 2;
     private static final int REQUEST_CODE_PERMISSIONS = 3;
-    private static final int MEDIA_PICKER_REQUEST_CODE = 100;
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
     private String photoVideoPostDocId;
@@ -212,10 +211,10 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         if (uploadImageUri != null) {
             // Create a unique filename for the image
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String imageName = "recipe_image_" + timestamp + ".jpg";
+            String imageName = "photovideo_" + timestamp + ".jpg";
 
             // Create a reference to the image file in Firebase Storage
-            StorageReference imageRef = storageRef.child("recipe_images/" + imageName);
+            StorageReference imageRef = storageRef.child("photovideo_images/" + imageName);
 
             // Upload the image file to Firebase Storage
             UploadTask uploadTask = imageRef.putFile(uploadImageUri);
@@ -257,9 +256,9 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
 
     private void updateDbWithImg(String imageUrl) {
         if (imageUrl != null) {
-            DocumentReference recipeRef = db.collection("recipes").document(photoVideoPostDocId);
+            DocumentReference photoVideoPostsRef = db.collection("photoVideoPosts").document(photoVideoPostDocId);
 
-            recipeRef
+            photoVideoPostsRef
                     .update("img", imageUrl)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override

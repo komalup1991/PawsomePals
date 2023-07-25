@@ -87,11 +87,13 @@
     <string name="give_your_post_a_caption">Give your post a caption...</string>
     <string name="share_your_ideas_here">Share your ideas here...</string>
     <string name="what_service_are_you_providing">What service are you providing?</string>
-    <string name="spinner_prompt">Select an option</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="about_the_event">About the event...</string>
     <string name="tagged_user">Tagged User</string>
     <string name="tagged_location">Tagged Location</string>
+    <string name="service_name">Service Name</string>
+    <string name="service_details">Service Details</string>
 
 </resources>

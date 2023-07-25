@@ -88,9 +88,12 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/border"
                 android:dropDownWidth="match_parent"
-                android:prompt="@string/spinner_prompt"
                 android:entries="@array/menu_options_array"
+                android:hint="@string/what_service_are_you_providing"
+                android:prompt="@string/spinner_prompt"
+                android:spinnerMode="dropdown"
                 android:textSize="16sp"
+                android:tooltipText="@string/what_service_are_you_providing"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/userNameTextView" />
 
@@ -102,7 +105,7 @@
                 android:layout_marginTop="8dp"
                 android:autofillHints="post"
                 android:background="@drawable/border"
-                android:hint="@string/what_service_are_you_providing"
+                android:hint="@string/service_name"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/serviceTypeSpinnerOptions" />
@@ -115,15 +118,11 @@
                 android:layout_marginTop="8dp"
                 android:autofillHints="post"
                 android:background="@drawable/border"
-                android:hint="@string/share_your_ideas_here"
+                android:hint="@string/service_details"
                 android:inputType="textMultiLine"
                 android:textSize="16sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/serviceNameEditTextView" />
-
-
-
-
             <TextView
                 android:id="@+id/tagPeopleTextView"
                 android:layout_width="wrap_content"
@@ -140,6 +139,23 @@
                 app:layout_constraintTop_toBottomOf="@+id/notesOnServiceEditTextView" />
 
             <TextView
+                android:id="@+id/taggedUserDisplayTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:text="@string/tagged_user"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.125"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tagPeopleTextView" />
+
+            <TextView
                 android:id="@+id/addLocationTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -152,7 +168,24 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.025"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tagPeopleTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/taggedUserDisplayTextView" />
+            <AutoCompleteTextView
+                android:id="@+id/searchLocationDisplayTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/border"
+                android:ems="10"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.125"
+                android:hint="Tag a location"
+                android:imeOptions="actionDone"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/addLocationTextView" />
 
 
 

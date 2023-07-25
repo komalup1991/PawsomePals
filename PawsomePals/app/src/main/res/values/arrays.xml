@@ -2,10 +2,15 @@
 <resources>
     <string-array name="menu_options_array">
 
-        <item>Option 1</item>
-        <item>Option 2</item>
+        <item>Dog Sitting</item>
+        <item>Vet</item>
+        <item>Dog Boarding</item>
+        <item>Dog Training</item>
+        <item>Dog Grooming</item>
 
 
     </string-array>
+
+    <string name="spinner_prompt">Select an option</string>
 
 </resources>
