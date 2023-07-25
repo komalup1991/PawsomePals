@@ -105,6 +105,10 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.GONE);
 
+        if (!checkStoragePermission()) {
+            requestStoragePermission();
+        }
+
         radioGroupGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -191,13 +195,15 @@ public class EditUserProfileActivity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private void requestStoragePermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
+    }
+
     private void requestCameraPermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
     }
 
-    private void requestStoragePermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
-    }
+
 
     private void saveDataToFirebaseStorage() {
         String name = editTextName.getText().toString().trim();
@@ -417,5 +423,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
         String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "TempImage", null);
         return Uri.parse(path);
     }
+
+
 
 }
