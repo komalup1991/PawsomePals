@@ -19,13 +19,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.dialog.MaterialDialogs;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -47,8 +45,8 @@ import edu.northeastern.pawsomepals.models.Users;
 public class CreatePostActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
-    private TextView userNameTextView,tagPeopleTextView,addLocationTextView,taggedUserDisplayTextView;
-    private EditText captionEditTextView,postContentEditTextView;
+    private TextView userNameTextView, tagPeopleTextView, addLocationTextView, taggedUserDisplayTextView;
+    private EditText captionEditTextView, postContentEditTextView;
     private Dialog progressDialog;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -102,10 +100,10 @@ public class CreatePostActivity extends AppCompatActivity {
         taggedUserDisplayTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                   showUserSelectionDialog();
+                showUserSelectionDialog();
             }
         });
-        
+
         fetchAllUsersFromFirestore();
 
         List<String> locationSuggestions = new ArrayList<>();
@@ -125,15 +123,12 @@ public class CreatePostActivity extends AppCompatActivity {
         });
 
 
-        
-
-
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                    uploadToFireStore();
-                    showProgressDialog("Your post is being saved...");
+                uploadToFireStore();
+                showProgressDialog("Your post is being saved...");
             }
         });
 
@@ -170,43 +165,43 @@ public class CreatePostActivity extends AppCompatActivity {
         boolean[] checkedItems = new boolean[allUsers.size()];
 
         int i = 0;
-        for (Map.Entry<String, Users> entry: allUsers.entrySet()) {
-             Users user = entry.getValue();
-             if (user.getName() != null) {
-                 userNames.add(user.getName());
-                 userIds.add(user.getUserId());
-             }
-             checkedItems[i++] = selectedUsers.contains(user);
-     }
+        for (Map.Entry<String, Users> entry : allUsers.entrySet()) {
+            Users user = entry.getValue();
+            if (user.getName() != null) {
+                userNames.add(user.getName());
+                userIds.add(user.getUserId());
+            }
+            checkedItems[i++] = selectedUsers.contains(user);
+        }
 
         String[] userNamesArray = userNames.toArray(new String[userNames.size()]);
         String[] userIdsArray = userIds.toArray(new String[userNames.size()]);
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-             builder.setTitle("Select Users")
-                     .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
-                         Users user = allUsers.get(userIdsArray[which]);
-                         Log.d("yoo"," "+ user.getName());
-                         if (isChecked) {
-                             selectedUsers.add(user);
-                         } else {
-                             selectedUsers.remove(user);
-                         }
-                     })
-                     .setPositiveButton("OK", (dialog, which) -> {
-                         updateSelectedUsersTextView();
+        builder.setTitle("Select Users")
+                .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
+                    Users user = allUsers.get(userIdsArray[which]);
+                    Log.d("yoo", " " + user.getName());
+                    if (isChecked) {
+                        selectedUsers.add(user);
+                    } else {
+                        selectedUsers.remove(user);
+                    }
+                })
+                .setPositiveButton("OK", (dialog, which) -> {
+                    updateSelectedUsersTextView();
 
-                     })
-                     .setNegativeButton("Cancel", null)
-                     .show();
-                     }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
 
     private void updateSelectedUsersTextView() {
         List<String> selectedNames = new ArrayList<>();
         for (Users user : selectedUsers) {
-            Log.d("yoo"," "+user.getName());
+            Log.d("yoo", " " + user.getName());
             selectedNames.add(user.getName());
-    }
+        }
 
         StringBuilder commaSeparatedNames = new StringBuilder();
         for (int i = 0; i < selectedNames.size(); i++) {
@@ -259,13 +254,13 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
     private void uploadToFireStore() {
-         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-         String caption = captionEditTextView.getText().toString();
-         String postContent = postContentEditTextView.getText().toString();
-         String userTagged = taggedUserDisplayTextView.getText().toString();
-         String locationTagged = searchLocationDisplayTextView.getText().toString();
-         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
+        String caption = captionEditTextView.getText().toString();
+        String postContent = postContentEditTextView.getText().toString();
+        String userTagged = taggedUserDisplayTextView.getText().toString();
+        String locationTagged = searchLocationDisplayTextView.getText().toString();
+        String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> post = new HashMap<>();
         post.put("createdBy", loggedInUserId);
