@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.ui.chat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
@@ -67,6 +71,20 @@ public class ChatFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), CreateNewChatActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        getFCMToken();
+    }
+
+    private void getFCMToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (task.isSuccessful()){
+                    String token = task.getResult();
+                    ChatFirebaseUtil.currentUserDetails().update("fcmToken",token);
+                }
             }
         });
     }

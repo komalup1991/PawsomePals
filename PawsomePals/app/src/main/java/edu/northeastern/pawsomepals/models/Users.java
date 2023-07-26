@@ -10,6 +10,7 @@ public class Users {
   private String profileImage;
     private String gender;
     private String dob;
+    private String fcmToken;
 
 
     public Users() {
@@ -33,6 +34,14 @@ public class Users {
         this.name = name;
         this.recipeId = recipeId;
         this.profileImage = profileImage;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     public void setName(String name) {

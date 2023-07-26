@@ -11,11 +11,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
@@ -42,6 +46,17 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
                 LogoutDialogFragment dialog = new LogoutDialogFragment();
                 dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
                 dialog.show(getSupportFragmentManager(), "logout_dialog");
+//                Log out delete messaging token to avoid receiving messages
+//                FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                       if (task.isSuccessful()){
+//                           LogoutDialogFragment dialog = new LogoutDialogFragment();
+//                           dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
+//                           dialog.show(getSupportFragmentManager(), "logout_dialog");
+//                       }
+//                    }
+//                });
             }
         });
 
