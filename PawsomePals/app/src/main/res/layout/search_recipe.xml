@@ -4,22 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:clickable="true"
     android:background="?android:attr/selectableItemBackground">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:textStyle="bold"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:layout_gravity="center_horizontal"/>
+<ImageView
+android:id="@+id/circleImageView"
+android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:src="@drawable/dogbone"
+    android:layout_marginEnd="10dp"
 
-    <!-- Add more TextViews or other views here to display recipe details -->
-    <!-- For example, you can include TextViews for recipe description, author, etc. -->
+    />
+
+<TextView
+android:id="@+id/title"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:textSize="18sp"
+android:textColor="@android:color/black"
+android:textStyle="bold"
+android:maxLines="1"
+android:ellipsize="end"
+android:layout_gravity="center_vertical"
+    />
 
 </LinearLayout>

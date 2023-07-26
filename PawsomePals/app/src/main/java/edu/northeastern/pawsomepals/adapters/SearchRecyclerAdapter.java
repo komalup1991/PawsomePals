@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
@@ -40,7 +42,10 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder
         Recipe recipe = recipes.get(position);
         holder.title.setText(recipe.getTitle());
         Log.d("title",recipe.getTitle());
-        holder.bindThisData(recipe);
+        Glide.with(holder.itemView.getContext())
+                .load(recipe.getImg())
+                .into(holder.recipeImage);
+       // holder.bindThisData(recipe);
 
         holder.title.setOnClickListener(new View.OnClickListener() {
             @Override
