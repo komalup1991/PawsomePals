@@ -4,17 +4,15 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -28,27 +26,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 
 import android.Manifest;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -104,10 +95,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         progressBar.setVisibility(View.GONE);
-
-        if (!checkStoragePermission()) {
-            requestStoragePermission();
-        }
 
         radioGroupGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -191,6 +178,10 @@ public class EditUserProfileActivity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
+    }
+
     private boolean checkStoragePermission() {
         return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
@@ -198,11 +189,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private void requestStoragePermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
     }
-
-    private void requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
-    }
-
 
 
     private void saveDataToFirebaseStorage() {
@@ -216,7 +202,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
             Toast.makeText(this, "Please fill all the fields and add a profile picture.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         progressBar.setVisibility(View.VISIBLE);
 
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -264,9 +249,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
     }
 
 
-
     private void navigateToEditDogProfileActivity() {
-        Intent intent = new Intent(EditUserProfileActivity.this, HomeActivity.class);
+        Intent intent = new Intent(EditUserProfileActivity.this, EditDogProfileActivity.class);
         startActivity(intent);
     }
 
@@ -299,6 +283,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
                         editTextDOB.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
                     }
                 }, year, month, dayOfMonth);
+
+        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
 
         datePickerDialog.show();
     }
@@ -423,7 +409,6 @@ public class EditUserProfileActivity extends AppCompatActivity {
         String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "TempImage", null);
         return Uri.parse(path);
     }
-
 
 
 }

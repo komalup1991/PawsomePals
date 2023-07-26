@@ -178,7 +178,7 @@
             android:drawableLeft="@drawable/baseline_calendar_month_24"
             android:drawablePadding="10dp"
             android:ems="10"
-            android:hint="Date Of Birth"
+            android:hint="Date Of Birth/Adoption"
             android:inputType="date"
             android:paddingLeft="20dp"
             android:paddingTop="13dp"
