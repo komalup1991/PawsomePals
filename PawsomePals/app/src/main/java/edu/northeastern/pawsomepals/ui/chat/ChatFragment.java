@@ -50,6 +50,7 @@ public class ChatFragment extends Fragment {
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewChatButton = view.findViewById(R.id.new_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
+
         setupRecyclerView();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -83,6 +84,7 @@ public class ChatFragment extends Fragment {
             public void onComplete(@NonNull Task<String> task) {
                 if (task.isSuccessful()){
                     String token = task.getResult();
+                    Log.i("token",token);
                     ChatFirebaseUtil.currentUserDetails().update("fcmToken",token);
                 }
             }
@@ -115,6 +117,10 @@ public class ChatFragment extends Fragment {
         super.onResume();
         if (adapter != null){
             adapter.startListening();
+        }
+        synchronized(this) {
+            // update your adapter data here
+            adapter.notifyDataSetChanged();
         }
     }
 

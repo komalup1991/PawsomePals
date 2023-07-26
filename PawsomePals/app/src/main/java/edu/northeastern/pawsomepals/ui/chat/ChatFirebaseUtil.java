@@ -32,6 +32,7 @@ public class ChatFirebaseUtil {
         intent.putExtra("name",model.getName());
         intent.putExtra("userId",model.getUserId());
         intent.putExtra("email",model.getEmail());
+        intent.putExtra("fcmToken",model.getFcmToken());
     }
 
     public static DocumentReference currentUserDetails(){
@@ -65,7 +66,9 @@ public class ChatFirebaseUtil {
         String userName = intent.getStringExtra("name");
         String userId =  intent.getStringExtra("userId");
         String email = intent.getStringExtra("email");
-        return new Users(userName,userId,email);
+        String fcmToken = intent.getStringExtra("fcmToken");
+
+        return new Users(userName,userId,email,fcmToken);
     }
 
     public static CollectionReference allChatRoomCollectionReference(){

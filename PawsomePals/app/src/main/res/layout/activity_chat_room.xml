@@ -55,7 +55,8 @@
         android:id="@+id/message_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/chatRoomToolBar" />
+        android:layout_below="@id/chatRoomToolBar"
+        android:layout_above="@+id/bottomLayout"/>
 
     <LinearLayout
         android:id="@+id/bottomLayout"

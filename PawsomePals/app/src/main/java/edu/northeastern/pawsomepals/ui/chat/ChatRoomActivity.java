@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DownloadManager;
+import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +20,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Arrays;
 
 import edu.northeastern.pawsomepals.R;
@@ -26,6 +33,13 @@ import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.Users;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 public class ChatRoomActivity extends AppCompatActivity {
     private EditText messageInput;
@@ -48,7 +62,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
         otherUserName = findViewById(R.id.userName);
-        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(),otherUser.getUserId());
+        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
 
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
@@ -63,7 +77,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String message = messageInput.getText().toString().trim();
-                if(message.isEmpty()) return;
+                if (message.isEmpty()) return;
                 sendMessageToUser(message);
             }
         });
@@ -79,7 +93,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //check
-                Intent intent = new Intent(getApplicationContext(),EditChatRoomInfoActivity.class);
+                Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
                 startActivity(intent);
             }
         });
@@ -90,11 +104,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void setupChatRecyclerView() {
         Query query = ChatFirebaseUtil.getChatroomMessageReference(chatRoomId)
-                .orderBy("timestamp",Query.Direction.DESCENDING);
+                .orderBy("timestamp", Query.Direction.DESCENDING);
 
         FirestoreRecyclerOptions<ChatMessageModel> options = new FirestoreRecyclerOptions.Builder<ChatMessageModel>()
-                .setQuery(query,ChatMessageModel.class).build();
-        adapter = new ChatMessageRecyclerAdapter(options,getApplicationContext());
+                .setQuery(query, ChatMessageModel.class).build();
+        adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);
@@ -108,33 +122,88 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatRoomModel.setLastMessage(message);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        ChatMessageModel chatMessageModel = new ChatMessageModel(message,ChatFirebaseUtil.currentUserId(), Timestamp.now());
+        ChatMessageModel chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now());
         ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentReference> task) {
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             messageInput.setText("");
+                            sendNotification(message);
                         }
                     }
                 });
     }
 
     private void getOrCreateChatRoomModel() {
-        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task ->{
-            if(task.isSuccessful()){
+        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
                 chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
 
-                if (chatRoomModel == null){
+                if (chatRoomModel == null) {
                     //first time chat
                     chatRoomModel = new ChatRoomModel(
                             chatRoomId,
-                            Arrays.asList(ChatFirebaseUtil.currentUserId(),otherUser.getUserId()),
+                            Arrays.asList(ChatFirebaseUtil.currentUserId(), otherUser.getUserId()),
                             Timestamp.now(),
                             ""
                     );
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
+            }
+        });
+    }
+
+    private void sendNotification(String message) {
+        //current username, message, currentuserid,otheruserid
+        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    Users currentUser = task.getResult().toObject(Users.class);
+
+                    try{
+                        JSONObject jasonObject = new JSONObject();
+                        JSONObject notificationObj = new JSONObject();
+                        notificationObj.put("title",currentUser.getName());
+                        notificationObj.put("body",message);
+
+                        JSONObject dataObj = new JSONObject();
+                        dataObj.put("userId", currentUser.getUserId());
+
+                        jasonObject.put("notification",notificationObj);
+                        jasonObject.put("data",dataObj);
+                        jasonObject.put("to",otherUser.getFcmToken());
+
+                        callApi(jasonObject);
+
+                    }catch (Exception e){
+
+                    }
+                }
+            }
+        });
+    }
+    private void callApi(JSONObject jasonObject) {
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+        OkHttpClient client = new OkHttpClient();
+
+        String url = "https://fcm.googleapis.com/fcm/send";
+        RequestBody body = RequestBody.create(jasonObject.toString(),JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .header("Authorization","Bearer AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
             }
         });
     }

@@ -16,10 +16,11 @@ public class Users {
     public Users() {
     }
 
-    public Users(String name, String userId, String email) {
+    public Users(String name, String userId, String email,String fcmToken) {
         this.name = name;
         this.userId = userId;
         this.email = email;
+        this.fcmToken = fcmToken;
     }
 
     public Users(String userId, String email) {
