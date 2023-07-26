@@ -283,14 +283,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
-                            Log.d("yoo",user.getProfileImage());
+
+                            if(user.getProfileImage()!=null){
                             Glide.with(this)
                                     .load(user.getProfileImage())
-                                    .into(userProfilePic);
+                                    .into(userProfilePic);}
 
-                            userNameTextView.setText(user.getName());
+                            if(user.getName()!=null)
+                            {  userNameTextView.setText(user.getName());
 
-                        }
+                        }}
                     } else {
                         Log.e("yoo", "Error getting user's info.", task.getException());
                     }
@@ -527,13 +529,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
         }
-        return false;
+        else{   return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED; }
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_PERMISSIONS);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_GALLERY);
         }
+        else{
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_GALLERY);
+    }
     }
 
     private void openCamera() {
