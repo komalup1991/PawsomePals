@@ -30,6 +30,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,6 +53,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.BreedDetails;
+import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
+import edu.northeastern.pawsomepals.network.PawsomePalWebService;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 
 public class EditDogProfileActivity extends AppCompatActivity {
@@ -67,8 +71,6 @@ public class EditDogProfileActivity extends AppCompatActivity {
     private RadioButton radioButtonMedium;
     private RadioButton radioButtonLarge;
     private boolean isMixedBreedChecked = false;
-    private List<String> dogBreedsList;
-    private List<String> mixedBreedsList;
     private ProgressBar progressBar;
     private Calendar calendar;
     private FirebaseAuth firebaseAuth;
@@ -87,7 +89,9 @@ public class EditDogProfileActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_STORAGE = 4;
     private Uri photoUri;
     private String dogDocId;
-
+    private PawsomePalWebService pawsomePalWebService;
+    private ArrayAdapter<String> breedAdapter;
+    private ArrayAdapter<String> mixedBreedAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,16 +125,6 @@ public class EditDogProfileActivity extends AppCompatActivity {
 
         progressBar.setVisibility(View.GONE);
 
-        dogBreedsList = Arrays.asList("Breed 1", "Breed 2", "Breed 3", "Breed 4", "Breed 5");
-        ArrayAdapter<String> breedAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, dogBreedsList);
-        spinnerDogBreed.setAdapter(breedAdapter);
-
-        mixedBreedsList = Arrays.asList("Mixed Breed 1", "Mixed Breed 2", "Mixed Breed 3");
-        ArrayAdapter<String> mixedBreedAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, mixedBreedsList);
-        spinnerMixedBreed.setAdapter(mixedBreedAdapter);
-
         checkBoxMixedBreed.setOnCheckedChangeListener((buttonView, isChecked) -> {
             isMixedBreedChecked = isChecked;
             if (isChecked) {
@@ -143,14 +137,14 @@ public class EditDogProfileActivity extends AppCompatActivity {
         radioGroupDogGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                isGenderSelected = true; // Set the flag when the user selects a gender
+                isGenderSelected = true;
             }
         });
 
         radioGroupDogSize.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                isDogSizeSelected = true; // Set the flag when the user selects a dog size
+                isDogSizeSelected = true;
             }
         });
 
@@ -176,9 +170,51 @@ public class EditDogProfileActivity extends AppCompatActivity {
             }
         });
 
+        breedAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        mixedBreedAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+
+        breedAdapter.insert("Dog's Breed", 0);
+        mixedBreedAdapter.insert("Dog's Mixed Breed", 0);
+
+        spinnerDogBreed.setAdapter(breedAdapter);
+        spinnerMixedBreed.setAdapter(mixedBreedAdapter);
+
+        PawsomePalWebService.UiThreadCallback uiThreadCallback = new BaseUiThreadCallback() {
+
+            public void onGetBreedsName(List<String> breeds) {
+                progressBar.setVisibility(View.GONE);
+
+                breedAdapter.clear();
+                mixedBreedAdapter.clear();
+
+                breedAdapter.insert("Dog's Breed", 0);
+                mixedBreedAdapter.insert("Dog's Mixed Breed", 0);
+
+                breedAdapter.addAll(breeds);
+                mixedBreedAdapter.addAll(breeds);
+
+                breedAdapter.notifyDataSetChanged();
+                mixedBreedAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError() {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(EditDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onEmptyResult() {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(EditDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
+            }
+
+        };
+
+        pawsomePalWebService = new PawsomePalWebService(uiThreadCallback);
+        pawsomePalWebService.getBreedsNames();
+        progressBar.setVisibility(View.VISIBLE);
     }
-
-
 
 
     private void openImageChooserDialog() {
@@ -255,12 +291,16 @@ public class EditDogProfileActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
         }
-        return false;
+        else
+        {return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, PERMISSIONS_REQUEST_STORAGE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
+        }
+        else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
         }
     }
 
@@ -324,6 +364,24 @@ public class EditDogProfileActivity extends AppCompatActivity {
         if (TextUtils.isEmpty(dogName) || TextUtils.isEmpty(dogGender) || TextUtils.isEmpty(dob) ||
                 TextUtils.isEmpty(dogSize) || TextUtils.isEmpty(dogBreed) || photoUri == null) {
             Toast.makeText(this, "Please fill all the fields.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if the selected breed is not the default text
+        if (dogBreed.equals("Dog's Breed")) {
+            Toast.makeText(this, "Please select a valid dog breed.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if the mixed breed is checked and if the selected mixed breed is not the default text
+        if (isMixedBreedChecked && dogMixedBreed.equals("Dog's Mixed Breed")) {
+            Toast.makeText(this, "Please select a valid mixed breed.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if(dogBreed.equals(dogMixedBreed))
+        {
+            Toast.makeText(this, "Please select a different mixed breed.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -486,6 +544,4 @@ public class EditDogProfileActivity extends AppCompatActivity {
 
         }
     }
-
-
 }
