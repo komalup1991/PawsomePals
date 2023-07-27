@@ -170,8 +170,8 @@ public class EditDogProfileActivity extends AppCompatActivity {
             }
         });
 
-        breedAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
-        mixedBreedAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
+        breedAdapter = new ArrayAdapter<>(this, R.layout.spinner_list, new ArrayList<>());
+        mixedBreedAdapter = new ArrayAdapter<>(this, R.layout.spinner_list, new ArrayList<>());
 
         breedAdapter.insert("Dog's Breed", 0);
         mixedBreedAdapter.insert("Dog's Mixed Breed", 0);

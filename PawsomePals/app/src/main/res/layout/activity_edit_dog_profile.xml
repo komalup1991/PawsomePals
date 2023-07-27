@@ -105,7 +105,7 @@
                     android:id="@+id/radioButtonMale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="Male"
@@ -117,7 +117,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="Female"
@@ -162,19 +162,19 @@
                     android:id="@+id/radioButtonSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/custom_radio_button"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="Small"
                     android:textColor="@color/white"
-                    android:textColorHint="@color/white" />
+                    android:textColorHint="@color/white"
+                    android:buttonTint="@color/white"/>
 
                 <RadioButton
                     android:id="@+id/radioButtonMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="Medium"
@@ -186,7 +186,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="Large"
@@ -197,13 +197,11 @@
 
             <Spinner
                 android:id="@+id/spinnerDogBreed"
-                style="@style/CustomSpinnerStyle"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/input_bg"
                 android:popupBackground="@color/accentColor"
-                android:popupTheme="@style/WhiteSpinnerDropdownItem"
                 android:spinnerMode="dropdown"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
@@ -213,7 +211,6 @@
 
             <Spinner
                 android:id="@+id/spinnerMixedBreed"
-                style="@style/CustomSpinnerStyle"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_marginStart="16dp"
@@ -239,6 +236,7 @@
                 android:text="Mixed Breed"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
+                android:buttonTint="@color/white"
                 app:layout_constraintStart_toStartOf="@+id/spinnerDogBreed"
                 app:layout_constraintTop_toBottomOf="@+id/spinnerDogBreed" />
 
