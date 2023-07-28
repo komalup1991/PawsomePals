@@ -58,6 +58,8 @@ public class CreateServicesActivity extends AppCompatActivity {
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
     private AutoCompleteTextView searchLocationDisplayTextView;
+    private String userNameToSaveInFeed;
+    private String userProfileUrlToSaveInFeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -272,6 +274,9 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("userTagged", userTagged);
         services.put("locationTagged", locationTagged);
         services.put("createdAt", createdAt);
+        services.put("username",userNameToSaveInFeed);
+        services.put("userProfileImage",userProfileUrlToSaveInFeed);
+        services.put("type",2);
 
         //Add a new document with a generated ID
         db.collection("services")
@@ -332,6 +337,8 @@ public class CreateServicesActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
+                            userNameToSaveInFeed = user.getName();
+                            userProfileUrlToSaveInFeed = user.getProfileImage();
 
                             Glide.with(this)
                                     .load(user.getProfileImage())

@@ -91,6 +91,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private Uri galleryImageUri, cameraImageUri;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
+    private String userNameToSaveInFeed;
+    private String userProfileUrlToSaveInFeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -484,6 +486,10 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         photoVideoPosts.put("userTagged", userTagged);
         photoVideoPosts.put("locationTagged", locationTagged);
         photoVideoPosts.put("createdAt", createdAt);
+        photoVideoPosts.put("username",userNameToSaveInFeed);
+        photoVideoPosts.put("userProfileImage",userProfileUrlToSaveInFeed);
+        photoVideoPosts.put("type",1);
+
 
         //Add a new document with a generated ID
         db.collection("photoVideoPosts")
@@ -655,6 +661,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
+                            userNameToSaveInFeed = user.getName();
+                            userProfileUrlToSaveInFeed = user.getProfileImage();
 
                             Glide.with(this)
                                     .load(user.getProfileImage())

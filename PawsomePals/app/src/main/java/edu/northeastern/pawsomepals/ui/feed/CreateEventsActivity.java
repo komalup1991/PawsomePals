@@ -99,6 +99,8 @@ public class CreateEventsActivity extends AppCompatActivity {
     private boolean isDeleteConfirmationDialogVisible = false;
     int selectedHour = 0;
     int selectedMinute = 0;
+    private String userNameToSaveInFeed;
+    private String userProfileUrlToSaveInFeed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -545,6 +547,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
+
         Map<String, Object> events = new HashMap<>();
         events.put("createdBy", loggedInUserId);
         events.put("eventName", eventName);
@@ -554,6 +557,9 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("userTagged", userTagged);
         events.put("locationTagged", locationTagged);
         events.put("createdAt", createdAt);
+        events.put("username",userNameToSaveInFeed);
+        events.put("userProfileImage",userProfileUrlToSaveInFeed);
+        events.put("type",3);
 
         //Add a new document with a generated ID
         db.collection("events")
@@ -725,6 +731,8 @@ public class CreateEventsActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
+                            userNameToSaveInFeed = user.getName();
+                            userProfileUrlToSaveInFeed = user.getProfileImage();
 
                             Glide.with(this)
                                     .load(user.getProfileImage())

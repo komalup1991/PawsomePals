@@ -18,14 +18,14 @@
             android:orientation="horizontal"
             android:overScrollMode="never"
             android:scrollbars="none"
-            app:layout_constraintBottom_toTopOf="@+id/otherRecyclerView"
+            app:layout_constraintBottom_toTopOf="@+id/feedsRecyclerView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Vertical RecyclerView for other items -->
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/otherRecyclerView"
+            android:id="@+id/feedsRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:clipToPadding="false"

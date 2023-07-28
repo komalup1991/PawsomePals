@@ -97,7 +97,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
 
     public void setRecipes(List<Recipe> recipeList) {
         recipes = recipeList;
-        notifyDataSetChanged();
     }
 
     public static class RecipeViewHolder extends RecyclerView.ViewHolder{

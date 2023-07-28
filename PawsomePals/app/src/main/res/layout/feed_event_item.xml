@@ -5,7 +5,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:background="@drawable/border"
+    android:backgroundTint="@color/pastelBlue"
+    android:padding="16dp"
+    android:layout_margin="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/userProfilePic"
@@ -85,7 +88,7 @@
         android:contentDescription="Event Date"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/eventDate"
+        android:src="@drawable/eventdate"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/eventDetailsImageView" />
 
@@ -110,7 +113,7 @@
         android:contentDescription="Event Time"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/eventTime"
+        android:src="@drawable/eventtime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/eventDateImageView" />
 
@@ -125,6 +128,55 @@
         app:layout_constraintStart_toEndOf="@id/eventTimeImageView"
         app:layout_constraintTop_toTopOf="@id/eventTimeImageView" />
 
+    <ImageView
+        android:id="@+id/userTaggedImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="User Tagged"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/user"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eventTimeTextView" />
+
+    <TextView
+        android:id="@+id/userTaggedTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="User Tagged"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
+        app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
+
+    <ImageView
+        android:id="@+id/locationTaggedImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="Location Tagged"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/pin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
+
+    <TextView
+        android:id="@+id/locationTaggedTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="Location Tagged"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
+        app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
+
+
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -134,7 +186,7 @@
         android:gravity="end"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/eventTimeImageView">
+        app:layout_constraintTop_toBottomOf="@id/locationTaggedTextView">
 
         <ImageButton
             android:id="@+id/likeButton"
