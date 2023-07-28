@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?><!-- item_text_post.xml -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/border"
+    android:backgroundTint="@color/pastelBlue"
+    android:padding="16dp"
+    android:layout_margin="8dp">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/userProfilePic"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/dog_paw"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/usernameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/custom_border_sticker"
+        android:text="@string/john_doe"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/userProfilePic"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/eventNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/custom_border_sticker"
+        android:text="@string/john_doe"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameTextView"/>
+
+
+
+    <ImageView
+        android:id="@+id/eventImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="eventImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eventNameTextView" />
+
+    <TextView
+        android:id="@+id/timestampTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:text="10 minutes ago"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eventImage" />
+
+
+    <ImageView
+        android:id="@+id/eventDetailsImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="Event Detail"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/information"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eventImage" />
+
+    <TextView
+        android:id="@+id/eventDetailsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="Event Details"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/eventDetailsImageView"
+        app:layout_constraintTop_toTopOf="@id/eventDetailsImageView" />
+
+    <ImageView
+        android:id="@+id/eventDateImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="Event Date"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/eventdate"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eventDetailsImageView" />
+
+    <TextView
+        android:id="@+id/eventDateTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="Event Date"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/eventDateImageView"
+        app:layout_constraintTop_toTopOf="@id/eventDateImageView" />
+
+
+    <ImageView
+        android:id="@+id/eventTimeImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="Event Time"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/eventtime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/eventDateImageView" />
+
+    <TextView
+        android:id="@+id/eventTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="Event Time"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/eventTimeImageView"
+        app:layout_constraintTop_toTopOf="@id/eventTimeImageView" />
+
+    <ImageView
+        android:id="@+id/userTaggedImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="User Tagged"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/user"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eventTimeTextView" />
+
+    <TextView
+        android:id="@+id/userTaggedTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="User Tagged"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
+        app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
+
+    <ImageView
+        android:id="@+id/locationTaggedImageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        android:contentDescription="Location Tagged"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/pin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
+
+    <TextView
+        android:id="@+id/locationTaggedTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="18dp"
+        android:text="Location Tagged"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
+        app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
+
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="32dp"
+        android:gravity="end"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/locationTaggedTextView">
+
+        <ImageButton
+            android:id="@+id/likeButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="@string/like"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/like" />
+
+        <TextView
+            android:id="@+id/likeCountTextView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/custom_border_sticker"
+            android:text="(0)"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/commentButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="@string/comment"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/message" />
+
+        <TextView
+            android:id="@+id/commentCountTextView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/custom_border_sticker"
+            android:text="(0)"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/shareButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="@string/share"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/sharepost" />
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,113 +1,57 @@
 package edu.northeastern.pawsomepals.models;
 
-public class Event {
-    private String createdBy;
+public class Event extends FeedItem {
     private String eventName;
     private String img;
     private String eventDate;
     private String eventTime;
     private String eventDetails;
-    private String userTagged;
-    private String locationTagged;
-    private String createdAt;
+    private String eventId;
 
     public Event() {
     }
 
-    public Event(String createdBy, String eventName, String img, String eventDate, String eventTime, String eventDetails, String userTagged, String locationTagged) {
-        this.createdBy = createdBy;
+    public Event(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String eventName, String img, String eventDate, String eventTime, String eventDetails) {
+        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy);
         this.eventName = eventName;
         this.img = img;
         this.eventDate = eventDate;
         this.eventTime = eventTime;
         this.eventDetails = eventDetails;
-        this.userTagged = userTagged;
-        this.locationTagged = locationTagged;
     }
 
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
-
-    public void setEventName(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public String getEventDate() {
-        return eventDate;
-    }
-
-    public void setEventDate(String eventDate) {
-        this.eventDate = eventDate;
-    }
-
-    public String getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(String eventTime) {
-        this.eventTime = eventTime;
+    @Override
+    public int getType() {
+        return FeedItem.TYPE_EVENT;
     }
 
     public String getEventDetails() {
         return eventDetails;
     }
 
-    public void setEventDetails(String eventDetails) {
-        this.eventDetails = eventDetails;
+    public String getEventTime() {
+        return eventTime;
     }
 
-    public String getUserTagged() {
-        return userTagged;
+    public String getEventDate() {
+        return eventDate;
     }
 
-    public void setUserTagged(String userTagged) {
-        this.userTagged = userTagged;
+    public String getImg() {
+        return img;
     }
 
-    public String getLocationTagged() {
-        return locationTagged;
+    public String getEventName() {
+        return eventName;
     }
 
-    public void setLocationTagged(String locationTagged) {
-        this.locationTagged = locationTagged;
-    }
-    public String getCreatedAt() {
-        return createdAt;
+    public String getEventId() {
+        return eventId;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
-    @Override
-    public String toString() {
-        return "Event{" +
-                "createdBy='" + createdBy + '\'' +
-                ", eventName='" + eventName + '\'' +
-                ", img='" + img + '\'' +
-                ", eventDate='" + eventDate + '\'' +
-                ", eventTime='" + eventTime + '\'' +
-                ", eventDetails='" + eventDetails + '\'' +
-                ", userTagged='" + userTagged + '\'' +
-                ", locationTagged='" + locationTagged + '\'' +
-                ", createdAt='" + createdAt + '\'' +
-                '}';
-    }
+
 }

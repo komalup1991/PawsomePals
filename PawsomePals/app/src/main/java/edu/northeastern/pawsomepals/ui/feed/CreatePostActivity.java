@@ -56,6 +56,8 @@ public class CreatePostActivity extends AppCompatActivity {
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
     private AutoCompleteTextView searchLocationDisplayTextView;
+    private String userNameToSaveInFeed;
+    private String userProfileUrlToSaveInFeed;
 
 
     @Override
@@ -269,6 +271,9 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("userTagged", userTagged);
         post.put("locationTagged", locationTagged);
         post.put("createdAt", createdAt);
+        post.put("username",userNameToSaveInFeed);
+        post.put("userProfileImage",userProfileUrlToSaveInFeed);
+        post.put("type",4);
 
         //Add a new document with a generated ID
         db.collection("posts")
@@ -329,6 +334,8 @@ public class CreatePostActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
+                            userNameToSaveInFeed = user.getName();
+                            userProfileUrlToSaveInFeed = user.getProfileImage();
 
                             Glide.with(this)
                                     .load(user.getProfileImage())

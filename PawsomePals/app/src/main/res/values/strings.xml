@@ -95,5 +95,9 @@
     <string name="tagged_location">Tagged Location</string>
     <string name="service_name">Service Name</string>
     <string name="service_details">Service Details</string>
+    <string name="like">like</string>
+    <string name="comment">comment</string>
+    <string name="share">share</string>
+    <string name="john_doe">John Doe</string>
 
 </resources>

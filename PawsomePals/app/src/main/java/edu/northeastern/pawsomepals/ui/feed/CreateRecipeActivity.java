@@ -283,14 +283,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
                             Users user = userDocument.toObject(Users.class);
-                            Log.d("yoo",user.getProfileImage());
+
+                            if(user.getProfileImage()!=null){
                             Glide.with(this)
                                     .load(user.getProfileImage())
-                                    .into(userProfilePic);
+                                    .into(userProfilePic);}
 
-                            userNameTextView.setText(user.getName());
+                            if(user.getName()!=null)
+                            {  userNameTextView.setText(user.getName());
 
-                        }
+                        }}
                     } else {
                         Log.e("yoo", "Error getting user's info.", task.getException());
                     }
@@ -527,13 +529,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
         }
-        return false;
+        else{   return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED; }
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_PERMISSIONS);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_GALLERY);
         }
+        else{
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_GALLERY);
+    }
     }
 
     private void openCamera() {
@@ -572,13 +577,18 @@ public class CreateRecipeActivity extends AppCompatActivity {
         Bundle extras = data.getExtras();
         Bitmap cameraImageBitmap = (Bitmap) extras.get("data");
 
+        // Resize the image to your desired dimensions
+        int targetWidth = 1920; // Adjust this to your preferred width
+        int targetHeight = (int) (cameraImageBitmap.getHeight() * (targetWidth / (double) cameraImageBitmap.getWidth()));
+        cameraImageBitmap = Bitmap.createScaledBitmap(cameraImageBitmap, targetWidth, targetHeight, true);
+
         // Save the cameraImageBitmap to a file and return its URI
         String imageFileName = "IMG_" + System.currentTimeMillis() + ".jpg";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File imageFile = new File(storageDir, imageFileName);
         try {
             FileOutputStream outputStream = new FileOutputStream(imageFile);
-            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream); // Adjust compression quality (0-100) as needed
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
@@ -588,6 +598,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
         return Uri.fromFile(imageFile);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

@@ -40,17 +40,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/imageProfile"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_marginTop="32dp"
-                android:scaleType="centerCrop"
                 android:src="@drawable/default_profile_image"
+                android:scaleType="centerCrop"
+                app:civ_border_width="2dp"
+                app:civ_border_color="#FFFFFF"
                 app:layout_constraintEnd_toEndOf="parent"
-
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvUserProfileHeader" />
+                app:layout_constraintTop_toBottomOf="@+id/tvUserProfileHeader"/>
 
 
             <ImageView
@@ -62,7 +64,7 @@
                 android:src="@drawable/baseline_add_24"
                 app:layout_constraintBottom_toBottomOf="@id/imageProfile"
                 app:layout_constraintEnd_toEndOf="@id/imageProfile"
-                app:tint="@color/black" />
+                app:tint="@color/white" />
 
             <EditText
                 android:id="@+id/editTextName"
@@ -103,7 +105,7 @@
                     android:id="@+id/radioButtonMale"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:text="Male"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white" />
@@ -113,7 +115,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:text="Female"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white" />
@@ -123,7 +125,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:button="@drawable/custom_radio_button"
+                    android:buttonTint="@color/white"
                     android:text="Other"
                     android:textColor="@color/white"
                     android:textColorHint="@color/white" />
