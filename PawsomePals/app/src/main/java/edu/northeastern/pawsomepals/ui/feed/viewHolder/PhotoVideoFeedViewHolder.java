@@ -42,9 +42,11 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder{
         userTaggedTextView.setText(photoVideo.getUserTagged());
         locationTaggedTextView.setText(photoVideo.getLocationTagged());
         photoVideoCaptionTextView.setText(photoVideo.getCaption());
-        Glide.with(userProfilePic.getContext())
+
+        Glide.with(photoVideoImageView.getContext())
                 .load(photoVideo.getImg())
                 .into(photoVideoImageView);
+
 
 
 

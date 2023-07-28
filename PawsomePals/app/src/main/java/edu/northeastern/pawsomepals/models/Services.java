@@ -4,6 +4,7 @@ public class Services extends FeedItem {
     private String serviceType;
     private String serviceName;
     private String serviceNotes;
+    private String serviceId;
 
     public Services() {
 
@@ -32,4 +33,13 @@ public class Services extends FeedItem {
     public String getServiceNotes() {
         return serviceNotes;
     }
+
+    public String getServiceId() {
+        return serviceId;
+    }
+
+    public void setServiceId(String serviceId) {
+        this.serviceId = serviceId;
+    }
+
 }

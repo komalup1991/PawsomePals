@@ -1,6 +1,6 @@
 package edu.northeastern.pawsomepals.models;
 
-public abstract class FeedItem {
+public abstract class FeedItem   {
     public static final int TYPE_PHOTO_VIDEO = 1;
     public static final int TYPE_SERVICE = 2;
     public static final int TYPE_EVENT = 3;

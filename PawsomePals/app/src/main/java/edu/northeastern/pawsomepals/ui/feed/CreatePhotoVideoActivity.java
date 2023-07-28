@@ -237,9 +237,11 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
                         if (downloadUri != null) {
                             String imageUrl = downloadUri.toString();
+                            Log.d("yoo","here  "+downloadUri.toString());
                             updateDbWithImg(imageUrl);
                         }
                     } else {
+                        Log.d("yoo", "Error uploading image to storage");
 
                         Toast.makeText(CreatePhotoVideoActivity.this, "Error uploading image: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -264,8 +266,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                     .update("img", imageUrl)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            Log.d("yoo", "DocumentSnapshot successfully updated!");
+                        public void onSuccess(Void unused ) {
+                            Log.d("yoo", "!!!!!!!!!");
                             hideProgressDialog();
                             finish();
                         }
@@ -379,9 +381,15 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         }
     }
 
+
     private Uri saveCameraImageToFile(Intent data) {
         Bundle extras = data.getExtras();
         Bitmap cameraImageBitmap = (Bitmap) extras.get("data");
+
+        // Resize the image to your desired dimensions
+        int targetWidth = 1920; // Adjust this to your preferred width
+        int targetHeight = (int) (cameraImageBitmap.getHeight() * (targetWidth / (double) cameraImageBitmap.getWidth()));
+        cameraImageBitmap = Bitmap.createScaledBitmap(cameraImageBitmap, targetWidth, targetHeight, true);
 
         // Save the cameraImageBitmap to a file and return its URI
         String imageFileName = "IMG_" + System.currentTimeMillis() + ".jpg";
@@ -389,7 +397,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         File imageFile = new File(storageDir, imageFileName);
         try {
             FileOutputStream outputStream = new FileOutputStream(imageFile);
-            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream); // Adjust compression quality (0-100) as needed
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
@@ -399,6 +407,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
 
         return Uri.fromFile(imageFile);
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

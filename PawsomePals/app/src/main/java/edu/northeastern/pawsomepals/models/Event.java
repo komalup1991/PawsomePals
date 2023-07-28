@@ -6,6 +6,7 @@ public class Event extends FeedItem {
     private String eventDate;
     private String eventTime;
     private String eventDetails;
+    private String eventId;
 
     public Event() {
     }
@@ -43,4 +44,14 @@ public class Event extends FeedItem {
     public String getEventName() {
         return eventName;
     }
+
+    public String getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+
 }

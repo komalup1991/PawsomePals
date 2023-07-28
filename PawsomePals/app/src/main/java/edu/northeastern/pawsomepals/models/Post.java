@@ -32,4 +32,10 @@ public class Post extends FeedItem  {
     public String getPostContent() {
         return postContent;
     }
+
+    public void setPostId(String postId) {
+        this.postId = postId;
+    }
+
+
 }

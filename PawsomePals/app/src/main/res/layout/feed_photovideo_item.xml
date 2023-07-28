@@ -5,7 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:background="@drawable/border"
+    android:backgroundTint="@color/pastelPeach"
+    android:padding="16dp"
+    android:layout_margin="8dp">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/userProfilePic"
@@ -29,6 +32,20 @@
         app:layout_constraintStart_toEndOf="@id/userProfilePic"
         app:layout_constraintTop_toTopOf="parent" />
 
+
+    <ImageView
+        android:id="@+id/photoVideoImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="photoVideoImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/usernameTextView" />
+
     <TextView
         android:id="@+id/photoVideoCaptionTextView"
         android:layout_width="0dp"
@@ -38,28 +55,9 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/usernameTextView" />
-    <ImageView
-        android:id="@+id/photoVideoImageView"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="eventImage"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/photoVideoCaptionTextView" />
-
-    <TextView
-        android:id="@+id/timestampTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        android:text="10 minutes ago"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/border_user_profile_img"
         app:layout_constraintTop_toBottomOf="@id/photoVideoImageView" />
+
 
     <ImageView
         android:id="@+id/userTaggedImageView"
@@ -72,7 +70,7 @@
         android:scaleType="fitCenter"
         android:src="@drawable/user"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photoVideoImageView" />
+        app:layout_constraintTop_toBottomOf="@+id/photoVideoCaptionTextView" />
 
     <TextView
         android:id="@+id/userTaggedTextView"
@@ -97,6 +95,17 @@
         android:src="@drawable/pin"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
+    <TextView
+        android:id="@+id/timestampTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@drawable/custom_border_sticker"
+        app:layout_constraintTop_toBottomOf="@+id/locationTaggedImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="10 minutes ago"
+         />
+
 
     <TextView
         android:id="@+id/locationTaggedTextView"
@@ -108,18 +117,15 @@
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
         app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
-
-
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:gravity="end"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/locationTaggedTextView">
+        app:layout_constraintTop_toBottomOf="@id/timestampTextView">
 
         <ImageButton
             android:id="@+id/likeButton"

@@ -577,13 +577,18 @@ public class CreateRecipeActivity extends AppCompatActivity {
         Bundle extras = data.getExtras();
         Bitmap cameraImageBitmap = (Bitmap) extras.get("data");
 
+        // Resize the image to your desired dimensions
+        int targetWidth = 1920; // Adjust this to your preferred width
+        int targetHeight = (int) (cameraImageBitmap.getHeight() * (targetWidth / (double) cameraImageBitmap.getWidth()));
+        cameraImageBitmap = Bitmap.createScaledBitmap(cameraImageBitmap, targetWidth, targetHeight, true);
+
         // Save the cameraImageBitmap to a file and return its URI
         String imageFileName = "IMG_" + System.currentTimeMillis() + ".jpg";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File imageFile = new File(storageDir, imageFileName);
         try {
             FileOutputStream outputStream = new FileOutputStream(imageFile);
-            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream); // Adjust compression quality (0-100) as needed
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
@@ -593,6 +598,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
         return Uri.fromFile(imageFile);
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

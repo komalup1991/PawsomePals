@@ -22,7 +22,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.FeedAdapter;
@@ -41,7 +40,7 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
     private RecyclerView feedsRecyclerView;
     private RecipeAdapter recipeAdapter;
 
-    private List<FeedItem> feedItemList = new ArrayList<>();
+    private final List<FeedItem> feedItemList = new ArrayList<>();
     private RecipeAdapter.OnItemActionListener onItemActionListener;
     private FeedAdapter feedAdapter;
 
@@ -61,11 +60,11 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
         recipeAdapter = new RecipeAdapter(new ArrayList<>(), new ArrayList<Users>(), onItemActionListener);
         recipeRecyclerView.setAdapter(recipeAdapter);
 
-        feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
-        LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
-        feedsRecyclerView.setLayoutManager(verticalLayoutManager);
-        feedAdapter = new FeedAdapter(feedItemList, requireContext());
-        feedsRecyclerView.setAdapter(feedAdapter);
+//        feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
+//        LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
+//        feedsRecyclerView.setLayoutManager(verticalLayoutManager);
+//        feedAdapter = new FeedAdapter(feedItemList, requireContext());
+//        feedsRecyclerView.setAdapter(feedAdapter);
 
         fetchRecipesFromFirestore();
 
@@ -104,69 +103,68 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
 
     private void fetchRecipesFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("recipes")
-                .addSnapshotListener((querySnapshot, error) -> {
-                    if (error != null) {
-                        Log.e("FeedAllFragment", "Error getting recipes.", error);
-                        return;
-                    }
+        db.collection("recipes").addSnapshotListener((querySnapshot, error) -> {
+            if (error != null) {
+                Log.e("FeedAllFragment", "Error getting recipes.", error);
+                return;
+            }
 
-                    List<Recipe> recipeList = new ArrayList<>();
-                    for (QueryDocumentSnapshot document : querySnapshot) {
-                        Recipe recipe = document.toObject(Recipe.class);
-                        recipe.setRecipeId(document.getId());
-                        String userId = recipe.getCreatedBy();
-                        fetchUserNameFromFirestore(userId, recipe, recipeList);
-                        recipeList.add(recipe);
-                    }
-                    recipeAdapter.setRecipes(recipeList);
-                    recipeAdapter.notifyDataSetChanged();
-                });
+            List<Recipe> recipeList = new ArrayList<>();
+            for (QueryDocumentSnapshot document : querySnapshot) {
+                Recipe recipe = document.toObject(Recipe.class);
+                recipe.setRecipeId(document.getId());
+                String userId = recipe.getCreatedBy();
+                fetchUserNameFromFirestore(userId, recipe, recipeList);
+                recipeList.add(recipe);
+            }
+            recipeAdapter.setRecipes(recipeList);
+            recipeAdapter.notifyDataSetChanged();
+        });
     }
 
 
     private void fetchUserNameFromFirestore(String userId, Recipe recipe, List<Recipe> recipeList) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("user")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
-                            Users user = userDocument.toObject(Users.class);
-                            recipe.setUsername(user.getName());
-                            recipe.setUserProfileImage(user.getProfileImage());
-                        }
-                    } else {
-                        Log.e("FeedAllFragment", "Error getting user's name.", task.getException());
-                    }
+        db.collection("user").whereEqualTo("userId", userId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                for (QueryDocumentSnapshot userDocument : task.getResult()) {
+                    Users user = userDocument.toObject(Users.class);
+                    recipe.setUsername(user.getName());
+                    recipe.setUserProfileImage(user.getProfileImage());
+                }
+            } else {
+                Log.e("FeedAllFragment", "Error getting user's name.", task.getException());
+            }
 
 
-                    recipeAdapter.notifyDataSetChanged();
-                });
+            recipeAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override
     public void onDataLoaded(List<QuerySnapshot> querySnapshots) {
+
         for (QuerySnapshot querySnapshot : querySnapshots) {
             for (QueryDocumentSnapshot document : querySnapshot) {
                 int type = Math.toIntExact((Long) document.getData().get("type"));
                 FeedItem feedItem = null;
                 switch (type) {
-                    case FeedItem.TYPE_PHOTO_VIDEO ->feedItem = document.toObject(PhotoVideo.class);
+                    case FeedItem.TYPE_PHOTO_VIDEO -> feedItem = document.toObject(PhotoVideo.class);
                     case FeedItem.TYPE_EVENT -> feedItem = document.toObject(Event.class);
                     case FeedItem.TYPE_POST -> feedItem = document.toObject(Post.class);
                     case FeedItem.TYPE_SERVICE -> feedItem = document.toObject(Services.class);
                 }
-                feedItemList.add(feedItem);
+                if (feedItem != null) {
+                    feedItemList.add(feedItem);
+                }
             }
         }
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                feedAdapter.notifyDataSetChanged();
+           //     feedAdapter.notifyDataSetChanged();
             }
         });
     }

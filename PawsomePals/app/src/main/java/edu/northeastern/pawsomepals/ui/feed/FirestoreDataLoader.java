@@ -31,7 +31,7 @@ public class FirestoreDataLoader {
                 List<QuerySnapshot> querySnapshots = new ArrayList<>();
                 try {
                     for (CollectionReference collection : collections) {
-                        Query query = collection.orderBy(orderByField);
+                        Query query = collection.orderBy(orderByField, Query.Direction.DESCENDING);
                         Task<QuerySnapshot> task = query.get();
                         Tasks.await(task);
                         if (task.isSuccessful()) {

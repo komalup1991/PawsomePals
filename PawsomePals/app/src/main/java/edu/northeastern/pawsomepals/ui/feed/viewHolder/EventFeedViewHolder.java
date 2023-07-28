@@ -23,7 +23,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
     TextView locationTaggedTextView ;
     TextView eventDetailsTextView ;
     TextView eventDateTextView ;
-    TextView eventTimeTextView ;
+    TextView eventTimeTextView,eventNameTextView ;
     public EventFeedViewHolder(@NonNull View itemView) {
         super(itemView);
          userProfilePic = itemView.findViewById(R.id.userProfilePic);
@@ -35,6 +35,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
          eventDetailsTextView = itemView.findViewById(R.id.eventDetailsTextView);
          eventDateTextView = itemView.findViewById(R.id.eventDateTextView);
          eventTimeTextView = itemView.findViewById(R.id.eventTimeTextView);
+        eventNameTextView = itemView.findViewById(R.id.eventNameTextView);
     }
     public void bindData(Event event) {
         Glide.with(userProfilePic.getContext())
@@ -50,5 +51,6 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         eventDetailsTextView.setText(event.getEventDetails());
         eventDateTextView.setText(event.getEventDate());
         eventTimeTextView.setText(event.getEventTime());
+        eventNameTextView.setText(event.getEventName());
     }
 }
