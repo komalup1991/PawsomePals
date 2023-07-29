@@ -110,6 +110,10 @@ public class ChatFragment extends Fragment {
         if (adapter != null){
             adapter.startListening();
         }
+        synchronized(this) {
+            // update your adapter data here
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -129,6 +133,10 @@ public class ChatFragment extends Fragment {
         super.onStop();
         if (adapter != null){
             adapter.stopListening();
+        }
+        synchronized(this) {
+            // update your adapter data here
+            adapter.notifyDataSetChanged();
         }
     }
 }

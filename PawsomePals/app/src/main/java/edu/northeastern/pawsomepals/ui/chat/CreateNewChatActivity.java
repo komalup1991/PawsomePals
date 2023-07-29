@@ -76,6 +76,10 @@ public class CreateNewChatActivity extends AppCompatActivity {
         if (adapter != null){
             adapter.startListening();
         }
+//        synchronized(this) {
+//            // update your adapter data here
+//            adapter.notifyDataSetChanged();
+//        }
     }
 
     @Override

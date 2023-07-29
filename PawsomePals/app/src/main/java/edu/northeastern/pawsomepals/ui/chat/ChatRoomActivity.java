@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,6 +24,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -203,7 +206,22 @@ public class ChatRoomActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-
+//                if (response.isSuccessful()){
+//                    try {
+//                        if (response.body() != null) {
+//                            JSONObject responseJson = new JSONObject();
+//                            JSONArray results = responseJson.getJSONArray("results");
+//                            if(responseJson.getInt("failure")==1){
+//                                JSONObject error = (JSONObject) results.get(0);
+//                                Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
+//                                return;
+//                            }
+//                        }
+//                    } catch (JSONException e){
+//                        e.printStackTrace();
+//                    }
+//                    showToast("Notification sent successfully");
+////                }
             }
         });
     }

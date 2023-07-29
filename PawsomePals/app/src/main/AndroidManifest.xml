@@ -89,6 +89,9 @@
         <activity
             android:name=".ui.login.MainActivity"
             android:screenOrientation="portrait"
+            android:exported="false">
+        </activity>
+        <activity android:name="edu.northeastern.pawsomepals.ui.chat.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
