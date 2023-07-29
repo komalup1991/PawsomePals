@@ -12,24 +12,26 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
+
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.search.SearchViewHolder;
 
-public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder> {
+public class SearchUserAdapter extends RecyclerView.Adapter<SearchViewHolder>{
 
-    private List<Recipe> recipes;
+    private final SearchUserAdapter.OnItemActionListener onItemActionListener;
 
-    private SearchRecyclerAdapter.OnItemActionListener onItemActionListener;
     public interface OnItemActionListener {
-        void onRecipeClick(Recipe recipe);
+        void onUserClick(Users user);
     }
+    private List<Users> users;
 
-    public SearchRecyclerAdapter(List<Recipe> recipes, List<Users> user, SearchRecyclerAdapter.OnItemActionListener onItemActionListener) {
-        this.recipes = recipes;
+    public SearchUserAdapter(List<Users> users, SearchUserAdapter.OnItemActionListener onItemActionListener) {
+        this.users = users;
         this.onItemActionListener = onItemActionListener;
     }
+
     @NonNull
     @Override
     public SearchViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -39,29 +41,39 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-        Recipe recipe = recipes.get(position);
-        holder.title.setText(recipe.getTitle());
-        Log.d("title",recipe.getTitle());
-        Glide.with(holder.itemView.getContext())
-                .load(recipe.getImg())
-                .into(holder.recipeImage);
-       // holder.bindThisData(recipe);
+
+        Users user = users.get(position);
+        holder.title.setText(user.getName());
+
+        Glide.with(holder.itemView.getContext()).
+                load(user.getProfileImage()).
+                into(holder.searchImage);
+
 
         holder.title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onRecipeClick(recipes.get(position));
+                onItemActionListener.onUserClick(users.get(position));
+            }
+        });
+
+        holder.searchImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(users.get(position));
             }
         });
 
     }
-    public void setRecipes(List<Recipe> recipeList) {
-        recipes = recipeList;
+
+    public void setUsers(List<Users> userList) {
+        users = userList;
         notifyDataSetChanged();
     }
 
+
     @Override
     public int getItemCount() {
-        return recipes.size();
+        return users.size();
     }
 }

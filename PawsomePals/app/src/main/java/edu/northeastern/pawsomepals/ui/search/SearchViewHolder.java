@@ -13,13 +13,13 @@ import edu.northeastern.pawsomepals.models.Recipe;
 public class SearchViewHolder extends RecyclerView.ViewHolder {
 
     public TextView title;
-    public ImageView recipeImage;
+    public ImageView searchImage;
 
 
     public SearchViewHolder(@NonNull View itemView) {
         super(itemView);
         this.title = itemView.findViewById(R.id.title);
-        this.recipeImage = itemView.findViewById(R.id.circleImageView);
+        this.searchImage = itemView.findViewById(R.id.circleImageView);
 
     }
 
