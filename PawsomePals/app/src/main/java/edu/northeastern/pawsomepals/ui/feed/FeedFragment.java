@@ -38,7 +38,7 @@ public class FeedFragment extends Fragment {
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
         FragmentAdapter fragmentAdapter = new FragmentAdapter(this.getActivity());
-        viewPager.setUserInputEnabled(false);
+    //    viewPager.setUserInputEnabled(false);
         viewPager.setAdapter(fragmentAdapter);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
