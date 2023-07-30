@@ -9,6 +9,7 @@
     <color name="pastelYellow">#FDFD96</color>
     <color name="pastelOrange">#FFB74D</color>
     <color name="pastelMint">#98FF98</color>
+    <color name="pasteRed">#FAA0A0</color>
     <color name="pastelLavender">#E6E6FA</color>
     <color name="pastelPeach">#FFDAB9</color>
     <color name="pastelAqua">#00FFFF</color>
@@ -34,5 +35,36 @@
     <color name="text_color">@color/white</color>
     <color name="toolbar_color">@color/darkPink</color>
     <color name="divider_color">#FF0000</color>
+
+    <color name="lightGray">#D3D3D3</color>
+    <color name="beige">#F5F5DC</color>
+
+    <!-- Complementary Colors -->
+    <color name="complementaryPink">#FFA07A</color>
+    <color name="complementaryCoral">#FF6347</color>
+    <color name="complementaryLightBlue">#ADD8E6</color>
+    <color name="complementaryLightGreen">#90EE90</color>
+    <color name="complementaryLavender">#E0B0FF</color>
+    <color name="complementaryYellow">#FFFFE0</color>
+
+    <!-- Analogous Colors -->
+    <color name="analogousYellow">#FFF8DC</color>
+    <color name="analogousGreen">#98FB98</color>
+    <color name="analogousBlue">#B0E0E6</color>
+
+    <!-- Earth Tones -->
+    <color name="paleTerracotta">#F0EAD6</color>
+    <color name="softSageGreen">#C1DAD6</color>
+    <color name="dustyRose">#B39EB5</color>
+
+    <!-- Metallic Accents -->
+    <color name="roseGold">#B76E79</color>
+    <color name="copper">#B87333</color>
+    <color name="paleGold">#E6BE8A</color>
+
+    <!-- Pastel Neons -->
+    <color name="pastelNeonPink">#FF6EC7</color>
+    <color name="pastelNeonGreen">#C6FF00</color>
+    <color name="pastelNeonOrange">#FFB347</color>
 
 </resources>
