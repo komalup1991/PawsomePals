@@ -66,6 +66,8 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.ImageUtil;
+import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 
 public class CreatePhotoVideoActivity extends AppCompatActivity {
@@ -135,7 +137,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         selectPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showPhotoSelectionDialog();
+                ImageUtil.showPhotoSelectionDialog(CreatePhotoVideoActivity.this);
             }
         });
 
@@ -211,17 +213,10 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         else if (galleryImageUri != null) uploadImageUri = galleryImageUri;
 
         if (uploadImageUri != null) {
-            // Create a unique filename for the image
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String imageName = "photovideo_" + timestamp + ".jpg";
-
-            // Create a reference to the image file in Firebase Storage
             StorageReference imageRef = storageRef.child("photovideo_images/" + imageName);
-
-            // Upload the image file to Firebase Storage
             UploadTask uploadTask = imageRef.putFile(uploadImageUri);
-
-            // Retrieve the download URL of the uploaded image
             Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -267,7 +262,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused ) {
-                            Log.d("yoo", "!!!!!!!!!");
                             hideProgressDialog();
                             finish();
                         }
@@ -294,17 +288,17 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case 0:
-                        if (checkCameraPermission()) {
-                            openCamera();
+                        if (ImageUtil.checkCameraPermission(CreatePhotoVideoActivity.this)) {
+                            ImageUtil.openCamera(CreatePhotoVideoActivity.this);
                         } else {
-                            requestCameraPermission();
+                            ImageUtil.requestCameraPermission(CreatePhotoVideoActivity.this);
                         }
                         break;
                     case 1:
-                        if (checkStoragePermission()) {
-                            openGallery();
+                        if (ImageUtil.checkStoragePermission(CreatePhotoVideoActivity.this)) {
+                            ImageUtil.openGallery(CreatePhotoVideoActivity.this);
                         } else {
-                            requestStoragePermission();
+                            ImageUtil.requestStoragePermission(CreatePhotoVideoActivity.this);
                         }
                         break;
                 }
@@ -322,54 +316,18 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         isEditImageDialogVisible = true;
         dialog.show();
     }
-    private boolean checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
-        }
-        else{   return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED; }
-    }
-
-    private void requestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_CODE_GALLERY);
-        }
-        else{
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_GALLERY);
-        }
-    }
 
 
 
 
-    private void openGallery() {
-        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(galleryIntent, REQUEST_CODE_GALLERY);
-    }
 
-
-
-    private void requestCameraPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_PERMISSIONS);
-    }
-
-    private void openCamera() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        try {
-            startActivityForResult(takePictureIntent, REQUEST_CODE_CAMERA);
-        } catch (ActivityNotFoundException e) {
-        }
-    }
-
-    private boolean checkCameraPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
                 galleryImageUri = null;
-                cameraImageUri = saveCameraImageToFile(data);
+                cameraImageUri = ImageUtil.saveCameraImageToFile(data,this);
                 selectPhoto.setVisibility(View.GONE);
                 Glide.with(this).load(cameraImageUri).centerCrop().into(photoVideoImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
@@ -382,39 +340,15 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     }
 
 
-    private Uri saveCameraImageToFile(Intent data) {
-        Bundle extras = data.getExtras();
-        Bitmap cameraImageBitmap = (Bitmap) extras.get("data");
 
-        // Resize the image to your desired dimensions
-        int targetWidth = 1920; // Adjust this to your preferred width
-        int targetHeight = (int) (cameraImageBitmap.getHeight() * (targetWidth / (double) cameraImageBitmap.getWidth()));
-        cameraImageBitmap = Bitmap.createScaledBitmap(cameraImageBitmap, targetWidth, targetHeight, true);
-
-        // Save the cameraImageBitmap to a file and return its URI
-        String imageFileName = "IMG_" + System.currentTimeMillis() + ".jpg";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File imageFile = new File(storageDir, imageFileName);
-        try {
-            FileOutputStream outputStream = new FileOutputStream(imageFile);
-            cameraImageBitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream); // Adjust compression quality (0-100) as needed
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        return Uri.fromFile(imageFile);
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (checkCameraPermission()) {
-                    openCamera();
+                if (ImageUtil.checkCameraPermission(this)) {
+                    ImageUtil.openCamera(this);
                 } else {
                     Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
                 }
@@ -454,32 +388,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         cameraImageUri = null;
     }
 
-    private void showPhotoSelectionDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Upload Photo");
-        builder.setItems(new CharSequence[]{"Take Photo", "Choose from Gallery"}, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        if (checkCameraPermission()) {
-                            openCamera();
-                        } else {
-                            requestCameraPermission();
-                        }
-                        break;
-                    case 1:
-                        if (checkStoragePermission()) {
-                            openGallery();
-                        } else {
-                            requestStoragePermission();
-                        }
-                        break;
-                }
-            }
-        });
-        builder.show();
-    }
+
 
     private void uploadToFireStore() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);

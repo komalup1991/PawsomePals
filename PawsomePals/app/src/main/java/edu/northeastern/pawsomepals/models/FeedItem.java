@@ -1,6 +1,13 @@
 package edu.northeastern.pawsomepals.models;
 
-public abstract class FeedItem   {
+import android.icu.text.SimpleDateFormat;
+import android.util.Log;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Locale;
+
+public abstract class FeedItem  implements Comparable<FeedItem> {
     public static final int TYPE_PHOTO_VIDEO = 1;
     public static final int TYPE_SERVICE = 2;
     public static final int TYPE_EVENT = 3;
@@ -35,6 +42,10 @@ public abstract class FeedItem   {
         return userTagged;
     }
 
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public String getLocationTagged() {
         return locationTagged;
     }
@@ -56,4 +67,22 @@ public abstract class FeedItem   {
     public void setUserProfileImage(String userProfileImage) {
         this.userProfileImage = userProfileImage;
     }
+
+    @Override
+    public int compareTo(FeedItem feedItem) {
+//        Log.d("yoo", "convertStringToDate(f eedItem2.getCreatedAt()) = " + convertStringToDate(feedItem2.getCreatedAt()));
+//        Log.d("yoo", "convertStringToDate(feedItem.getCreatedAt()) = " + convertStringToDate(feedItem.getCreatedAt()));
+//        return convertStringToDate(this.getCreatedAt())
+//                .compareTo(convertStringToDate(feedItem.getCreatedAt()));
+        return 0;
+    }
+
+//    private Date convertStringToDate(String createdAt) {
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+//        try {
+//            return sdf.parse(createdAt);
+//        } catch (ParseException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

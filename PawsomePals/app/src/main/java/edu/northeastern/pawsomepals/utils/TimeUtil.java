@@ -33,7 +33,10 @@ public class TimeUtil {
                 timeAgoText = hours + " hours ago";
         } else {
             int days = (int) (timeDifferenceMillis / (24 * 60 * 60 * 1000));
-            timeAgoText = days + " days ago";
+            if (days == 1)
+                timeAgoText = days + " day ago";
+            else
+                timeAgoText = days + " days ago";
         }
 
         return timeAgoText;
