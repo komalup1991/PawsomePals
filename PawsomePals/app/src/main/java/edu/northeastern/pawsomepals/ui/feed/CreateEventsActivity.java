@@ -68,6 +68,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -566,6 +567,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("username",userNameToSaveInFeed);
         events.put("userProfileImage",userProfileUrlToSaveInFeed);
         events.put("type",3);
+        events.put("eventId", UUID.randomUUID().toString());
 
         //Add a new document with a generated ID
         db.collection("events")
@@ -574,7 +576,6 @@ public class CreateEventsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         eventsDocId = documentReference.getId();
-
                         Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
                         hideProgressDialog();
                         finish();
@@ -709,10 +710,15 @@ public class CreateEventsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            showConfirmationDialog();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        showConfirmationDialog();
     }
 
     private void showConfirmationDialog() {
