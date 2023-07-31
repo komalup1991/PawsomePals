@@ -98,6 +98,7 @@ public class ProfileFragment extends Fragment {
 
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
         profileId = sharedPreferences.getString("profileId", "none");
+
         // Initialize UI elements
         profileImage = view.findViewById(R.id.profileImage);
         profileName = view.findViewById(R.id.profileName);
@@ -110,6 +111,13 @@ public class ProfileFragment extends Fragment {
         fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
         editOrFollowButton = view.findViewById(R.id.editOrFollowButton);
         progressBar = view.findViewById(R.id.progressBar);
+
+        // Check if the profileId is the same as the current user's userId
+        if (profileId.equals(userId)) {
+            editOrFollowButton.setText("Edit Profile");
+        } else {
+            setupFollowButton();
+        }
         editOrFollowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,16 +142,16 @@ public class ProfileFragment extends Fragment {
         });
 
         // Call the method to display name and image of the user
-        getUserInfo(userId);
+        getUserInfo(profileId);
 
         // Call the method to start listening for changes in the following count
-        getFollowingCount(userId);
+        getFollowingCount(profileId);
 
         // Call the method to start listening for changes in the followers count
-        getFollowersCount(userId);
+        getFollowersCount(profileId);
 
         // Call the method to start listening for changes in the posts count
-        getPostsCount(userId);
+        getPostsCount(profileId);
 
         progressBar.setVisibility(View.GONE);
 
@@ -579,6 +587,32 @@ public class ProfileFragment extends Fragment {
                         Log.e("Update Profile Image", "Error updating profileImage field", e);
                     });
         }
+    }
+
+    private void setupFollowButton() {
+        // Check if the document for the current user exists in the "follow" collection
+        firebaseFirestore.collection("follow")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> followingList = (List<String>) documentSnapshot.get("following");
+                        if (followingList != null && followingList.contains(profileId)) {
+                            // The current user is already following this profile
+                            editOrFollowButton.setText("Following");
+                        } else {
+                            // The current user is not following this profile
+                            editOrFollowButton.setText("Follow");
+                        }
+                    } else {
+                        // Document does not exist, the current user is not following this profile
+                        editOrFollowButton.setText("Follow");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the error if needed
+                    Log.e("Setup Follow Button", "Error checking if document exists", e);
+                });
     }
 
     @Override
