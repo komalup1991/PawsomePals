@@ -1,9 +1,18 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
+import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,25 +21,38 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
+import edu.northeastern.pawsomepals.ui.feed.CreatePhotoVideoActivity;
+import edu.northeastern.pawsomepals.utils.ImageUtil;
 
 public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
@@ -52,7 +74,14 @@ public class ProfileFragment extends Fragment {
     private ImageView profileImage;
     private Button editOrFollowButton;
     private String profileId;
-
+    private long followingCountValue = 0;
+    private long followersCountValue = 0;
+    private long postsCountValue = 0;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_GALLERY = 2;
+    private static final int PERMISSIONS_REQUEST_CAMERA = 3;
+    private static final int PERMISSIONS_REQUEST_STORAGE = 4;
+    private Uri photoUri;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,6 +125,28 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
+
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openImageChooserDialog();
+            }
+        });
+
+        // Call the method to display name and image of the user
+        getUserInfo(userId);
+
+        // Call the method to start listening for changes in the following count
+        getFollowingCount(userId);
+
+        // Call the method to start listening for changes in the followers count
+        getFollowersCount(userId);
+
+        // Call the method to start listening for changes in the posts count
+        getPostsCount(userId);
+
+        progressBar.setVisibility(View.GONE);
+
         return view;
     }
 
@@ -280,7 +331,255 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    private void getFollowingCount(String userIdValue) {
+        firebaseFirestore.collection("follow")
+                .document(userIdValue)
+                .addSnapshotListener((documentSnapshot, e) -> {
+                    if (e != null) {
+                        Log.w("Get Following Count", "Listen failed.", e);
+                        return;
+                    }
 
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        List<String> followingList = (List<String>) documentSnapshot.get("following");
+                        if (followingList != null) {
+                            followingCountValue = followingList.size();
+                            // Update the UI with the new following count
+                            followingCount.setText(String.valueOf(followingCountValue));
+                        }
+                    } else {
+                        Log.d("Get Following Count", "Current data: null");
+                    }
+                });
+    }
+
+    private void getFollowersCount(String userIdValue) {
+        firebaseFirestore.collection("follow")
+                .document(userIdValue)
+                .addSnapshotListener((documentSnapshot, e) -> {
+                    if (e != null) {
+                        Log.w("Get Followers Count", "Listen failed.", e);
+                        return;
+                    }
+
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        List<String> followersList = (List<String>) documentSnapshot.get("follows");
+                        if (followersList != null) {
+                            followersCountValue = followersList.size();
+                            // Update the UI with the new followers count
+                            followersCount.setText(String.valueOf(followersCountValue));
+                        }
+                    } else {
+                        Log.d("Get Followers Count", "Current data: null");
+                    }
+                });
+    }
+
+    private void getPostsCount(String userIdValue) {
+        firebaseFirestore.collection("posts")
+                .whereEqualTo("createdBy", userIdValue)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    postsCountValue = queryDocumentSnapshots.size();
+                    // Update the UI with the new posts count
+                    postsCount.setText(String.valueOf(postsCountValue));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Get Posts Count", "Error getting documents.", e);
+                });
+    }
+
+    private void getUserInfo(String userIdValue) {
+        firebaseFirestore.collection("user")
+                .whereEqualTo("userId", userIdValue)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    postsCountValue = queryDocumentSnapshots.size();
+                    // Update the UI with the new posts count
+                    postsCount.setText(String.valueOf(postsCountValue));
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Get Posts Count", "Error getting documents.", e);
+                });
+
+        firebaseFirestore.collection("user")
+                .whereEqualTo("userId", userIdValue)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
+                            Users user = userDocument.toObject(Users.class);
+
+                            String profileImagePath = user.getProfileImage();
+                            if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
+                                // Load the profile image using Glide
+                                Glide.with(requireContext())
+                                        .load(profileImagePath)
+                                        .into(profileImage);
+                            } else {
+                                // If the profile image path is empty or null, you can use a placeholder image
+                                Glide.with(requireContext())
+                                        .load(R.drawable.default_profile_image)
+                                        .into(profileImage);
+                            }
+
+
+                            profileName.setText(user.getName());
+
+
+                        }
+                    } else {
+                        Log.e("yoo", "Error getting user's info.", task.getException());
+                    }
+                });
+    }
+
+    private void openImageChooserDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Choose Profile Picture");
+        builder.setItems(new String[]{"Take Photo", "Choose from Gallery"}, (dialog, which) -> {
+            if (which == 0) {
+                handleImageCaptureFromCamera();
+            } else if (which == 1) {
+                handleImagePickFromGallery();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Camera permissions granted, proceed with image capture
+                    handleImageCaptureFromCamera();
+                } else {
+                    // Camera permissions denied, show a message or handle accordingly
+                    Toast.makeText(getActivity(), "Camera permissions denied.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case PERMISSIONS_REQUEST_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Storage permissions granted, proceed with image pick
+                    handleImagePickFromGallery();
+                } else {
+                    // Storage permissions denied, show a message or handle accordingly
+                    Toast.makeText(getActivity(), "Storage permissions denied.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    private void handleImagePickFromGallery() {
+        // Check if storage permissions are granted
+        if (checkStoragePermission()) {
+            Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(pickPhotoIntent, REQUEST_IMAGE_GALLERY);
+        } else {
+            // Request storage permissions if not granted
+            requestStoragePermission();
+        }
+    }
+
+    private void handleImageCaptureFromCamera() {
+        // Check if camera permissions are granted
+        if (checkCameraPermission()) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        } else {
+            // Request camera permissions if not granted
+            requestCameraPermission();
+        }
+    }
+
+
+    private boolean checkCameraPermission() {
+        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
+    }
+
+    private boolean checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        }
+        else
+        {return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
+    }
+
+    private void requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
+        }
+        else{
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                // Handle image capture from the camera
+                if (data != null && data.getExtras() != null) {
+                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+                    profileImage.setImageBitmap(bitmap);
+
+                    // Convert the Bitmap to a URI and set it to the photoUri
+                    photoUri = getImageUriFromBitmap(bitmap);
+                    // Update the profileImage field in Firestore
+                    updateProfileImageInFirestore(photoUri);
+                } else {
+                    // Handle the case when data is null or the image capture failed
+                    Toast.makeText(getActivity(), "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == REQUEST_IMAGE_GALLERY) {
+                // Handle image pick from the gallery
+                Uri selectedImageUri = data.getData();
+                if (selectedImageUri != null) {
+                    photoUri = selectedImageUri;
+                    profileImage.setImageURI(photoUri);
+                    // Update the profileImage field in Firestore
+                    updateProfileImageInFirestore(photoUri);
+                }
+            }
+        }
+    }
+
+    private Uri getImageUriFromBitmap(Bitmap bitmap) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bitmap, "TempImage", null);
+        return Uri.parse(path);
+    }
+
+    private void updateProfileImageInFirestore(Uri photoUri) {
+        if (currentUser != null) {
+            // Get the Firestore reference for the user document
+            DocumentReference userRef = firebaseFirestore.collection("user").document(userId);
+
+            // Create a map to update the profileImage field
+            Map<String, Object> updateData = new HashMap<>();
+            updateData.put("profileImage", photoUri.toString());
+
+            // Update the document with the new profileImage value
+            userRef.update(updateData)
+                    .addOnSuccessListener(aVoid -> {
+                        // Update successful, do something if needed
+                    })
+                    .addOnFailureListener(e -> {
+                        // Update failed, handle the error
+                        Log.e("Update Profile Image", "Error updating profileImage field", e);
+                    });
+        }
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
