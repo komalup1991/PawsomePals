@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,7 +31,6 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -58,7 +58,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private boolean isGenderSelected = false;
 
     private ImageView imageProfile;
-    private EditText editTextName, editTextDOB;
+    private EditText editTextName;
+    private TextView textViewDOB;
     private RadioGroup radioGroupGender;
     private Button btnSave;
     private Uri photoUri;
@@ -90,7 +91,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
         imageProfile = findViewById(R.id.imageProfile);
         editTextName = findViewById(R.id.editTextName);
         radioGroupGender = findViewById(R.id.radioGroupGender);
-        editTextDOB = findViewById(R.id.editTextDOB);
+        textViewDOB = findViewById(R.id.textViewDOB);
         btnSave = findViewById(R.id.btnSave);
         progressBar = findViewById(R.id.progressBar);
 
@@ -110,8 +111,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
             }
         });
 
-        editTextDOB.setInputType(InputType.TYPE_NULL);
-        editTextDOB.setOnClickListener(new View.OnClickListener() {
+        textViewDOB.setInputType(InputType.TYPE_NULL);
+        textViewDOB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePicker();
@@ -203,7 +204,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private void saveDataToFirebaseStorage() {
         String name = editTextName.getText().toString().trim();
         String gender = getSelectedGender();
-        String dob = editTextDOB.getText().toString().trim();
+        String dob = textViewDOB.getText().toString().trim();
 
         // Check if all the required fields are filled
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(gender) || TextUtils.isEmpty(dob) ||
@@ -289,7 +290,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         // Handle the selected date
-                        editTextDOB.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+                        textViewDOB.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
                     }
                 }, year, month, dayOfMonth);
 
@@ -323,7 +324,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
             isGenderSelected = savedInstanceState.getBoolean("isGenderSelected");
 
             editTextName.setText(name);
-            editTextDOB.setText(dob);
+            textViewDOB.setText(dob);
 
             // Restore gender selection
             if (isGenderSelected) {
@@ -355,15 +356,15 @@ public class EditUserProfileActivity extends AppCompatActivity {
         outState.putParcelable("photoUri", photoUri);
 
         String name = editTextName.getText().toString();
-        String dob = editTextDOB.getText().toString();
+        String dob = textViewDOB.getText().toString();
         String gender = getSelectedGender();
-        String datePickerValue = editTextDOB.getText().toString();
+        String datePickerValue = textViewDOB.getText().toString();
 
         outState.putString("name", name);
         outState.putString("dob", dob);
         outState.putString("gender", gender);
         outState.putString("datePickerValue", datePickerValue);
-        outState.putBoolean("shouldShowDatePicker", editTextDOB.hasFocus() && !datePickerOpened);
+        outState.putBoolean("shouldShowDatePicker", textViewDOB.hasFocus() && !datePickerOpened);
         outState.putBoolean("isGenderSelected", isGenderSelected); // Save the isGenderSelected flag
     }
 
@@ -378,7 +379,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         // Handle the selected date
-                        editTextDOB.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
+                        textViewDOB.setText(dayOfMonth + "/" + (month + 1) + "/" + year);
                     }
                 }, year, month, dayOfMonth);
 

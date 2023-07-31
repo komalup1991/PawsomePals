@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,7 +32,6 @@ import androidx.core.content.ContextCompat;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +53,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.BreedDetails;
 import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
@@ -64,7 +63,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
     private Spinner spinnerMixedBreed;
     private CheckBox checkBoxMixedBreed;
     private EditText editTextDogName;
-    private EditText editTextDOB;
+    private TextView textViewDOB;
     private RadioGroup radioGroupDogGender;
     private RadioGroup radioGroupDogSize;
     private RadioButton radioButtonSmall;
@@ -110,7 +109,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
         spinnerMixedBreed = findViewById(R.id.spinnerMixedBreed);
         checkBoxMixedBreed = findViewById(R.id.checkBoxMixedBreed);
         editTextDogName = findViewById(R.id.editTextName);
-        editTextDOB = findViewById(R.id.editTextDOB);
+        textViewDOB = findViewById(R.id.textViewDOB);
         radioGroupDogGender = findViewById(R.id.radioGroupGender);
         radioGroupDogSize = findViewById(R.id.radioGroupSize);
         radioButtonSmall = findViewById(R.id.radioButtonSmall);
@@ -156,8 +155,8 @@ public class EditDogProfileActivity extends AppCompatActivity {
             }
         });
 
-        editTextDOB.setInputType(InputType.TYPE_NULL);
-        editTextDOB.setOnClickListener(new View.OnClickListener() {
+        textViewDOB.setInputType(InputType.TYPE_NULL);
+        textViewDOB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePicker();
@@ -358,7 +357,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
         String dogMixedBreed = isMixedBreedChecked ? spinnerMixedBreed.getSelectedItem().toString() : "Not mixed";
         String dogGender = getSelectedRadioGroupValue(radioGroupDogGender);
         String dogSize = getSelectedRadioGroupValue(radioGroupDogSize);
-        String dob = editTextDOB.getText().toString();
+        String dob = textViewDOB.getText().toString();
 
         // Check if all the required fields are filled
         if (TextUtils.isEmpty(dogName) || TextUtils.isEmpty(dogGender) || TextUtils.isEmpty(dob) ||
@@ -470,7 +469,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
 
             // Format the selected date and set it to the editTextDOB field
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
-            editTextDOB.setText(sdf.format(calendar.getTime()));
+            textViewDOB.setText(sdf.format(calendar.getTime()));
         }
     };
 
@@ -484,7 +483,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
         String dogMixedBreed = isMixedBreedChecked ? spinnerMixedBreed.getSelectedItem().toString() : "Not mixed";
         String dogGender = getSelectedRadioGroupValue(radioGroupDogGender);
         String dogSize = getSelectedRadioGroupValue(radioGroupDogSize);
-        String dob = editTextDOB.getText().toString();
+        String dob = textViewDOB.getText().toString();
 
 
         outState.putString("name", dogName);
@@ -518,7 +517,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
             isMixedBreedChecked = savedInstanceState.getBoolean("isMixedBreedChecked");
 
             editTextDogName.setText(name);
-            editTextDOB.setText(dob);
+            textViewDOB.setText(dob);
 
             // Restore gender selection
             if (isGenderSelected) {

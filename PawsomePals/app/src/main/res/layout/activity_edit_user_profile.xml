@@ -131,8 +131,8 @@
                     android:textColorHint="@color/white" />
             </RadioGroup>
 
-            <EditText
-                android:id="@+id/editTextDOB"
+            <TextView
+                android:id="@+id/textViewDOB"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -161,9 +161,9 @@
                 android:text="@string/new_profile_save_button"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="@id/editTextDOB"
-                app:layout_constraintStart_toStartOf="@id/editTextDOB"
-                app:layout_constraintTop_toBottomOf="@id/editTextDOB" />
+                app:layout_constraintEnd_toEndOf="@id/textViewDOB"
+                app:layout_constraintStart_toStartOf="@id/textViewDOB"
+                app:layout_constraintTop_toBottomOf="@id/textViewDOB" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
