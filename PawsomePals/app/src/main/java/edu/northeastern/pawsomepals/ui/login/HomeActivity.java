@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,6 +67,16 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 currentSelectedItemIndex = item.getItemId();
                 Class fragmentClass = getFragmentClassBasedOnId(item.getItemId());
+
+                // Check if the selected fragment is the ProfileFragment
+                if (fragmentClass == ProfileFragment.class) {
+                    // Set the profileId to the current user's userId
+                    SharedPreferences sharedPreferences = getSharedPreferences("ProfileId", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("profileId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                    editor.apply();
+                }
+
                 replaceFragment(fragmentClass, item.getItemId());
                 return true;
             }
@@ -117,6 +128,16 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
         String tag = "fragment_" + itemId;
         Fragment fragmentByTag = getSupportFragmentManager().findFragmentByTag(tag);
         if (fragmentByTag == null) {
+
+            // Check if the selected fragment is the ProfileFragment
+            if (fragmentClass == ProfileFragment.class) {
+                // Set the profileId to the current user's userId
+                SharedPreferences sharedPreferences = getSharedPreferences("ProfileId", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("profileId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                editor.apply();
+            }
+
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
                     .replace(R.id.fragment_container_view, fragmentClass, null, tag)
