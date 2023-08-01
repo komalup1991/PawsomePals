@@ -52,8 +52,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         Glide.with(holder.itemView.getContext())
                 .load(recipe.getImg())
                 .into(holder.recipeImage);
-
-
             Glide.with(holder.itemView.getContext())
                     .load(recipe.getUserProfileImage())
                     .into(holder.userProfilePic);

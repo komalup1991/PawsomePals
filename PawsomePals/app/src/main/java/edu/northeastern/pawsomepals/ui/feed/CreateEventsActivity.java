@@ -1,30 +1,19 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
-import static com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,11 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -49,21 +34,15 @@ import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -73,6 +52,9 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
 
 public class CreateEventsActivity extends AppCompatActivity {
@@ -84,7 +66,7 @@ public class CreateEventsActivity extends AppCompatActivity {
     private CircleImageView userProfilePic;
     private String eventsDocId;
     private TextView userNameTextView, tagPeopleTextView, addLocationTextView, taggedUserDisplayTextView;
-    private EditText eventNameEditText,eventDetailsEditText;
+    private EditText eventNameEditText, eventDetailsEditText;
     private Dialog progressDialog;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
@@ -95,14 +77,16 @@ public class CreateEventsActivity extends AppCompatActivity {
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
     private AutoCompleteTextView searchLocationDisplayTextView;
-    private ImageView selectPhoto,photoVideoImageView;
+    private ImageView selectPhoto, eventImageView;
     private Uri galleryImageUri, cameraImageUri;
-    private boolean isEditImageDialogVisible = false;
-    private boolean isDeleteConfirmationDialogVisible = false;
+
     int selectedHour = 0;
     int selectedMinute = 0;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
+
+    private Context context;
+    private boolean isDeleteConfirmationDialogVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +104,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
         addLocationTextView = findViewById(R.id.addLocationTextView);
         searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
-        photoVideoImageView = findViewById(R.id.photoVideoImageView);
+        eventImageView = findViewById(R.id.photoVideoImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
         ImageView editImageView = findViewById(R.id.editImageView);
@@ -154,9 +138,20 @@ public class CreateEventsActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Add Post");
+            actionBar.setTitle("Add Event");
         }
-        fetchUserInfoFromFirestore(loggedInUserId);
+        FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
+            @Override
+            public void onUserReceived(Users user) {
+                userNameToSaveInFeed=user.getName();
+                userProfileUrlToSaveInFeed=user.getProfileImage();
+
+                Glide.with(CreateEventsActivity.this)
+                        .load(user.getProfileImage())
+                        .into(userProfilePic);
+                userNameTextView.setText(user.getName());
+            }
+        });
 
         selectPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -215,18 +210,45 @@ public class CreateEventsActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (eventNameEditText.getText().toString().isEmpty()) {
+                    eventNameEditText.setError("This field is required");
+                    Toast.makeText(CreateEventsActivity.this, "Event Name is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (eventDetailsEditText.getText().toString().isEmpty()) {
+                    eventDetailsEditText.setError("This field is required");
+                    Toast.makeText(CreateEventsActivity.this, "Event Detail is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                uploadToFireStore();
-                uploadImageToStorage();
-                showProgressDialog("Your Photo/Video post is being saved...");
+                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
+                        "event", new BaseDataCallback() {
+
+                            @Override
+                            public void onImageUriReceived(String imageUrl) {
+                                createFeedMap(imageUrl);
+                            }
+
+                            @Override
+                            public void onDismiss() {
+                                DialogHelper.hideProgressDialog(progressDialog);
+                                finish();
+                            }
+
+                            @Override
+                            public void onError(Exception exception) {
+                                Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                DialogHelper.showProgressDialog("Your Event is being saved...", progressDialog, CreateEventsActivity.this);
             }
         });
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showCancelConfirmationDialog();
-                finish();
+                DialogHelper.showCancelConfirmationDialog(context, CreateEventsActivity.this);
+           //     finish();
             }
         });
 
@@ -275,70 +297,7 @@ public class CreateEventsActivity extends AppCompatActivity {
 
     }
 
-    private void uploadImageToStorage() {
-        Uri uploadImageUri = null;
-        if (cameraImageUri != null) uploadImageUri = cameraImageUri;
-        else if (galleryImageUri != null) uploadImageUri = galleryImageUri;
 
-        if (uploadImageUri != null) {
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String imageName = "event_image_" + timestamp + ".jpg";
-            StorageReference imageRef = storageRef.child("event_images/" + imageName);
-            UploadTask uploadTask = imageRef.putFile(uploadImageUri);
-            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return imageRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        if (downloadUri != null) {
-                            String imageUrl = downloadUri.toString();
-                            updateDbWithImg(imageUrl);
-                        }
-                    } else {
-
-                        Toast.makeText(CreateEventsActivity.this, "Error uploading image: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        }
-        else{
-            hideProgressDialog();
-            finish();
-        }
-    }
-
-    private void updateDbWithImg(String imageUrl) {
-        if (imageUrl != null) {
-            DocumentReference eventRef = db.collection("events").document(eventsDocId);
-            eventRef
-                    .update("img", imageUrl)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            hideProgressDialog();
-                            finish();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("yoo", "Error updating document", e);
-                        }
-                    });
-        }
-        else{
-            hideProgressDialog();
-            finish();
-        }
-    }
     private void showEditImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Photo");
@@ -369,10 +328,10 @@ public class CreateEventsActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                isEditImageDialogVisible = false;
+                boolean isEditImageDialogVisible = false;
             }
         });
-        isEditImageDialogVisible = true;
+        boolean isEditImageDialogVisible = true;
         dialog.show();
     }
 
@@ -382,14 +341,14 @@ public class CreateEventsActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
                 galleryImageUri = null;
-                cameraImageUri = ImageUtil.saveCameraImageToFile(data,this);
+                cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(cameraImageUri).centerCrop().into(photoVideoImageView);
+                Glide.with(this).load(cameraImageUri).centerCrop().into(eventImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
                 cameraImageUri = null;
                 galleryImageUri = data.getData();
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(galleryImageUri).centerCrop().into(photoVideoImageView);
+                Glide.with(this).load(galleryImageUri).centerCrop().into(eventImageView);
             }
         }
     }
@@ -412,7 +371,6 @@ public class CreateEventsActivity extends AppCompatActivity {
     }
 
 
-
     private void showDeleteConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you want to delete the selected image?");
@@ -427,23 +385,22 @@ public class CreateEventsActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                isDeleteConfirmationDialogVisible = false;
+                 isDeleteConfirmationDialogVisible = false;
             }
         });
-        isDeleteConfirmationDialogVisible = true;
+         isDeleteConfirmationDialogVisible = true;
         dialog.show();
     }
 
     private void deleteImage() {
-        photoVideoImageView.setImageDrawable(null);
+        eventImageView.setImageDrawable(null);
         selectPhoto.setVisibility(View.VISIBLE);
         galleryImageUri = null;
         cameraImageUri = null;
     }
 
 
-
-    private void uploadToFireStore() {
+    private void createFeedMap(String imageUrlFromFirebaseStorage) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String eventName = eventNameEditText.getText().toString();
@@ -453,8 +410,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         String userTagged = taggedUserDisplayTextView.getText().toString();
         String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
-
-
         Map<String, Object> events = new HashMap<>();
         events.put("createdBy", loggedInUserId);
         events.put("eventName", eventName);
@@ -464,36 +419,19 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("userTagged", userTagged);
         events.put("locationTagged", locationTagged);
         events.put("createdAt", createdAt);
-        events.put("username",userNameToSaveInFeed);
-        events.put("userProfileImage",userProfileUrlToSaveInFeed);
-        events.put("type",3);
+        events.put("username", userNameToSaveInFeed);
+        events.put("userProfileImage", userProfileUrlToSaveInFeed);
+        events.put("type", 3);
         events.put("eventId", UUID.randomUUID().toString());
+        events.put("img", imageUrlFromFirebaseStorage);
 
-        //Add a new document with a generated ID
-        db.collection("events")
-                .add(events)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        eventsDocId = documentReference.getId();
-                        Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        hideProgressDialog();
-                        finish();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("yoo", "Error adding document", e);
-                    }
-                });
-    }
-
-    private void hideProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
+        FirebaseUtil.createCollectionInFirestore(events,"events" ,new BaseDataCallback() {
+            @Override
+            public void onDismiss() {
+                DialogHelper.hideProgressDialog(progressDialog);
+                finish();
+            }
+        });
     }
 
     private void fetchAllUsersFromFirestore() {
@@ -573,40 +511,6 @@ public class CreateEventsActivity extends AppCompatActivity {
     }
 
 
-    private void showCancelConfirmationDialog() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Confirm Action")
-                .setMessage("Are you sure you want to cancel?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        finish();
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .show();
-    }
-
-    private void showProgressDialog(String s) {
-        if (progressDialog == null) {
-            progressDialog = new Dialog(this);
-            progressDialog.setContentView(R.layout.custom_progress_dialog);
-            progressDialog.setCancelable(false);
-            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        TextView progressMessageTextView = progressDialog.findViewById(R.id.progressMessageTextView);
-        if (progressMessageTextView != null) {
-            progressMessageTextView.setText(s);
-        }
-
-        progressDialog.show();
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -634,29 +538,4 @@ public class CreateEventsActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-
-    private void fetchUserInfoFromFirestore(String userId) {
-        db.collection("user")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
-                            Users user = userDocument.toObject(Users.class);
-                            userNameToSaveInFeed = user.getName();
-                            userProfileUrlToSaveInFeed = user.getProfileImage();
-
-                            Glide.with(this)
-                                    .load(user.getProfileImage())
-                                    .into(userProfilePic);
-                            userNameTextView.setText(user.getName());
-
-                        }
-                    } else {
-                        Log.e("yoo", "Error getting user's info.", task.getException());
-                    }
-                });
-    }
-
 }
