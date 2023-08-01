@@ -130,10 +130,10 @@ public class ChatFragment extends Fragment {
         if (adapter != null){
             adapter.startListening();
         }
-//        synchronized(this) {
-//            // update your adapter data here
-//            adapter.notifyDataSetChanged();
-//        }
+        synchronized(this) {
+            // update your adapter data here
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
