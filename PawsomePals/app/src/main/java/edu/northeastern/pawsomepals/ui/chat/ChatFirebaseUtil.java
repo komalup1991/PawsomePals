@@ -37,6 +37,7 @@ public class ChatFirebaseUtil {
         intent.putExtra("userId", model.getUserId());
         intent.putExtra("email", model.getEmail());
         intent.putExtra("fcmToken", model.getFcmToken());
+        intent.putExtra("chatStyle","oneOnOne");
     }
 
     public static void passGroupChatModelAsIntent(Intent intent, List<Users> users) {
@@ -49,8 +50,7 @@ public class ChatFirebaseUtil {
         }
         intent.putExtra("name", nameBuilder.toString());
         intent.putExtra("ids", idBuilder.toString());
-        Log.i("info", nameBuilder.toString());
-        Log.i("info", idBuilder.toString());
+        intent.putExtra("chatStyle","group");
     }
 
     public static DocumentReference currentUserDetails() {
@@ -109,6 +109,9 @@ public class ChatFirebaseUtil {
         String fcmToken = intent.getStringExtra("fcmToken");
 
         return new Users(userName, userId, email, fcmToken);
+    }
+    public static String getChatStyleFromIntent(Intent intent){
+        return intent.getStringExtra("chatStyle");
     }
 
     public static GroupChatModel getGroupChatModelFromIntent(Intent intent) {

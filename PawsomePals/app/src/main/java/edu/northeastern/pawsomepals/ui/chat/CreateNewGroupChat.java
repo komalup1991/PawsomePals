@@ -89,20 +89,11 @@ public class CreateNewGroupChat extends AppCompatActivity {
             }
         }
 
-        for (Users user : userList) {
-            Log.i("info", user.getName());
-        }
-
-
         if (userList.size() > 1) {
-            Intent intent = new Intent(getApplicationContext(), GroupChatActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
         }
-
-//        HashMap newChatMap = new HashMap();
-//        newChatMap.put("id",key);
-
     }
 }

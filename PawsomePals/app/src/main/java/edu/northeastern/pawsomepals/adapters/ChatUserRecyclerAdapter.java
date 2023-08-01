@@ -48,12 +48,6 @@ public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,Chat
         if (model.getUserId().equals(ChatFirebaseUtil.currentUserId())){
             holder.userNameText.setText(model.getName()+"(Me)");
         }
-        holder.addCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                usersList.get(holder.getBindingAdapterPosition()).setChatSelected(isChecked);
-            }
-        });
         //Listener to open new ChatRoomActivity
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

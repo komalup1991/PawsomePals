@@ -35,6 +35,7 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
+import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -50,7 +51,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageButton functionBtn;
     private ImageButton backBtn;
     private ImageButton infoBtn;
-    private TextView otherUserName;
+    private TextView chatRoomName;
     private RecyclerView chatRoomRecyclerView;
 
     private Users otherUser;
@@ -58,24 +59,14 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ChatRoomModel chatRoomModel;
     private ChatMessageRecyclerAdapter adapter;
 
+    private GroupChatModel group;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
-        otherUserName = findViewById(R.id.userName);
-        chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
-
-        messageInput = findViewById(R.id.message_input);
-        sendMessageBtn = findViewById(R.id.message_send_btn);
-        functionBtn = findViewById(R.id.function_btn);
-        infoBtn = findViewById(R.id.chatroom_more_button);
-        chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
-        backBtn = findViewById(R.id.message_back_button);
-
-        otherUserName.setText(otherUser.getName());
-
+        initialView();
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,9 +92,32 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-        getOrCreateChatRoomModel();
+        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("oneOnOne")) {
+            otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
+            chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
+            chatRoomName.setText(otherUser.getName());
+            getOrCreateChatRoomModel();
+        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")){
+            group = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
+            chatRoomId = ChatFirebaseUtil.getGroupRoomId(group.getGroupMembers());
+            chatRoomName.setText(group.getGroupName());
+
+            getOrCreateGroupChatModel();
+        }
+
         setupChatRecyclerView();
     }
+
+    private void initialView() {
+        chatRoomName = findViewById(R.id.userName);
+        messageInput = findViewById(R.id.message_input);
+        sendMessageBtn = findViewById(R.id.message_send_btn);
+        functionBtn = findViewById(R.id.function_btn);
+        infoBtn = findViewById(R.id.chatroom_more_button);
+        chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
+        backBtn = findViewById(R.id.message_back_button);
+    }
+
 
     private void setupChatRecyclerView() {
         Query query = ChatFirebaseUtil.getChatroomMessageReference(chatRoomId)
@@ -157,46 +171,66 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
+    private void getOrCreateGroupChatModel() {
+        ChatFirebaseUtil.getChatroomReference(chatRoomId).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
+
+                if (chatRoomModel == null) {
+                    //first time chat
+                    chatRoomModel = new ChatRoomModel(
+                            chatRoomId,
+                            group.getGroupMembers(),
+                            Timestamp.now(),
+                            ""
+                    );
+                    ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+                }
+            }
+        });
+    }
+
     private void sendNotification(String message) {
         //current username, message, currentuserid,otheruserid
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
                     Users currentUser = task.getResult().toObject(Users.class);
 
-                    try{
+                    try {
                         JSONObject jasonObject = new JSONObject();
                         JSONObject notificationObj = new JSONObject();
-                        notificationObj.put("title",currentUser.getName());
-                        notificationObj.put("body",message);
+                        notificationObj.put("title", currentUser.getName());
+                        notificationObj.put("body", message);
 
                         JSONObject dataObj = new JSONObject();
                         dataObj.put("userId", currentUser.getUserId());
 
-                        jasonObject.put("notification",notificationObj);
-                        jasonObject.put("data",dataObj);
-                        jasonObject.put("to",otherUser.getFcmToken());
+                        jasonObject.put("notification", notificationObj);
+                        jasonObject.put("data", dataObj);
+                        jasonObject.put("to", otherUser.getFcmToken());
 
                         callApi(jasonObject);
 
-                    }catch (Exception e){
+                    } catch (Exception e) {
 
                     }
                 }
             }
         });
     }
+
     private void callApi(JSONObject jasonObject) {
         MediaType JSON = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
 
         String url = "https://fcm.googleapis.com/fcm/send";
-        RequestBody body = RequestBody.create(jasonObject.toString(),JSON);
+        RequestBody body = RequestBody.create(jasonObject.toString(), JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
-                .header("Authorization","Bearer AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
+                .header("Authorization", "Bearer AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
