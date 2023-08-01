@@ -11,6 +11,7 @@ public class Users {
     private String gender;
     private String dob;
     private String fcmToken;
+    private boolean chatSelected = false;
 
 
     public Users() {
@@ -101,6 +102,14 @@ public class Users {
 
     public void setDob(String dob) {
         this.dob = dob;
+    }
+
+    public boolean isChatSelected() {
+        return chatSelected;
+    }
+
+    public void setChatSelected(boolean chatSelected) {
+        this.chatSelected = chatSelected;
     }
 }
 
