@@ -22,7 +22,7 @@ public class ChatRoomModel {
         this.userIds = userIds;
         this.lastMessageTimestamp = lastMessageTimestamp;
         this.lastMessageSenderId = lastMessageSenderId;
-        this.chatStyle = ChatStyle.ONEONONE;
+        this.chatStyle = null;
     }
 
     public ChatStyle getChatStyle() {

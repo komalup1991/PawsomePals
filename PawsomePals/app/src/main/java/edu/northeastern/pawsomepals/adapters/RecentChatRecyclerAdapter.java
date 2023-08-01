@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,10 @@ import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 import edu.northeastern.pawsomepals.ui.chat.ChatRoomActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,58 +45,41 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 
     @Override
     protected void onBindViewHolder(@NonNull ChatRoomModelViewHolder holder, int position, @NonNull ChatRoomModel model) {
-//        if (model.getChatStyle()!= null){
-//            if (model.getChatStyle().equals(ChatStyle.ONEONONE.toString())) {
-                ChatFirebaseUtil.getOtherUserFromChatroom(model.getUserIds())
-                        .get().addOnCompleteListener(task -> {
+
+        if (model.getChatStyle() != null) {
+            List<Users> users = new ArrayList<>();
+            if (model.getChatStyle().toString().equals(ChatStyle.GROUP.toString())) {
+
+                List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(model.getUserIds());
+                for (DocumentReference reference : references) {
+                    reference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
-                                boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
-                                Users otherUser = task.getResult().toObject(Users.class);
-                                if (otherUser != null) {
-                                    holder.userNameText.setText(otherUser.getName());
-                                    Glide.with(this.context)
-                                            .load(otherUser.getProfileImage())
-                                            .into(holder.profilePic);
-                                }
-                                if (lastMessageSentByMe)
-                                    holder.lastMessageText.setText("You:" + model.getLastMessage());
-                                else
-                                    holder.lastMessageText.setText(model.getLastMessage());
-                                if (model.getLastMessageTimestamp() != null) {
-                                    holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
-                                }
-                                if (otherUser != null) {
-                                    holder.itemView.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            //navigate to chat activity;
-                                            Intent intent = new Intent(context, ChatRoomActivity.class);
-                                            ChatFirebaseUtil.passUserModelAsIntent(intent, otherUser);
-                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            context.startActivity(intent);
-                                        }
-                                    });
+                                Log.i("info", "complete");
+                                Users user = task.getResult().toObject(Users.class);
+                                if (user != null)
+                                    users.add(user);
+                                if (users.size() > 1) {
+                                    boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
+                                    holder.userNameText.setText("Group Chat");
+//            Glide.with(this.context)
+//                    .load(otherUser.getProfileImage())
+//                    .into(holder.profilePic);
+
+                                    if (lastMessageSentByMe)
+                                        holder.lastMessageText.setText("You:" + model.getLastMessage());
+                                    else
+                                        holder.lastMessageText.setText(model.getLastMessage());
+                                    if (model.getLastMessageTimestamp() != null) {
+                                        holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
+                                    }
                                 }
                             }
-                        });
-                List<Users> users = new ArrayList<>();
-
-//            } else  {
-//                boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
-//                holder.userNameText.setText("Group Chat");
-////            Glide.with(this.context)
-////                    .load(otherUser.getProfileImage())
-////                    .into(holder.profilePic);
-//
-//                if (lastMessageSentByMe)
-//                    holder.lastMessageText.setText("You:" + model.getLastMessage());
-//                else
-//                    holder.lastMessageText.setText(model.getLastMessage());
-//                if (model.getLastMessageTimestamp() != null) {
-//                    holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
-//                }
-//        }
-
+                        }
+                    });
+                }
+            }
 
 //            holder.itemView.setOnClickListener(new View.OnClickListener() {
 //                @Override
@@ -103,9 +91,40 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 //                    context.startActivity(intent);
 //                }
 //            });
-
-//        }
-
+        } else {
+            ChatFirebaseUtil.getOtherUserFromChatroom(model.getUserIds())
+                    .get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
+                            Users otherUser = task.getResult().toObject(Users.class);
+                            if (otherUser != null) {
+                                holder.userNameText.setText(otherUser.getName());
+                                Glide.with(this.context)
+                                        .load(otherUser.getProfileImage())
+                                        .into(holder.profilePic);
+                            }
+                            if (lastMessageSentByMe)
+                                holder.lastMessageText.setText("You:" + model.getLastMessage());
+                            else
+                                holder.lastMessageText.setText(model.getLastMessage());
+                            if (model.getLastMessageTimestamp() != null) {
+                                holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
+                            }
+                            if (otherUser != null) {
+                                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        //navigate to chat activity;
+                                        Intent intent = new Intent(context, ChatRoomActivity.class);
+                                        ChatFirebaseUtil.passUserModelAsIntent(intent, otherUser);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        context.startActivity(intent);
+                                    }
+                                });
+                            }
+                        }
+                    });
+        }
     }
 
 
