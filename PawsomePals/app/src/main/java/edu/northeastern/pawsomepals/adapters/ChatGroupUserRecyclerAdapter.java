@@ -25,20 +25,18 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,ChatUserRecyclerAdapter.UserModelViewHolder> {
+public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,ChatGroupUserRecyclerAdapter.UserModelViewHolder> {
 
     private Context context;
-    private List<Users> usersList;
 
 
-    public ChatUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<Users> options, Context context) {
+    public ChatGroupUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<Users> options, Context context) {
         super(options);
         this.context = context;
     }
 
     @Override
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull Users model) {
-        usersList = new ArrayList<>();
         holder.userNameText.setText(model.getName());
         //set up image
         Glide.with(this.context)
@@ -51,7 +49,7 @@ public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,Chat
         holder.addCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                usersList.get(holder.getBindingAdapterPosition()).setChatSelected(isChecked);
+                model.setChatSelected(isChecked);
             }
         });
         //Listener to open new ChatRoomActivity
@@ -66,11 +64,6 @@ public class ChatUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,Chat
             }
         });
     }
-
-//    @Override
-//    public int getItemCount() {
-//        return usersList.size();
-//    }
 
     @NonNull
     @Override
