@@ -50,13 +50,6 @@ public class Dogs {
         this.breed = breed;
     }
 
-    public Boolean getMixedBreed() {
-        return isMixedBreed;
-    }
-
-    public void setMixedBreed(String mixedBreed) {
-        this.mixedBreed = mixedBreed;
-    }
 
     public String getProfileImage() {
         return profileImage;
@@ -90,7 +83,20 @@ public class Dogs {
         this.size = size;
     }
 
-    public void setMixedBreed(Boolean mixedBreed) {
+
+    public void setIsMixedBreed(Boolean mixedBreed) {
         isMixedBreed = mixedBreed;
+    }
+
+    public Boolean getIsMixedBreed() {
+        return isMixedBreed;
+    }
+
+    public void setMixedBreed(String mixedBreed) {
+        this.mixedBreed = mixedBreed;
+    }
+
+    public String getMixedBreed() {
+        return mixedBreed;
     }
 }
