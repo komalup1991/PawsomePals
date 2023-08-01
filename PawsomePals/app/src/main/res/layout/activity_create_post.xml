@@ -81,6 +81,7 @@
 
             <EditText
                 android:id="@+id/captionEditTextView"
+                android:required="true"
                 android:layout_width="396dp"
                 android:layout_height="43dp"
                 android:layout_marginStart="8dp"
@@ -95,6 +96,7 @@
 
             <EditText
                 android:id="@+id/postContentEditTextView"
+                android:required="true"
                 android:layout_width="396dp"
                 android:layout_height="171dp"
                 android:layout_marginStart="8dp"
@@ -147,14 +149,13 @@
                 android:id="@+id/addLocationTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:text="@string/add_location"
                 android:textAllCaps="true"
                 android:textColor="@color/darkPink"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.025"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/taggedUserDisplayTextView" />
 
@@ -175,6 +176,8 @@
                 android:visibility="gone"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/addLocationTextView" />
+
+
 
 
 
