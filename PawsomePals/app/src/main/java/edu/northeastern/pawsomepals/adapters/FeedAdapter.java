@@ -19,6 +19,7 @@ import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.EventFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PhotoVideoFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PostFeedViewHolder;
+import edu.northeastern.pawsomepals.ui.feed.viewHolder.RecipeRecyclerViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.ServicesFeedViewHolder;
 
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -36,6 +37,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
         View view;
         switch (viewType) {
+            case FeedItem.TYPE_RECIPE_HEADER -> {
+                view = layoutInflater.inflate(R.layout.recipe_recycler_view_layout, parent, false);
+                return new RecipeRecyclerViewHolder(view);
+            }
             case FeedItem.TYPE_POST -> {
                 view = layoutInflater.inflate(R.layout.feed_post_item, parent, false);
                 return new PostFeedViewHolder(view);
@@ -60,18 +65,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         FeedItem feedItem = this.feedItems.get(position);
         switch (feedItem.getType()) {
-            case FeedItem.TYPE_POST -> {
-                ((PostFeedViewHolder) holder).bindData((Post) feedItem);
-            }
-            case FeedItem.TYPE_PHOTO_VIDEO -> {
-                ((PhotoVideoFeedViewHolder) holder).bindData((PhotoVideo) feedItem);
-            }
-            case FeedItem.TYPE_EVENT -> {
-                ((EventFeedViewHolder) holder).bindData((Event) feedItem);
-            }
-            case FeedItem.TYPE_SERVICE -> {
-                ((ServicesFeedViewHolder) holder).bindData((Services) feedItem);
-            }
+            case FeedItem.TYPE_RECIPE_HEADER ->
+                    ((RecipeRecyclerViewHolder) holder).bindRecylerViewData();
+            case FeedItem.TYPE_POST -> ((PostFeedViewHolder) holder).bindData((Post) feedItem);
+            case FeedItem.TYPE_PHOTO_VIDEO -> ((PhotoVideoFeedViewHolder) holder).bindData((PhotoVideo) feedItem);
+            case FeedItem.TYPE_EVENT -> ((EventFeedViewHolder) holder).bindData((Event) feedItem);
+            case FeedItem.TYPE_SERVICE -> ((ServicesFeedViewHolder) holder).bindData((Services) feedItem);
         }
     }
 

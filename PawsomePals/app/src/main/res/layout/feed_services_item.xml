@@ -1,203 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- item_text_post.xml -->
+
 
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:padding="16dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="8dp"
     android:background="@drawable/border"
-    android:backgroundTint="@color/pastelLavender"
-    android:layout_margin="8dp">
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/userProfilePic"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:src="@drawable/dog_paw"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-    <TextView
-        android:id="@+id/usernameTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="18dp"
-        android:text="@string/john_doe"
-        android:textStyle="bold"
-        android:background="@drawable/custom_border_sticker"
-        app:layout_constraintStart_toEndOf="@id/userProfilePic"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/timestampTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="10 minutes ago"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/serviceDetailTextView"
-        />
-
-    <ImageView
-        android:id="@+id/serviceTypeImageView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_margin="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/custom_border_sticker"
-        android:contentDescription="Service Type"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/petservice"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/usernameTextView" />
-
-    <TextView
-        android:id="@+id/serviceTypeTextView"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:background="@drawable/custom_border_sticker"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/serviceTypeImageView"
-        app:layout_constraintTop_toTopOf="@id/serviceTypeImageView" />
-    <TextView
-        android:id="@+id/serviceNameTextView"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/custom_border_sticker"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/serviceTypeTextView" />
-    <TextView
-        android:id="@+id/serviceDetailTextView"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/serviceNameTextView" />
-    <ImageView
-        android:id="@+id/userTaggedImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        android:contentDescription="User Tagged"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/user"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/serviceDetailTextView" />
-
-    <TextView
-        android:id="@+id/userTaggedTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="18dp"
-        android:text="User Tagged"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
-        app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
-
-    <ImageView
-        android:id="@+id/locationTaggedImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        android:contentDescription="Location Tagged"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/pin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
-
-    <TextView
-        android:id="@+id/locationTaggedTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="18dp"
-        android:text="Location Tagged"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
-        app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
+    android:backgroundTint="@color/pastelLavender">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/user_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="32dp"
-        android:gravity="end"
         android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/custom_border_top_round"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/locationTaggedTextView">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/likeButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/custom_border_sticker"
-            android:contentDescription="@string/like"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/like" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userProfilePic"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:src="@drawable/dog_paw" />
 
         <TextView
-            android:id="@+id/likeCountTextView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/custom_border_sticker"
+            android:id="@+id/usernameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="18dp"
-            android:text="(0)"
-            android:textStyle="bold" />
-        <ImageButton
-            android:id="@+id/commentButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/custom_border_sticker"
-            android:contentDescription="@string/comment"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/message" />
-        <TextView
-            android:id="@+id/commentCountTextView"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/custom_border_sticker"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="18dp"
-            android:text="(0)"
-            android:textStyle="bold" />
-        <ImageButton
-            android:id="@+id/shareButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_margin="8dp"
-            android:background="@drawable/custom_border_sticker"
-            android:contentDescription="@string/share"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/sharepost" />
-
+            android:text="@string/john_doe"
+            android:textStyle="bold"
+            app:layout_constraintStart_toEndOf="@id/userProfilePic"
+            app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_border_bottom_round"
+        android:backgroundTint="@color/pastelLightLavender"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_container">
+
+        <ImageView
+            android:id="@+id/serviceTypeImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="Service Type"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/petservice"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/serviceTypeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Service Type"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/serviceTypeImageView"
+            app:layout_constraintEnd_toStartOf="@+id/timestampTextView"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/serviceTypeImageView"
+            app:layout_constraintTop_toTopOf="@id/serviceTypeImageView" />
+
+        <TextView
+            android:id="@+id/timestampTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:text="10 minutes ago"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/serviceNameTextView"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/custom_border_sticker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/serviceTypeTextView" />
+
+        <TextView
+            android:id="@+id/serviceDetailTextView"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/custom_border_sticker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/serviceNameTextView" />
+
+        <ImageView
+            android:id="@+id/userTaggedImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="User Tagged"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/user"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/serviceDetailTextView" />
+
+        <TextView
+            android:id="@+id/userTaggedTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="User Tagged"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/userTaggedImageView"
+            app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
+            app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
+
+        <ImageView
+            android:id="@+id/locationTaggedImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="Location Tagged"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/pin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
+
+        <TextView
+            android:id="@+id/locationTaggedTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Location Tagged"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/locationTaggedImageView"
+            app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
+            app:layout_constraintTop_toTopOf="@id/locationTaggedImageView"  />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <include
+            layout="@layout/feed_actions_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/content_layout" />
+    </androidx.constraintlayout.widget.ConstraintLayout>

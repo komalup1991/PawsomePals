@@ -99,5 +99,8 @@
     <string name="comment">comment</string>
     <string name="share">share</string>
     <string name="john_doe">John Doe</string>
+    <string name="recipe_description">Recipe Description</string>
+    <string name="recipe_ingredients">Recipe Ingredients</string>
+    <string name="recipe_serving_size">Serving Size</string>
 
 </resources>

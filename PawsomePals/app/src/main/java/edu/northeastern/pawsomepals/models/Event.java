@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
+import androidx.annotation.Nullable;
+
 public class Event extends FeedItem {
     private String eventName;
     private String img;
@@ -53,5 +55,21 @@ public class Event extends FeedItem {
         this.eventId = eventId;
     }
 
+    @Override
+    public int hashCode() {
+        return eventId.hashCode();
+    }
 
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Event otherEvent)) {
+            return false;
+        }
+
+        if (otherEvent.eventId == null || this.eventId == null) {
+            return false;
+        }
+
+        return this.eventId.equals(otherEvent.eventId);
+    }
 }

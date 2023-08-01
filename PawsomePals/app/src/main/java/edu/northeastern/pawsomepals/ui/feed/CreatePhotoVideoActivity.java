@@ -5,24 +5,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import android.Manifest;
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,28 +27,18 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +47,10 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
-import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 
 public class CreatePhotoVideoActivity extends AppCompatActivity {
@@ -95,6 +78,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private boolean isDeleteConfirmationDialogVisible = false;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,7 +116,18 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Add Post");
         }
-        fetchUserInfoFromFirestore(loggedInUserId);
+        FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
+            @Override
+            public void onUserReceived(Users user) {
+                userNameToSaveInFeed=user.getName();
+                userProfileUrlToSaveInFeed=user.getProfileImage();
+
+                Glide.with(CreatePhotoVideoActivity.this)
+                        .load(user.getProfileImage())
+                        .into(userProfilePic);
+                userNameTextView.setText(user.getName());
+            }
+        });
 
         selectPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,12 +186,39 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (captionEditTextView.getText().toString().isEmpty()) {
+                    captionEditTextView.setError("This field is required");
+                    Toast.makeText(CreatePhotoVideoActivity.this, "Post Caption is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (photoVideoImageView.getDrawable() == null) {
+                    Toast.makeText(CreatePhotoVideoActivity.this, "Post Image is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                uploadToFireStore();
-                uploadImageToStorage();
-                showProgressDialog("Your Photo/Video post is being saved...");
+                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
+                        "photovideo", new BaseDataCallback() {
+
+                            @Override
+                            public void onImageUriReceived(String imageUrl) {
+                                createFeedMap(imageUrl);
+                            }
+
+                            @Override
+                            public void onDismiss() {
+                                DialogHelper.hideProgressDialog(progressDialog);
+                                finish();
+                            }
+
+                            @Override
+                            public void onError(Exception exception) {
+                                Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                DialogHelper.showProgressDialog("Your Photo/Video is being saved...", progressDialog, CreatePhotoVideoActivity.this);
             }
         });
+
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,80 +228,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void uploadImageToStorage() {
-        Uri uploadImageUri = null;
-        if (cameraImageUri != null) uploadImageUri = cameraImageUri;
-        else if (galleryImageUri != null) uploadImageUri = galleryImageUri;
-
-        if (uploadImageUri != null) {
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String imageName = "photovideo_" + timestamp + ".jpg";
-            StorageReference imageRef = storageRef.child("photovideo_images/" + imageName);
-            UploadTask uploadTask = imageRef.putFile(uploadImageUri);
-            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                @Override
-                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                    if (!task.isSuccessful()) {
-                        throw task.getException();
-                    }
-                    return imageRef.getDownloadUrl();
-                }
-            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                @Override
-                public void onComplete(@NonNull Task<Uri> task) {
-                    if (task.isSuccessful()) {
-                        Uri downloadUri = task.getResult();
-                        if (downloadUri != null) {
-                            String imageUrl = downloadUri.toString();
-                            Log.d("yoo","here  "+downloadUri.toString());
-                            updateDbWithImg(imageUrl);
-                        }
-                    } else {
-                        Log.d("yoo", "Error uploading image to storage");
-
-                        Toast.makeText(CreatePhotoVideoActivity.this, "Error uploading image: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-
-
-        }
-        else{
-            hideProgressDialog();
-            finish();
-        }
-
-
-    }
-
-    private void updateDbWithImg(String imageUrl) {
-        if (imageUrl != null) {
-            DocumentReference photoVideoPostsRef = db.collection("photoVideoPosts").document(photoVideoPostDocId);
-
-            photoVideoPostsRef
-                    .update("img", imageUrl)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused ) {
-                            hideProgressDialog();
-                            finish();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.w("yoo", "Error updating document", e);
-                        }
-                    });
-        }
-        else{
-            hideProgressDialog();
-            finish();
-        }
-    }
-
-
     private void showEditImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Photo");
@@ -316,10 +264,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         isEditImageDialogVisible = true;
         dialog.show();
     }
-
-
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -390,7 +334,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
 
 
 
-    private void uploadToFireStore() {
+    private void createFeedMap(String imageUrlFromFirebaseStorage) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String caption = captionEditTextView.getText().toString();
@@ -407,33 +351,14 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         photoVideoPosts.put("username",userNameToSaveInFeed);
         photoVideoPosts.put("userProfileImage",userProfileUrlToSaveInFeed);
         photoVideoPosts.put("type",1);
-
-
-        //Add a new document with a generated ID
-        db.collection("photoVideoPosts")
-                .add(photoVideoPosts)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        photoVideoPostDocId = documentReference.getId();
-                        Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        hideProgressDialog();
-                        finish();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("yoo", "Error adding document", e);
-                    }
-                });
-    }
-
-    private void hideProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
+        photoVideoPosts.put("img", imageUrlFromFirebaseStorage);
+        FirebaseUtil.createCollectionInFirestore(photoVideoPosts, "photovideo",new BaseDataCallback() {
+            @Override
+            public void onDismiss() {
+                DialogHelper.hideProgressDialog(progressDialog);
+                finish();
+            }
+        });
     }
 
     private void fetchAllUsersFromFirestore() {
@@ -532,21 +457,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showProgressDialog(String s) {
-        if (progressDialog == null) {
-            progressDialog = new Dialog(this);
-            progressDialog.setContentView(R.layout.custom_progress_dialog);
-            progressDialog.setCancelable(false);
-            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        TextView progressMessageTextView = progressDialog.findViewById(R.id.progressMessageTextView);
-        if (progressMessageTextView != null) {
-            progressMessageTextView.setText(s);
-        }
-
-        progressDialog.show();
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -576,28 +486,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     }
 
 
-    private void fetchUserInfoFromFirestore(String userId) {
-        db.collection("user")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
-                            Users user = userDocument.toObject(Users.class);
-                            userNameToSaveInFeed = user.getName();
-                            userProfileUrlToSaveInFeed = user.getProfileImage();
-
-                            Glide.with(this)
-                                    .load(user.getProfileImage())
-                                    .into(userProfilePic);
-                            userNameTextView.setText(user.getName());
-
-                        }
-                    } else {
-                        Log.e("yoo", "Error getting user's info.", task.getException());
-                    }
-                });
-    }
 
 
 }
