@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.models.BreedDetails;
+import edu.northeastern.pawsomepals.models.BreedHeightDetails;
+import edu.northeastern.pawsomepals.models.BreedImageDetails;
 import edu.northeastern.pawsomepals.models.BreedWeightDetails;
 
 public class PawsomePalWebService {
     private static final String API_KEY = "live_fLrLBAIBG2wu5m1YEvBZvVAHsI6ZIjrSH5RXdGaKVNTNpvjrS5JTp1ohgfIPm3vg";
-    private static final String BASE_URL = "https://api.thecatapi.com/";
+    private static final String BASE_URL = "https://api.thedogapi.com/";
 
     private UiThreadCallback uiThreadCallback;
 
@@ -104,52 +106,36 @@ public class PawsomePalWebService {
                 JSONObject breedObject = breedsArray.getJSONObject(i);
 
                 JSONObject weightObject = breedObject.getJSONObject("weight");
-                String imperial = weightObject.getString("imperial");
-                String metric = weightObject.getString("metric");
+                String imperialWeight = weightObject.getString("imperial");
+                String metricWeight = weightObject.getString("metric");
+
+                JSONObject heightObject = breedObject.getJSONObject("height");
+                String imperialHeight = weightObject.getString("imperial");
+                String metricHeight = weightObject.getString("metric");
 
                 String id = breedObject.getString("id");
                 String name = breedObject.getString("name");
-                String cfa_url = breedObject.getString("cfa_url");
-                String vetstreet_url = breedObject.getString("vetstreet_url");
-                String vcahospitals_url = breedObject.getString("vcahospitals_url");
+                String bred_for = breedObject.getString("bred_for");
+                String breed_group = breedObject.getString("breed_group");
+                String life_span = breedObject.getString("life_span");
                 String temperament = breedObject.getString("temperament");
                 String origin = breedObject.getString("origin");
-                String country_codes = breedObject.getString("country_codes");
-                String country_code = breedObject.getString("country_code");
-                String description = breedObject.getString("description");
-                String life_span = breedObject.getString("life_span");
-                String indoor = breedObject.getString("indoor");
-                String lap = breedObject.getString("lap");
-                String alt_names = breedObject.getString("alt_names");
-                String adaptability = breedObject.getString("adaptability");
-                String affection_level = breedObject.getString("affection_level");
-                String child_friendly = breedObject.getString("child_friendly");
-                String dog_friendly = breedObject.getString("dog_friendly");
-                String energy_level = breedObject.getString("energy_level");
-                String grooming = breedObject.getString("grooming");
-                String health_issues = breedObject.getString("health_issues");
-                String intelligence = breedObject.getString("intelligence");
-                String shedding_level = breedObject.getString("shedding_level");
-                String social_needs = breedObject.getString("social_needs");
-                String stranger_friendly = breedObject.getString("stranger_friendly");
-                String vocalisation = breedObject.getString("vocalisation");
-                String experimental = breedObject.getString("experimental");
-                String hairless = breedObject.getString("hairless");
-                String natural = breedObject.getString("natural");
-                String rare = breedObject.getString("rare");
-                String rex = breedObject.getString("rex");
-                String suppressed_tail = breedObject.getString("suppressed_tail");
-                String short_legs = breedObject.getString("short_legs");
-                String wikipedia_url = breedObject.getString("wikipedia_url");
-                String hypoallergenic = breedObject.getString("hypoallergenic");
                 String reference_image_id = breedObject.getString("reference_image_id");
 
-                BreedWeightDetails weight = new BreedWeightDetails(imperial, metric);
-                BreedDetails breed = new BreedDetails(weight, id, name, vetstreet_url, temperament, origin, country_codes,
-                        country_code, description, life_span, indoor, alt_names, adaptability, affection_level,
-                        child_friendly, dog_friendly, energy_level, grooming, health_issues, intelligence, shedding_level,
-                        social_needs, stranger_friendly, vocalisation, experimental, hairless, natural, rare, rex,
-                        suppressed_tail, short_legs, wikipedia_url, hypoallergenic, reference_image_id);
+                JSONObject imageObject = breedObject.getJSONObject("image");
+                String imageId = weightObject.getString("id");
+                String imageWidth = weightObject.getString("width");
+                String imageHeight = weightObject.getString("height");
+                String imageUrl = weightObject.getString("url");
+
+                BreedWeightDetails weight = new BreedWeightDetails(imperialWeight, metricWeight);
+
+                BreedHeightDetails height = new BreedHeightDetails(imperialHeight, metricHeight);
+
+                BreedImageDetails image = new BreedImageDetails(imageId, imageWidth, imageHeight, imageUrl);
+
+                BreedDetails breed = new BreedDetails(weight, height, id, name, bred_for, breed_group, life_span, temperament, origin, reference_image_id, image);
+
                 breeds.add(breed);
             }
         } catch (JSONException e) {
