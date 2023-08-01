@@ -21,20 +21,15 @@ import java.util.List;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.RecipeAllViewHolder> {
 
     private List<Recipe> recipes;
-    private RecipeAllAdapter.OnItemActionListener onItemActionListener;
-
-    public interface OnItemActionListener {
-        void onRecipeClick(Recipe recipe);
-
-        void onUserClick(Recipe recipe);
-    }
+    private OnItemActionListener onItemActionListener;
 
 
-    public RecipeAllAdapter(List<Recipe> recipes, List<Users> user, RecipeAllAdapter.OnItemActionListener onItemActionListener) {
+    public RecipeAllAdapter(List<Recipe> recipes, List<Users> user, OnItemActionListener onItemActionListener) {
         this.recipes = recipes;
         this.onItemActionListener = onItemActionListener;
     }

@@ -20,17 +20,19 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
+import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
 import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeRecyclerViewHolder extends RecyclerView.ViewHolder {
     private final RecyclerView recipeRecyclerView;
     private final RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
 
-    private RecipeAdapter.OnItemActionListener onItemActionListener = new RecipeAdapter.OnItemActionListener() {
+    private OnItemActionListener onItemActionListener = new OnItemActionListener() {
         @Override
         public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(itemView.getContext(), RecipeDetailActivity.class);
@@ -43,6 +45,11 @@ public class RecipeRecyclerViewHolder extends RecyclerView.ViewHolder {
             Intent intent = new Intent(itemView.getContext(), UserProfileActivity.class);
             intent.putExtra("userId", recipe.getCreatedBy());
             itemView.getContext().startActivity(intent);
+
+        }
+
+        @Override
+        public void onLikeClick(FeedItem feedItem) {
 
         }
     };

@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 import edu.northeastern.pawsomepals.adapters.RecipeAllAdapter;
 import edu.northeastern.pawsomepals.models.Recipe;
@@ -33,7 +35,7 @@ import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
 public class FeedRecipeFragment extends Fragment {
     private RecyclerView recipeAllRecyclerView;
     private RecipeAllAdapter recipeAllAdapter;
-    private RecipeAllAdapter.OnItemActionListener onItemActionListener;
+    private OnItemActionListener onItemActionListener;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -101,7 +103,7 @@ public class FeedRecipeFragment extends Fragment {
     }
 
     private void initializeItemActionListener() {
-        onItemActionListener = new RecipeAllAdapter.OnItemActionListener() {
+        onItemActionListener = new OnItemActionListener() {
             @Override
             public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
@@ -117,6 +119,11 @@ public class FeedRecipeFragment extends Fragment {
                 editor.apply();
 
                 //Navigate to Profile Fragment
+
+            }
+
+            @Override
+            public void onLikeClick(FeedItem feedItem) {
 
             }
         };
