@@ -35,6 +35,7 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
+import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
 import okhttp3.Call;
@@ -97,6 +98,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
             chatRoomName.setText(otherUser.getName());
             getOrCreateChatRoomModel();
+
         } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")){
             group = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getGroupRoomId(group.getGroupMembers());
@@ -165,6 +167,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             Timestamp.now(),
                             ""
                     );
+                    chatRoomModel.setChatStyle(ChatStyle.ONEONONE);
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
             }
@@ -184,6 +187,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             Timestamp.now(),
                             ""
                     );
+                    chatRoomModel.setChatStyle(ChatStyle.GROUP);
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
             }

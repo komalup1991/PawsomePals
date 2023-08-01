@@ -12,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ktx.Firebase;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -133,6 +134,14 @@ public class ChatFirebaseUtil {
         } else {
             return allUserCollectionReference().document(userIds.get(0));
         }
+    }
+
+    public static List<DocumentReference> getGroupFromChatRoom(List<String> userIds){
+        List<DocumentReference> references = new ArrayList<>();
+        for(int i = 0; i < userIds.size(); i++){
+            references.add(allUserCollectionReference().document(userIds.get(i)));
+        }
+        return references;
     }
 
     public static String timestampToString(Timestamp timestamp) {
