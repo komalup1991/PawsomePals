@@ -1,17 +1,13 @@
 package edu.northeastern.pawsomepals.models;
 
-import android.icu.text.SimpleDateFormat;
-import android.util.Log;
-
-import java.text.ParseException;
-import java.util.Date;
-import java.util.Locale;
-
 public abstract class FeedItem  implements Comparable<FeedItem> {
+
+    public static final int TYPE_RECIPE_HEADER = 0;
     public static final int TYPE_PHOTO_VIDEO = 1;
     public static final int TYPE_SERVICE = 2;
     public static final int TYPE_EVENT = 3;
     public static final int TYPE_POST = 4;
+
     private String username;
     private String userProfileImage;
     private String createdAt;

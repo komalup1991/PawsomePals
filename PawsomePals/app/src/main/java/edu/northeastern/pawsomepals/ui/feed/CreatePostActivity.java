@@ -7,9 +7,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -19,9 +18,9 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -41,6 +41,10 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
+import edu.northeastern.pawsomepals.utils.LocationUtil;
 
 public class CreatePostActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -55,9 +59,11 @@ public class CreatePostActivity extends AppCompatActivity {
     private String postDocId;
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
+    private Context context;
     private AutoCompleteTextView searchLocationDisplayTextView;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
+
 
 
     @Override
@@ -75,7 +81,7 @@ public class CreatePostActivity extends AppCompatActivity {
         tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
         taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
         addLocationTextView = findViewById(R.id.addLocationTextView);
-        searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
+      searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
 
         Button saveButton = findViewById(R.id.saveButton);
         Button cancelButton = findViewById(R.id.cancelButton);
@@ -90,7 +96,18 @@ public class CreatePostActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Add Post");
         }
-        fetchUserInfoFromFirestore(loggedInUserId);
+        FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
+            @Override
+            public void onUserReceived(Users user) {
+                userNameToSaveInFeed=user.getName();
+                userProfileUrlToSaveInFeed=user.getProfileImage();
+
+                Glide.with(CreatePostActivity.this)
+                        .load(user.getProfileImage())
+                        .into(userProfilePic);
+                userNameTextView.setText(user.getName());
+            }
+        });
 
         tagPeopleTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +124,6 @@ public class CreatePostActivity extends AppCompatActivity {
         });
 
         fetchAllUsersFromFirestore();
-
         List<String> locationSuggestions = new ArrayList<>();
         locationSuggestions.add("New York, USA");
         locationSuggestions.add("Los Angeles, USA");
@@ -125,12 +141,23 @@ public class CreatePostActivity extends AppCompatActivity {
         });
 
 
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (captionEditTextView.getText().toString().isEmpty()) {
+                    captionEditTextView.setError("This field is required");
+                    Toast.makeText(CreatePostActivity.this, "Post Caption is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (postContentEditTextView.getText().toString().isEmpty()) {
+                    postContentEditTextView.setError("This field is required");
+                    Toast.makeText(CreatePostActivity.this, "Post Detail is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                uploadToFireStore();
-                showProgressDialog("Your post is being saved...");
+                createFeedMap();
+                DialogHelper.showProgressDialog("Your post is being saved...",progressDialog,CreatePostActivity.this);
             }
         });
 
@@ -239,23 +266,10 @@ public class CreatePostActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showProgressDialog(String s) {
-        if (progressDialog == null) {
-            progressDialog = new Dialog(this);
-            progressDialog.setContentView(R.layout.custom_progress_dialog);
-            progressDialog.setCancelable(false);
-            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
 
-        TextView progressMessageTextView = progressDialog.findViewById(R.id.progressMessageTextView);
-        if (progressMessageTextView != null) {
-            progressMessageTextView.setText(s);
-        }
 
-        progressDialog.show();
-    }
 
-    private void uploadToFireStore() {
+    private void createFeedMap() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String caption = captionEditTextView.getText().toString();
@@ -275,32 +289,16 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("userProfileImage",userProfileUrlToSaveInFeed);
         post.put("type",4);
 
-        //Add a new document with a generated ID
-        db.collection("posts")
-                .add(post)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        postDocId = documentReference.getId();
-                        Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        hideProgressDialog();
-                        finish();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("yoo", "Error adding document", e);
-                    }
-                });
+        FirebaseUtil.createCollectionInFirestore(post,"posts" ,new BaseDataCallback() {
+            @Override
+            public void onDismiss() {
+                DialogHelper.hideProgressDialog(progressDialog);
+                finish();
+            }
+        });
     }
 
-    private void hideProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -331,27 +329,5 @@ public class CreatePostActivity extends AppCompatActivity {
     }
 
 
-    private void fetchUserInfoFromFirestore(String userId) {
-        db.collection("user")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
-                            Users user = userDocument.toObject(Users.class);
-                            userNameToSaveInFeed = user.getName();
-                            userProfileUrlToSaveInFeed = user.getProfileImage();
-
-                            Glide.with(this)
-                                    .load(user.getProfileImage())
-                                    .into(userProfilePic);
-                            userNameTextView.setText(user.getName());
-
-                        }
-                    } else {
-                        Log.e("yoo", "Error getting user's info.", task.getException());
-                    }
-                });
-    }
 
 }

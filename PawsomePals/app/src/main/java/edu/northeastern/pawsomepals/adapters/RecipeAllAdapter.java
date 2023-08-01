@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.text.format.DateUtils;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,8 +26,10 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
 
     private List<Recipe> recipes;
     private RecipeAllAdapter.OnItemActionListener onItemActionListener;
+
     public interface OnItemActionListener {
         void onRecipeClick(Recipe recipe);
+
         void onUserClick(Recipe recipe);
     }
 
@@ -35,6 +38,7 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
         this.recipes = recipes;
         this.onItemActionListener = onItemActionListener;
     }
+
     @NonNull
     @Override
     public RecipeAllAdapter.RecipeAllViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -54,7 +58,7 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
         Glide.with(holder.itemView.getContext())
                 .load(recipe.getImg())
                 .transform(new FitCenter(), new RoundedCorners(20))
-               .transition(DrawableTransitionOptions.withCrossFade())
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.recipeImage);
 
         Glide.with(holder.itemView.getContext())
@@ -89,6 +93,7 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
         });
 
     }
+
     public List<Recipe> getRecipes() {
         return recipes;
     }
@@ -102,12 +107,11 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
         recipes = recipeList;
     }
 
-    public static class RecipeAllViewHolder extends RecyclerView.ViewHolder{
+    public static class RecipeAllViewHolder extends RecyclerView.ViewHolder {
         ImageView recipeImage;
         TextView username;
         ImageView userProfilePic;
-        TextView recipeName,timestampTextView;
-
+        TextView recipeName, timestampTextView;
 
 
         public RecipeAllViewHolder(@NonNull View itemView) {
@@ -117,7 +121,6 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
             recipeName = itemView.findViewById(R.id.recipeNameTextView);
             username = itemView.findViewById(R.id.usernameTextView);
             timestampTextView = itemView.findViewById(R.id.timestampTextView);
-
 
 
         }

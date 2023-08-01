@@ -12,7 +12,6 @@ import com.bumptech.glide.Glide;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
-import edu.northeastern.pawsomepals.models.Post;
 
 public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder{
     CircleImageView userProfilePic ;

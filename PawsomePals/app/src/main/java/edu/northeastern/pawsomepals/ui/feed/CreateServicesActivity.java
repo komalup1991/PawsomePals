@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,6 +43,9 @@ import java.util.Map;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class CreateServicesActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -89,9 +93,20 @@ public class CreateServicesActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Add Post");
+            actionBar.setTitle("Add Service");
         }
-        fetchUserInfoFromFirestore(loggedInUserId);
+        FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
+            @Override
+            public void onUserReceived(Users user) {
+                userNameToSaveInFeed=user.getName();
+                userProfileUrlToSaveInFeed=user.getProfileImage();
+
+                Glide.with(CreateServicesActivity.this)
+                        .load(user.getProfileImage())
+                        .into(userProfilePic);
+                userNameTextView.setText(user.getName());
+            }
+        });
 
         tagPeopleTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,9 +144,19 @@ public class CreateServicesActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (serviceNameEditTextView.getText().toString().isEmpty()) {
+                    serviceNameEditTextView.setError("This field is required");
+                    Toast.makeText(CreateServicesActivity.this, "Service Name is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (notesOnServiceEditTextView.getText().toString().isEmpty()) {
+                    notesOnServiceEditTextView.setError("This field is required");
+                    Toast.makeText(CreateServicesActivity.this, "Service Detail is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                uploadToFireStore();
-                showProgressDialog("Your post is being saved...");
+                createFeedMap();
+                DialogHelper.showProgressDialog("Your post is being saved...",progressDialog,CreateServicesActivity.this);
             }
         });
 
@@ -240,23 +265,9 @@ public class CreateServicesActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void showProgressDialog(String s) {
-        if (progressDialog == null) {
-            progressDialog = new Dialog(this);
-            progressDialog.setContentView(R.layout.custom_progress_dialog);
-            progressDialog.setCancelable(false);
-            progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
 
-        TextView progressMessageTextView = progressDialog.findViewById(R.id.progressMessageTextView);
-        if (progressMessageTextView != null) {
-            progressMessageTextView.setText(s);
-        }
 
-        progressDialog.show();
-    }
-
-    private void uploadToFireStore() {
+    private void createFeedMap() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String serviceType = serviceTypeSpinnerOptions.getSelectedItem().toString();
@@ -278,32 +289,15 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("userProfileImage",userProfileUrlToSaveInFeed);
         services.put("type",2);
 
-        //Add a new document with a generated ID
-        db.collection("services")
-                .add(services)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        serviceDocId = documentReference.getId();
-                        Log.d("yoo", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        hideProgressDialog();
-                        finish();
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("yoo", "Error adding document", e);
-                    }
-                });
+        FirebaseUtil.createCollectionInFirestore(services,"services" ,new BaseDataCallback() {
+            @Override
+            public void onDismiss() {
+                DialogHelper.hideProgressDialog(progressDialog);
+                finish();
+            }
+        });
     }
 
-    private void hideProgressDialog() {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -331,30 +325,5 @@ public class CreateServicesActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-
-    private void fetchUserInfoFromFirestore(String userId) {
-        db.collection("user")
-                .whereEqualTo("userId", userId)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot userDocument : task.getResult()) {
-                            Users user = userDocument.toObject(Users.class);
-                            userNameToSaveInFeed = user.getName();
-                            userProfileUrlToSaveInFeed = user.getProfileImage();
-
-                            Glide.with(this)
-                                    .load(user.getProfileImage())
-                                    .into(userProfilePic);
-                            userNameTextView.setText(user.getName());
-
-                        }
-                    } else {
-                        Log.e("yoo", "Error getting user's info.", task.getException());
-                    }
-                });
-
     }
 }
