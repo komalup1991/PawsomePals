@@ -4,16 +4,19 @@ import static edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil.allUserColle
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.Dialog;
-import android.app.DownloadManager;
-import android.app.Notification;
+import android.provider.MediaStore;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -60,6 +63,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 
 public class ChatRoomActivity extends AppCompatActivity {
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_IMAGE_GALLERY = 2;
+
+    private static final int PERMISSIONS_REQUEST_CAMERA = 3;
+    private static final int PERMISSIONS_REQUEST_STORAGE = 4;
     private EditText messageInput;
     private ImageButton sendMessageBtn;
     private ImageButton functionBtn;
@@ -76,6 +84,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ChatMessageRecyclerAdapter adapter;
 
     private GroupChatModel group;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,11 +121,11 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
 
         functionBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDialog();
-            }
-        }
+                                           @Override
+                                           public void onClick(View view) {
+                                               showDialog();
+                                           }
+                                       }
         );
 
         if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("oneOnOne")) {
@@ -164,7 +173,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         backBtn = findViewById(R.id.message_back_button);
     }
 
-    private void showDialog(){
+    private void showDialog() {
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.chat_bottom_sheet_layout);
@@ -176,13 +185,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         cameraLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                handleImageCaptureFromCamera();
             }
         });
         galleryLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                handleImagePickFromGallery();
             }
         });
         locationLayout.setOnClickListener(new View.OnClickListener() {
@@ -192,7 +201,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
         dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.getWindow().setGravity(Gravity.BOTTOM);
@@ -357,4 +366,78 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Camera permissions granted, proceed with image capture
+                    handleImageCaptureFromCamera();
+                } else {
+                    // Camera permissions denied, show a message or handle accordingly
+                    Toast.makeText(this, "Camera permissions denied.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case PERMISSIONS_REQUEST_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Storage permissions granted, proceed with image pick
+                    handleImagePickFromGallery();
+                } else {
+                    // Storage permissions denied, show a message or handle accordingly
+                    Toast.makeText(this, "Storage permissions denied.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    private void handleImageCaptureFromCamera() {
+        // Check if camera permissions are granted
+        if (checkCameraPermission()) {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        } else {
+            // Request camera permissions if not granted
+            requestCameraPermission();
+        }
+    }
+
+    private boolean checkCameraPermission() {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
+    }
+
+    private void handleImagePickFromGallery() {
+        // Check if storage permissions are granted
+        if (checkStoragePermission()) {
+            Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            startActivityForResult(pickPhotoIntent, REQUEST_IMAGE_GALLERY);
+        } else {
+            // Request storage permissions if not granted
+            requestStoragePermission();
+        }
+    }
+    private boolean checkStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        }
+        else
+        {return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
+    }
+
+    private void requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
+        }
+        else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
+        }
+    }
+
 }
