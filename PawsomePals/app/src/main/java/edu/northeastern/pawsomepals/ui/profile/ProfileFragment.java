@@ -29,13 +29,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -43,12 +46,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.DogProfileAdapter;
+import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
 import edu.northeastern.pawsomepals.ui.feed.CreatePhotoVideoActivity;
@@ -65,6 +71,8 @@ public class ProfileFragment extends Fragment {
     private RecyclerView recyclerViewDogs;
     private RecyclerView recyclerViewPhotos;
     private RecyclerView recyclerViewRecipes;
+
+    private DogProfileAdapter dogProfileAdapter;
     private FloatingActionButton fabAddDogProfile;
 
     private TextView profileName;
@@ -82,6 +90,8 @@ public class ProfileFragment extends Fragment {
     private static final int PERMISSIONS_REQUEST_CAMERA = 3;
     private static final int PERMISSIONS_REQUEST_STORAGE = 4;
     private Uri photoUri;
+
+    private Boolean isUserProfile = false;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -106,18 +116,25 @@ public class ProfileFragment extends Fragment {
         followersCount = view.findViewById(R.id.followersCount);
         followingCount = view.findViewById(R.id.followingCount);
         recyclerViewDogs = view.findViewById(R.id.recyclerViewDogs);
+        recyclerViewDogs.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewPhotos = view.findViewById(R.id.recyclerViewPhotos);
         recyclerViewRecipes = view.findViewById(R.id.recyclerViewRecipes);
         fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
         editOrFollowButton = view.findViewById(R.id.editOrFollowButton);
         progressBar = view.findViewById(R.id.progressBar);
 
+
+
+
         // Check if the profileId is the same as the current user's userId
         if (profileId.equals(userId)) {
             editOrFollowButton.setText("Edit Profile");
+            isUserProfile = true;
         } else {
             setupFollowButton();
         }
+
+
         editOrFollowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,12 +151,16 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        profileImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openImageChooserDialog();
-            }
-        });
+        if (isUserProfile) {
+            profileImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openImageChooserDialog();
+                }
+            });
+        }
+
+        fetchDogProfiles(profileId);
 
         // Call the method to display name and image of the user
         getUserInfo(profileId);
@@ -442,6 +463,32 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    private void fetchDogProfiles(String userIdValue) {
+        progressBar.setVisibility(View.VISIBLE);
+
+        firebaseFirestore.collection("dogs")
+                .whereEqualTo("userId", userIdValue)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Dogs> dogProfiles = new ArrayList<>();
+
+                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Dogs dogProfile = documentSnapshot.toObject(Dogs.class);
+                        dogProfile.setDogId(documentSnapshot.getId());
+                        dogProfiles.add(dogProfile);
+                    }
+
+                    dogProfileAdapter = new DogProfileAdapter(dogProfiles, getContext(), isUserProfile, firebaseFirestore);
+                    recyclerViewDogs.setAdapter(dogProfileAdapter);
+
+                    progressBar.setVisibility(View.GONE);
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the error if needed
+                    progressBar.setVisibility(View.GONE);
+                    Log.e("Fetch Dog Profiles", "Error fetching dog profiles", e);
+                });
+    }
     private void openImageChooserDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Choose Profile Picture");
