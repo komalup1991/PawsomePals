@@ -1,7 +1,9 @@
 package edu.northeastern.pawsomepals.models;
 
+import androidx.annotation.Nullable;
+
 public class Post extends FeedItem  {
-    private String postId;
+
     private String caption;
     private String postContent;
 
@@ -9,20 +11,9 @@ public class Post extends FeedItem  {
 
     }
 
-    public Post(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String postId, String caption, String postContent,Long commentCount) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy,commentCount);
-        this.postId = postId;
-        this.caption = caption;
-        this.postContent = postContent;
-    }
-
     @Override
     public int getType() {
         return FeedItem.TYPE_POST;
-    }
-
-    public String getPostId() {
-        return postId;
     }
 
     public String getCaption() {
@@ -32,10 +23,24 @@ public class Post extends FeedItem  {
     public String getPostContent() {
         return postContent;
     }
-
-    public void setPostId(String postId) {
-        this.postId = postId;
+    @Override
+    public int hashCode() {
+        return getFeedItemId().hashCode();
     }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Post otherPost)) {
+            return false;
+        }
+
+        if (otherPost.getFeedItemId() == null || this.getFeedItemId() == null) {
+            return false;
+        }
+
+        return this.getFeedItemId().equals(otherPost.getFeedItemId());
+    }
+
 
 
 }

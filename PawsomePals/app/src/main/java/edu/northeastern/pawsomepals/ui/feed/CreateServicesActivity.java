@@ -289,7 +289,7 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("username",userNameToSaveInFeed);
         services.put("userProfileImage",userProfileUrlToSaveInFeed);
         services.put("type",2);
-        services.put("serviceId", UUID.randomUUID().toString());
+        services.put("feedItemId", UUID.randomUUID().toString());
 
         FirebaseUtil.createCollectionInFirestore(services,"services" ,new BaseDataCallback() {
             @Override

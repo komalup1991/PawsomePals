@@ -74,9 +74,8 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder{
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), CommentActivity.class);
-                intent.putExtra("postId",photoVideo.getPhotoVideoId());
+                intent.putExtra("feedItemId", photoVideo.getFeedItemId());
                 intent.putExtra("postType","photovideo");
-                intent.putExtra("IdField","photoVideoId");
                 activity.startActivity(intent);
             }
         });

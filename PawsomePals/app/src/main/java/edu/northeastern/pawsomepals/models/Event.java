@@ -8,21 +8,11 @@ public class Event extends FeedItem {
     private String eventDate;
     private String eventTime;
     private String eventDetails;
-    private String eventId;
- //   private Long commentCount;
-
 
     public Event() {
     }
 
-    public Event(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String eventName, String img, String eventDate, String eventTime, String eventDetails,Long commentCount) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy,commentCount);
-        this.eventName = eventName;
-        this.img = img;
-        this.eventDate = eventDate;
-        this.eventTime = eventTime;
-        this.eventDetails = eventDetails;
-    }
+
 
     @Override
     public int getType() {
@@ -48,29 +38,21 @@ public class Event extends FeedItem {
     public String getEventName() {
         return eventName;
     }
-
-    public String getEventId() {
-        return eventId;
-    }
-
-    public void setEventId(String eventId) {
-        this.eventId = eventId;
-    }
-
     @Override
     public int hashCode() {
-        return eventId.hashCode();
+        return getFeedItemId().hashCode();
     }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof Event otherEvent)) {
             return false;
         }
 
-        if (otherEvent.eventId == null || this.eventId == null) {
+        if (otherEvent.getFeedItemId() == null || this.getFeedItemId() == null) {
             return false;
         }
 
-        return this.eventId.equals(otherEvent.eventId);
+        return this.getFeedItemId().equals(otherEvent.getFeedItemId());
     }
 }

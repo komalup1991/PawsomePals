@@ -72,9 +72,8 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder{
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), CommentActivity.class);
-                intent.putExtra("postId",services.getServiceId());
+                intent.putExtra("feedItemId",services.getFeedItemId());
                 intent.putExtra("postType","services");
-                intent.putExtra("IdField","serviceId");
                 activity.startActivity(intent);
             }
         });

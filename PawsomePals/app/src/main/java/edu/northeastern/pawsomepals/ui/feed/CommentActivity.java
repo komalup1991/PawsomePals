@@ -47,7 +47,7 @@ public class CommentActivity extends AppCompatActivity {
     private ImageView userImageProfile;
     private TextView postCommentButton;
 
-    private String postId,postType,IdField;
+    private String feedItemId, postType, IdField;
     private String createdBy;
 
     String firebaseUser;
@@ -61,7 +61,7 @@ public class CommentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        userImageProfile= findViewById(R.id.image_profile);
+        userImageProfile = findViewById(R.id.image_profile);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Comments");
@@ -78,8 +78,8 @@ public class CommentActivity extends AppCompatActivity {
         FirebaseUtil.fetchUserInfoFromFirestore(firebaseUser, new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-                userNameToSaveInFeed=user.getName();
-                userProfileUrlToSaveInFeed=user.getProfileImage();
+                userNameToSaveInFeed = user.getName();
+                userProfileUrlToSaveInFeed = user.getProfileImage();
                 Glide.with(CommentActivity.this)
                         .load(user.getProfileImage())
                         .into(userImageProfile);
@@ -88,15 +88,12 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-        postId = getIntent().getStringExtra("postId");
+        feedItemId = getIntent().getStringExtra("feedItemId");
         postType = getIntent().getStringExtra("postType");
-        IdField = getIntent().getStringExtra("IdField");
 
-        Log.d("yoo","comment"+postType);
-        Log.d("yoo","comment "+IdField);
-        Log.d("yoo","comment "+postId);
+        Log.d("yoo", "comment" + postType);
+        Log.d("yoo", "comment " + feedItemId);
 
-      //  postId = intent.getStringExtra("postId");
         createdBy = intent.getStringExtra("createdBy");
 
 
@@ -105,7 +102,7 @@ public class CommentActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         commentRecyclerView.setLayoutManager(linearLayoutManager);
         commentList = new ArrayList<>();
-        commentAdapter = new CommentAdapter(this , commentList , postId);
+        commentAdapter = new CommentAdapter(this, commentList, feedItemId);
         commentRecyclerView.setAdapter(commentAdapter);
 
         addComment = findViewById(R.id.add_comment);
@@ -116,7 +113,7 @@ public class CommentActivity extends AppCompatActivity {
         postCommentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (TextUtils.isEmpty(addComment.getText().toString())){
+                if (TextUtils.isEmpty(addComment.getText().toString())) {
                     Toast.makeText(CommentActivity.this, "No comment added!", Toast.LENGTH_SHORT).show();
                 } else {
                     addComment();
@@ -133,25 +130,25 @@ public class CommentActivity extends AppCompatActivity {
     private void readComments() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("comments").whereEqualTo("postId",postId).
+        db.collection("comments").whereEqualTo("feedItemId", feedItemId).
                 addSnapshotListener((querySnapshot, error) -> {
-            if (error != null) {
-                Log.e("Comments", "Error getting comments.", error);
-                return;
-            }
-            List<Comment> commentList = new ArrayList<>();
-            for (QueryDocumentSnapshot document : querySnapshot) {
-                Comment comment = document.toObject(Comment.class);
-                try {
-                    comment.setCreatedAt(TimeUtil.formatTime(comment.getCreatedAt()));
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-                commentList.add(comment);
-            }
-            commentAdapter.setComments(commentList);
-            commentAdapter.notifyDataSetChanged();
-        });
+                    if (error != null) {
+                        Log.e("Comments", "Error getting comments.", error);
+                        return;
+                    }
+                    List<Comment> commentList = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        Comment comment = document.toObject(Comment.class);
+                        try {
+                            comment.setCreatedAt(TimeUtil.formatTime(comment.getCreatedAt()));
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                        commentList.add(comment);
+                    }
+                    commentAdapter.setComments(commentList);
+                    commentAdapter.notifyDataSetChanged();
+                });
     }
 
     private void getImage() {
@@ -167,20 +164,20 @@ public class CommentActivity extends AppCompatActivity {
         Map<String, Object> comments = new HashMap<>();
         comments.put("createdBy", createdBy);
         comments.put("comment", comment);
-        comments.put("postId", postId);
+        comments.put("feedItemId", feedItemId);
         comments.put("createdAt", createdAt);
         comments.put("username", userNameToSaveInFeed);
         comments.put("userProfileImage", userProfileUrlToSaveInFeed);
 
-        FirebaseUtil.createCollectionInFirestore(comments,"comments" ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(comments, "comments", new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
 
             }
         });
-Log.d("yoo","comment"+postType+IdField+postId);
-        FirebaseUtil.updateFeedWithCommentCount(postType,IdField, postId);
+        Log.d("yoo", "comment" + postType + IdField + feedItemId);
+        FirebaseUtil.updateFeedWithCommentCount(postType, feedItemId);
 
 
     }

@@ -100,6 +100,7 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     Services s = doc.toObject(Services.class);
+                    Log.d("yoo", "s item id " + s.getFeedItemId());
                     updateFeedItemList(s);
                 }
             }
@@ -112,7 +113,7 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     PhotoVideo pv = doc.toObject(PhotoVideo.class);
-                    Log.d("yoo","pv item id "+pv.getPhotoVideoId() );
+                    Log.d("yoo", "pv item id " + pv.getFeedItemId());
                     updateFeedItemList(pv);
                 }
             }
@@ -126,24 +127,23 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
         firestoreDataLoader.loadDataFromCollections();
     }
 
-    private void updateFeedItemList(FeedItem e) {
-        if (!feedItemList.contains(e)) {
+    private void updateFeedItemList(FeedItem item) {
+        if (!feedItemList.contains(item)) {
             int index = 0;
             if (!feedItemList.isEmpty()) {
                 index = 1; // account for header
             }
-            feedItemList.add(index, e);
+            feedItemList.add(index, item);
             feedAdapter.notifyItemChanged(index);
-        }
-        else{
-            for(FeedItem feedItem: feedItemList) {
-                Log.d("yoo","feed item id "+feedItem.getFeedItemId() );
-                Log.d("yoo","e item id "+e.getFeedItemId() );
-                if (Objects.equals(feedItem.getFeedItemId(), e.getFeedItemId())) {
-                    feedItem.setCommentCount(e.getCommentCount());
+        } else {
+            for (FeedItem feedItem : feedItemList) {
+                Log.d("feednow ",feedItem + "");
+                if (Objects.equals(feedItem.getFeedItemId(), item.getFeedItemId())) {
+                    feedItem.setCommentCount(item.getCommentCount());
                 }
-            }feedAdapter.notifyDataSetChanged();
             }
+            feedAdapter.notifyDataSetChanged();
+        }
 
 
     }
@@ -154,6 +154,11 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
         feedItemList.clear();
         feedItemList.add(new FeedItem() {
             @Override
+            public int compareTo(FeedItem feedItem) {
+                return 0;
+            }
+
+            @Override
             public int getType() {
                 return FeedItem.TYPE_RECIPE_HEADER;
             }
@@ -163,7 +168,8 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
                 int type = Math.toIntExact((Long) document.getData().get("type"));
                 FeedItem feedItem = null;
                 switch (type) {
-                    case FeedItem.TYPE_PHOTO_VIDEO -> feedItem = document.toObject(PhotoVideo.class);
+                    case FeedItem.TYPE_PHOTO_VIDEO ->
+                            feedItem = document.toObject(PhotoVideo.class);
                     case FeedItem.TYPE_EVENT -> feedItem = document.toObject(Event.class);
                     case FeedItem.TYPE_POST -> feedItem = document.toObject(Post.class);
                     case FeedItem.TYPE_SERVICE -> feedItem = document.toObject(Services.class);

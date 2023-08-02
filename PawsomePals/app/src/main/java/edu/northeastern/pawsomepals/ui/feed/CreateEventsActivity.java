@@ -422,7 +422,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("username", userNameToSaveInFeed);
         events.put("userProfileImage", userProfileUrlToSaveInFeed);
         events.put("type", 3);
-        events.put("eventId", UUID.randomUUID().toString());
+        events.put("feedItemId", UUID.randomUUID().toString());
         events.put("img", imageUrlFromFirebaseStorage);
 
         FirebaseUtil.createCollectionInFirestore(events,"events" ,new BaseDataCallback() {

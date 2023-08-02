@@ -72,9 +72,8 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), CommentActivity.class);
-                intent.putExtra("postId",post.getPostId());
+                intent.putExtra("feedItemId", post.getFeedItemId());
                 intent.putExtra("postType","posts");
-                intent.putExtra("IdField","postId");
                 activity.startActivity(intent);
             }
         });

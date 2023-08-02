@@ -353,7 +353,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         photoVideoPosts.put("userProfileImage",userProfileUrlToSaveInFeed);
         photoVideoPosts.put("type",1);
         photoVideoPosts.put("img", imageUrlFromFirebaseStorage);
-        photoVideoPosts.put("photoVideoId", UUID.randomUUID().toString());
+        photoVideoPosts.put("feedItemId", UUID.randomUUID().toString());
 
         FirebaseUtil.createCollectionInFirestore(photoVideoPosts, "photovideo",new BaseDataCallback() {
             @Override

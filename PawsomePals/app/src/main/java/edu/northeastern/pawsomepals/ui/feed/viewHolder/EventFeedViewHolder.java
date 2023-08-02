@@ -3,6 +3,7 @@ package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -131,9 +132,10 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), CommentActivity.class);
-                intent.putExtra("postId",event.getEventId());
+                intent.putExtra("feedItemId", event.getFeedItemId());
+                Log.d("yoo","in event view holder " +event.getFeedItemId() );
                 intent.putExtra("postType","events");
-                intent.putExtra("IdField","eventId");
+
                 activity.startActivity(intent);
             }
         });

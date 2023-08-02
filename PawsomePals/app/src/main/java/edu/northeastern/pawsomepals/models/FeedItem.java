@@ -1,5 +1,13 @@
 package edu.northeastern.pawsomepals.models;
 
+import android.icu.text.SimpleDateFormat;
+
+import androidx.annotation.Nullable;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Locale;
+
 public abstract class FeedItem  implements Comparable<FeedItem> {
 
     public static final int TYPE_RECIPE_HEADER = 0;
@@ -17,9 +25,10 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
     private String feedItemId;
     private Long commentCount;
 
-    public FeedItem() {}
+    public FeedItem() {
+    }
 
-    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy,Long commentCount) {
+    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, Long commentCount) {
         this.username = username;
         this.userProfileImage = userProfileImage;
         this.createdAt = createdAt;
@@ -84,14 +93,26 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         this.commentCount = commentCount;
     }
 
+
+
+
     @Override
     public int compareTo(FeedItem feedItem) {
-//        Log.d("yoo", "convertStringToDate(f eedItem2.getCreatedAt()) = " + convertStringToDate(feedItem2.getCreatedAt()));
-//        Log.d("yoo", "convertStringToDate(feedItem.getCreatedAt()) = " + convertStringToDate(feedItem.getCreatedAt()));
-//        return convertStringToDate(this.getCreatedAt())
-//                .compareTo(convertStringToDate(feedItem.getCreatedAt()));
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+//
+//        try {
+//            Date thisDate = sdf.parse(this.getCreatedAt());
+//            Date otherDate = sdf.parse(feedItem.getCreatedAt());
+//
+//            // Compare the dates and return the result
+//            return thisDate.compareTo(otherDate);
+//        } catch (ParseException e) {
+//            throw new RuntimeException(e);
+//        }
         return 0;
     }
+}
+
 
 //    private Date convertStringToDate(String createdAt) {
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
@@ -101,4 +122,5 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
 //            throw new RuntimeException(e);
 //        }
 //    }
-}
+
+

@@ -146,7 +146,7 @@ public class CreatePostActivity extends AppCompatActivity {
                 searchLocationDisplayTextView.setVisibility(View.VISIBLE);
             }
         });
-        
+
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -293,7 +293,7 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("username",userNameToSaveInFeed);
         post.put("userProfileImage",userProfileUrlToSaveInFeed);
         post.put("type",4);
-        post.put("postId", UUID.randomUUID().toString());
+        post.put("feedItemId", UUID.randomUUID().toString());
 
         FirebaseUtil.createCollectionInFirestore(post,"posts" ,new BaseDataCallback() {
             @Override
