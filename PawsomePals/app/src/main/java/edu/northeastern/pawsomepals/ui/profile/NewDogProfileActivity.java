@@ -57,7 +57,7 @@ import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 
-public class EditDogProfileActivity extends AppCompatActivity {
+public class NewDogProfileActivity extends AppCompatActivity {
 
     private Spinner spinnerDogBreed;
     private Spinner spinnerMixedBreed;
@@ -94,7 +94,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_dog_profile);
+        setContentView(R.layout.activity_new_dog_profile);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -199,13 +199,13 @@ public class EditDogProfileActivity extends AppCompatActivity {
             @Override
             public void onError() {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(EditDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onEmptyResult() {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(EditDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
             }
 
         };
@@ -347,7 +347,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
     }
 
     private void navigateToHomeActivity() {
-        Intent intent = new Intent(EditDogProfileActivity.this, HomeActivity.class);
+        Intent intent = new Intent(NewDogProfileActivity.this, HomeActivity.class);
         startActivity(intent);
     }
 
@@ -421,14 +421,14 @@ public class EditDogProfileActivity extends AppCompatActivity {
                         .set(dogData) // Use .set() to create or update the document
                         .addOnSuccessListener(aVoid -> {
                             progressBar.setVisibility(View.GONE);
-                            Toast.makeText(EditDogProfileActivity.this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(NewDogProfileActivity.this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
                             navigateToHomeActivity();
                             finish();
                         })
                         .addOnFailureListener(e -> {
                             progressBar.setVisibility(View.GONE);
                             Log.e("yoo", "Error adding document", e);
-                            Toast.makeText(EditDogProfileActivity.this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(NewDogProfileActivity.this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
                         });
             } else {
                 progressBar.setVisibility(View.GONE);
@@ -439,7 +439,7 @@ public class EditDogProfileActivity extends AppCompatActivity {
             public void onFailure(@NonNull Exception e) {
                 progressBar.setVisibility(View.GONE);
                 Log.e("yoo", "Error uploading profile picture", e);
-                Toast.makeText(EditDogProfileActivity.this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewDogProfileActivity.this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
     }
