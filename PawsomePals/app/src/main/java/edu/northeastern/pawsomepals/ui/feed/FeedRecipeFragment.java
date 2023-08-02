@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 import edu.northeastern.pawsomepals.adapters.RecipeAllAdapter;
@@ -115,6 +117,11 @@ public class FeedRecipeFragment extends Fragment {
                 editor.apply();
 
                 //Navigate to Profile Fragment
+                ProfileFragment profileFragment = new ProfileFragment();
+                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container_view, profileFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
 
             }
 
