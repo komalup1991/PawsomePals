@@ -19,26 +19,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
 import edu.northeastern.pawsomepals.adapters.RecentChatRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
-import edu.northeastern.pawsomepals.models.Users;
-
 
 public class ChatFragment extends Fragment {
     private EditText searchInput;
     private ImageButton searchButton;
-    private Button createNewChatButton,createNewGroupButton;
+    private Button createNewChatButton, createNewGroupButton;
     private RecyclerView chatRecyclerview;
     private RecentChatRecyclerAdapter adapter;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_chat, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
+        setupRecyclerView();
+        return view;
     }
 
     @Override
@@ -47,23 +51,21 @@ public class ChatFragment extends Fragment {
 
         searchInput = view.findViewById(R.id.chat_search_chat);
         searchButton = view.findViewById(R.id.chat_search_chat_btn);
-        chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewChatButton = view.findViewById(R.id.new_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewGroupButton = view.findViewById(R.id.new_group_chat_btn);
 
-        setupRecyclerView();
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String searchTerm = searchInput.getText().toString();
 
-                if (searchTerm.isEmpty() || searchTerm.length() < 3){
+                if (searchTerm.isEmpty() || searchTerm.length() < 3) {
                     searchInput.setError("Invalid Username");
                     return;
                 }
-                
+
                 setupRecyclerView();
             }
         });
@@ -90,10 +92,10 @@ public class ChatFragment extends Fragment {
         FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
             @Override
             public void onComplete(@NonNull Task<String> task) {
-                if (task.isSuccessful()){
+                if (task.isSuccessful()) {
                     String token = task.getResult();
-                    Log.i("token",token);
-                    ChatFirebaseUtil.currentUserDetails().update("fcmToken",token);
+                    ChatFirebaseUtil.currentUserDetails().update("fcmToken", token);
+                    setupRecyclerView();
                 }
             }
         });
@@ -101,12 +103,14 @@ public class ChatFragment extends Fragment {
 
     private void setupRecyclerView() {
         Query query = ChatFirebaseUtil.allChatRoomCollectionReference()
-                .whereArrayContains("userIds",ChatFirebaseUtil.currentUserId())
-                .orderBy("lastMessageTimestamp",Query.Direction.DESCENDING);
+                .whereArrayContains("userIds", ChatFirebaseUtil.currentUserId())
+                .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING);
 
-        FirestoreRecyclerOptions<ChatRoomModel> options = new FirestoreRecyclerOptions.Builder<ChatRoomModel>()
-                .setQuery(query,ChatRoomModel.class).build();
-        adapter = new RecentChatRecyclerAdapter(options,getContext());
+        FirestoreRecyclerOptions<ChatRoomModel> options =
+                new FirestoreRecyclerOptions.Builder<ChatRoomModel>()
+                        .setQuery(query, ChatRoomModel.class)
+                        .build();
+        adapter = new RecentChatRecyclerAdapter(options, getContext());
         chatRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
         chatRecyclerview.setAdapter(adapter);
         adapter.startListening();
@@ -115,23 +119,15 @@ public class ChatFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (adapter != null){
+        if (adapter != null) {
             adapter.startListening();
-        }
-        synchronized(this) {
-            // update your adapter data here
-            adapter.notifyDataSetChanged();
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (adapter != null){
-            adapter.startListening();
-        }
-        synchronized(this) {
-            // update your adapter data here
+        if (adapter != null) {
             adapter.notifyDataSetChanged();
         }
     }
@@ -139,7 +135,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        if (adapter != null){
+        if (adapter != null) {
             adapter.stopListening();
         }
     }

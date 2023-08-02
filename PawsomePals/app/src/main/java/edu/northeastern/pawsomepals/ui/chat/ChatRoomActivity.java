@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
+import static edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil.allUserCollectionReference;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,6 +11,7 @@ import android.app.DownloadManager;
 import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -18,6 +21,7 @@ import android.widget.Toast;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
@@ -29,7 +33,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
@@ -54,6 +60,8 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageButton infoBtn;
     private TextView chatRoomName;
     private RecyclerView chatRoomRecyclerView;
+    private List<Users> otherGroupUsers;
+    private List<Users> groupUsers;
 
     private Users otherUser;
     private String chatRoomId;
@@ -68,6 +76,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         initialView();
+        otherGroupUsers = new ArrayList<>();
+        groupUsers = new ArrayList<>();
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,8 +97,9 @@ public class ChatRoomActivity extends AppCompatActivity {
         infoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //check
                 Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
+                //check
+                ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers);
                 startActivity(intent);
             }
         });
@@ -99,10 +110,28 @@ public class ChatRoomActivity extends AppCompatActivity {
             chatRoomName.setText(otherUser.getName());
             getOrCreateChatRoomModel();
 
-        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")){
+        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")) {
             group = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getGroupRoomId(group.getGroupMembers());
             chatRoomName.setText(group.getGroupName());
+
+            List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(group.getGroupMembers());
+            for (DocumentReference reference : references) {
+                reference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot snapshot) {
+                        Users user = snapshot.toObject(Users.class);
+                        if (user != null)
+                            if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
+                                otherGroupUsers.add(user);
+                                groupUsers.add(user);
+                            }
+                        if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
+                            groupUsers.add(user);
+                        }
+                    }
+                });
+            }
 
             getOrCreateGroupChatModel();
         }
@@ -127,12 +156,20 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         FirestoreRecyclerOptions<ChatMessageModel> options = new FirestoreRecyclerOptions.Builder<ChatMessageModel>()
                 .setQuery(query, ChatMessageModel.class).build();
+
         adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);
         chatRoomRecyclerView.setAdapter(adapter);
         adapter.startListening();
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                chatRoomRecyclerView.smoothScrollToPosition(0);
+            }
+        });
     }
 
     private void sendMessageToUser(String message) {
@@ -195,6 +232,10 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void sendNotification(String message) {
+        if (otherGroupUsers.size() == 0) {
+            otherGroupUsers.add(otherUser);
+        }
+
         //current username, message, currentuserid,otheruserid
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -203,22 +244,26 @@ public class ChatRoomActivity extends AppCompatActivity {
                     Users currentUser = task.getResult().toObject(Users.class);
 
                     try {
-                        JSONObject jasonObject = new JSONObject();
-                        JSONObject notificationObj = new JSONObject();
-                        notificationObj.put("title", currentUser.getName());
-                        notificationObj.put("body", message);
+                        for (Users user : otherGroupUsers) {
+                            JSONObject jasonObject = new JSONObject();
+                            JSONObject notificationObj = new JSONObject();
+                            notificationObj.put("title", currentUser.getName());
+                            notificationObj.put("body", message);
 
-                        JSONObject dataObj = new JSONObject();
-                        dataObj.put("userId", currentUser.getUserId());
+                            JSONObject dataObj = new JSONObject();
+                            dataObj.put("userId", currentUser.getUserId());
 
-                        jasonObject.put("notification", notificationObj);
-                        jasonObject.put("data", dataObj);
-                        jasonObject.put("to", otherUser.getFcmToken());
+                            jasonObject.put("notification", notificationObj);
+                            jasonObject.put("data", dataObj);
 
-                        callApi(jasonObject);
 
+                            if (user != null) {
+                                jasonObject.put("to", user.getFcmToken());
+                            }
+                            callApi(jasonObject);
+                        }
                     } catch (Exception e) {
-
+                        Log.i("info", "exeption");
                     }
                 }
             }

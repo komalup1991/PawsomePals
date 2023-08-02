@@ -45,9 +45,9 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 
     @Override
     protected void onBindViewHolder(@NonNull ChatRoomModelViewHolder holder, int position, @NonNull ChatRoomModel model) {
+        List<Users> users = new ArrayList<>();
 
-        if (model.getChatStyle() != null) {
-            List<Users> users = new ArrayList<>();
+        if (model.getChatStyle() != null ) {
             if (model.getChatStyle().toString().equals(ChatStyle.GROUP.toString())) {
 
                 List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(model.getUserIds());
@@ -56,7 +56,6 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()) {
-                                Log.i("info", "complete");
                                 Users user = task.getResult().toObject(Users.class);
                                 if (user != null)
                                     users.add(user);
@@ -71,14 +70,68 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                                         holder.lastMessageText.setText("You:" + model.getLastMessage());
                                     else
                                         holder.lastMessageText.setText(model.getLastMessage());
+
                                     if (model.getLastMessageTimestamp() != null) {
                                         holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
                                     }
+                                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //navigate to chat activity;
+                                            Intent intent = new Intent(context, ChatRoomActivity.class);
+                                            ChatFirebaseUtil.passGroupChatModelAsIntent(intent,users);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            context.startActivity(intent);
+                                        }
+                                    });
+
+                                }
+                                if (users.size() == references.size()){
+                                    StringBuilder builder = new StringBuilder();
+                                    for (Users theUser:users){
+                                        builder.append(theUser.getName());
+                                        builder.append(" ");
+                                    }
+                                    holder.userNameText.setText(builder.toString());
                                 }
                             }
                         }
                     });
                 }
+
+            }else {
+                ChatFirebaseUtil.getOtherUserFromChatroom(model.getUserIds())
+                        .get().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
+                                Users otherUser = task.getResult().toObject(Users.class);
+                                if (otherUser != null) {
+                                    holder.userNameText.setText(otherUser.getName());
+                                    Glide.with(this.context)
+                                            .load(otherUser.getProfileImage())
+                                            .into(holder.profilePic);
+                                }
+                                if (lastMessageSentByMe)
+                                    holder.lastMessageText.setText("You:" + model.getLastMessage());
+                                else
+                                    holder.lastMessageText.setText(model.getLastMessage());
+                                if (model.getLastMessageTimestamp() != null) {
+                                    holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
+                                }
+                                if (otherUser != null) {
+                                    holder.itemView.setOnClickListener(new View.OnClickListener() {
+                                        @Override
+                                        public void onClick(View v) {
+                                            //navigate to chat activity;
+                                            Intent intent = new Intent(context, ChatRoomActivity.class);
+                                            ChatFirebaseUtil.passUserModelAsIntent(intent, otherUser);
+                                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                            context.startActivity(intent);
+                                        }
+                                    });
+                                }
+                            }
+                        });
             }
 
 //            holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -91,39 +144,6 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 //                    context.startActivity(intent);
 //                }
 //            });
-        } else {
-            ChatFirebaseUtil.getOtherUserFromChatroom(model.getUserIds())
-                    .get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
-                            Users otherUser = task.getResult().toObject(Users.class);
-                            if (otherUser != null) {
-                                holder.userNameText.setText(otherUser.getName());
-                                Glide.with(this.context)
-                                        .load(otherUser.getProfileImage())
-                                        .into(holder.profilePic);
-                            }
-                            if (lastMessageSentByMe)
-                                holder.lastMessageText.setText("You:" + model.getLastMessage());
-                            else
-                                holder.lastMessageText.setText(model.getLastMessage());
-                            if (model.getLastMessageTimestamp() != null) {
-                                holder.lastMessageTime.setText(ChatFirebaseUtil.timestampToString(model.getLastMessageTimestamp()));
-                            }
-                            if (otherUser != null) {
-                                holder.itemView.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        //navigate to chat activity;
-                                        Intent intent = new Intent(context, ChatRoomActivity.class);
-                                        ChatFirebaseUtil.passUserModelAsIntent(intent, otherUser);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                        context.startActivity(intent);
-                                    }
-                                });
-                            }
-                        }
-                    });
         }
     }
 
@@ -133,6 +153,11 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
     public ChatRoomModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.chat_search_chat_item, parent, false);
         return new ChatRoomModelViewHolder(view);
+    }
+
+    @Override
+    public void onDataChanged() {
+        super.onDataChanged();
     }
 
     class ChatRoomModelViewHolder extends RecyclerView.ViewHolder {

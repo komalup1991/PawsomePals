@@ -21,12 +21,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatGroupUserRecyclerAdapter;
-import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class CreateNewGroupChat extends AppCompatActivity {

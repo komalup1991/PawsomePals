@@ -52,10 +52,6 @@ public class FeedRecipeFragment extends Fragment {
         fetchRecipesFromFirestore();
     }
 
-
-
-
-
     private void fetchRecipesFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("recipes").addSnapshotListener((querySnapshot, error) -> {

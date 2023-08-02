@@ -100,7 +100,7 @@ public class ChatFirebaseUtil {
             }
 
         }
-        return "group" + groupChatId;
+        return "group_" + groupChatId;
     }
 
     public static Users getUserModelFromIntent(Intent intent) {
@@ -145,6 +145,6 @@ public class ChatFirebaseUtil {
     }
 
     public static String timestampToString(Timestamp timestamp) {
-        return new SimpleDateFormat("HH:HH").format(timestamp.toDate());
+        return new SimpleDateFormat("MMM d HH:mm:ss").format(timestamp.toDate());
     }
 }
