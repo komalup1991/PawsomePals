@@ -209,7 +209,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                 }
 
                 FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
-                        "event", new BaseDataCallback() {
+                        "recipes", new BaseDataCallback() {
 
                             @Override
                             public void onImageUriReceived(String imageUrl) {

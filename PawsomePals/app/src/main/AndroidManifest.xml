@@ -17,7 +17,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -28,6 +27,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PawsomePals"
         tools:targetApi="31">
+        <activity
+            android:name=".ui.feed.CommentActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.login.ForgotPassword"
             android:exported="false" />
@@ -65,38 +67,38 @@
             android:exported="false" />
         <activity
             android:name=".ui.feed.CreateEventsActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.feed.CreatePhotoVideoActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.feed.CreatePostActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.feed.CreateRecipeActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.login.HomeActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.feed.CreateServicesActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.feed.RecipeDetailActivity"
-            android:screenOrientation="portrait"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.login.MainActivity"
-            android:screenOrientation="portrait"
-            android:exported="false">
-        </activity>
-        <activity android:name="edu.northeastern.pawsomepals.ui.chat.SplashActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ui.chat.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -109,7 +111,7 @@
             android:name=".ui.chat.FCMNotificationService"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.goolge.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.goolge.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
