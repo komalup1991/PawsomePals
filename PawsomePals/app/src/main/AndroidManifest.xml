@@ -37,7 +37,7 @@
             android:name=".ui.profile.UserProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.profile.EditDogProfileActivity"
+            android:name=".ui.profile.NewDogProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ui.profile.EditUserProfileActivity"

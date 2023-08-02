@@ -260,7 +260,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
 
     private void navigateToEditDogProfileActivity() {
-        Intent intent = new Intent(EditUserProfileActivity.this, EditDogProfileActivity.class);
+        Intent intent = new Intent(EditUserProfileActivity.this, NewDogProfileActivity.class);
         startActivity(intent);
     }
 

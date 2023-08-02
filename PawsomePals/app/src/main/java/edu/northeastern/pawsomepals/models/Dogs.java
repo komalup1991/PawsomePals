@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
 public class Dogs {
+    private String dogId;
     private String userId;
     private String name;
     private String breed;
@@ -14,7 +15,8 @@ public class Dogs {
     public Dogs() {
     }
 
-    public Dogs(String name, String breed, Boolean isMixedBreed, String mixedBreed, String profileImage, String gender, String dob, String size) {
+    public Dogs(String dogId, String name, String breed, Boolean isMixedBreed, String mixedBreed, String profileImage, String gender, String dob, String size) {
+        this.dogId = dogId;
         this.userId = userId;
         this.name = name;
         this.breed = breed;
@@ -24,6 +26,14 @@ public class Dogs {
         this.gender = gender;
         this.dob = dob;
         this.size = size;
+    }
+
+    public String getDogId() {
+        return dogId;
+    }
+
+    public void setDogId(String dogId) {
+        this.dogId = dogId;
     }
 
     public String getUserId() {
