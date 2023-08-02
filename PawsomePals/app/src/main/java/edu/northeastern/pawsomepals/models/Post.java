@@ -9,8 +9,8 @@ public class Post extends FeedItem  {
 
     }
 
-    public Post(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String postId, String caption, String postContent) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy);
+    public Post(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String postId, String caption, String postContent,Long commentCount) {
+        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy,commentCount);
         this.postId = postId;
         this.caption = caption;
         this.postContent = postContent;

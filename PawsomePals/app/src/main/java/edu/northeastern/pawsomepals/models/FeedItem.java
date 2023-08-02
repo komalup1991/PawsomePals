@@ -14,16 +14,20 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
     private String userTagged;
     private String locationTagged;
     private String createdBy;
+    private String feedItemId;
+    private Long commentCount;
 
     public FeedItem() {}
 
-    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy) {
+    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy,Long commentCount) {
         this.username = username;
         this.userProfileImage = userProfileImage;
         this.createdAt = createdAt;
         this.userTagged = userTagged;
         this.locationTagged = locationTagged;
         this.createdBy = createdBy;
+        this.commentCount = commentCount;
+
     }
 
     public String getUserProfileImage() {
@@ -62,6 +66,22 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
 
     public void setUserProfileImage(String userProfileImage) {
         this.userProfileImage = userProfileImage;
+    }
+
+    public String getFeedItemId() {
+        return feedItemId;
+    }
+
+    public void setFeedItemId(String feedItemId) {
+        this.feedItemId = feedItemId;
+    }
+
+    public Long getCommentCount() {
+        return commentCount;
+    }
+
+    public void setCommentCount(Long commentCount) {
+        this.commentCount = commentCount;
     }
 
     @Override

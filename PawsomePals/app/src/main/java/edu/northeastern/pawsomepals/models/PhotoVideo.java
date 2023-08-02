@@ -8,8 +8,8 @@ public class PhotoVideo extends FeedItem  {
     public PhotoVideo() {
     }
 
-    public PhotoVideo(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String caption, String img) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy);
+    public PhotoVideo(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String caption, String img,Long commentCount) {
+        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy,commentCount);
         this.caption = caption;
         this.img = img;
     }

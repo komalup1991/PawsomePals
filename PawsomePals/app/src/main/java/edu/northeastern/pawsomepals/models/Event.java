@@ -9,12 +9,14 @@ public class Event extends FeedItem {
     private String eventTime;
     private String eventDetails;
     private String eventId;
+ //   private Long commentCount;
+
 
     public Event() {
     }
 
-    public Event(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String eventName, String img, String eventDate, String eventTime, String eventDetails) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy);
+    public Event(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String eventName, String img, String eventDate, String eventTime, String eventDetails,Long commentCount) {
+        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy,commentCount);
         this.eventName = eventName;
         this.img = img;
         this.eventDate = eventDate;
@@ -59,7 +61,6 @@ public class Event extends FeedItem {
     public int hashCode() {
         return eventId.hashCode();
     }
-
     @Override
     public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof Event otherEvent)) {

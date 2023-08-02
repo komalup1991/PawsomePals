@@ -1,5 +1,6 @@
 package edu.northeastern.pawsomepals.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -67,12 +68,18 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         switch (feedItem.getType()) {
             case FeedItem.TYPE_RECIPE_HEADER ->
                     ((RecipeRecyclerViewHolder) holder).bindRecylerViewData();
-            case FeedItem.TYPE_POST -> ((PostFeedViewHolder) holder).bindData((Post) feedItem);
-            case FeedItem.TYPE_PHOTO_VIDEO -> ((PhotoVideoFeedViewHolder) holder).bindData((PhotoVideo) feedItem);
-            case FeedItem.TYPE_EVENT -> ((EventFeedViewHolder) holder).bindData((Event) feedItem);
-            case FeedItem.TYPE_SERVICE -> ((ServicesFeedViewHolder) holder).bindData((Services) feedItem);
+            case FeedItem.TYPE_POST ->
+                    ((PostFeedViewHolder) holder). bindData (((Activity)context), (Post) feedItem);
+            case FeedItem.TYPE_PHOTO_VIDEO ->
+                    ((PhotoVideoFeedViewHolder) holder).bindData(((Activity)context), (PhotoVideo) feedItem);
+            case FeedItem.TYPE_EVENT ->
+                    ((EventFeedViewHolder) holder).bindData(((Activity)context), (Event) feedItem);
+            case FeedItem.TYPE_SERVICE ->
+                    ((ServicesFeedViewHolder) holder).bindData(((Activity)context), (Services) feedItem);
         }
     }
+
+
 
     @Override
     public int getItemViewType(int position) {

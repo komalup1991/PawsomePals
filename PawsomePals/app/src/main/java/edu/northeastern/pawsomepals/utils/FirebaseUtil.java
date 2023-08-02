@@ -1,7 +1,7 @@
 package edu.northeastern.pawsomepals.utils;
 
-import android.app.Activity;
-import android.app.Dialog;
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.net.Uri;
 import android.util.Log;
 
@@ -12,8 +12,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.AggregateQuery;
+import com.google.firebase.firestore.AggregateQuerySnapshot;
+import com.google.firebase.firestore.AggregateSource;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -93,7 +99,57 @@ public class FirebaseUtil {
         }
     }
 
-    public static void createCollectionInFirestore(Map<String, Object> feedTypeObj,String feedType, DataCallback dataCallback) {
+    public static void updateFeedWithCommentCount(String postType, String idField, String postId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection(postType)
+                .whereEqualTo(idField, postId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            // Get the first matching document
+                            DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+
+                            // Get the current commentCount value (default to 0 if the field doesn't exist)
+                            Integer currentCommentCount = documentSnapshot.getLong("commentCount") != null
+                                    ? documentSnapshot.getLong("commentCount").intValue() : 0;
+
+                            // Calculate the new commentCount
+                            int newCommentCount = currentCommentCount + 1;
+
+                            // Update the document with the new commentCount
+                            documentSnapshot.getReference().update("commentCount", newCommentCount)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            // CommentCount has been updated successfully
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            // Handle the error if the update fails
+                                        }
+                                    });
+                        } else {
+                            // Document with the given postId not found
+                            // You may handle this case as needed
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Handle the error if the query fails
+                    }
+                });
+
+    }
+
+    public static void createCollectionInFirestore(Map<String, Object> feedTypeObj, String feedType, DataCallback dataCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //Add a new document with a generated ID
         db.collection(feedType)

@@ -10,8 +10,8 @@ public class Services extends FeedItem {
 
     }
 
-    public Services(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String serviceType, String serviceName, String serviceNotes) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy);
+    public Services(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String serviceType, String serviceName, String serviceNotes,Long commentCount) {
+        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy,commentCount);
         this.serviceType = serviceType;
         this.serviceName = serviceName;
         this.serviceNotes = serviceNotes;

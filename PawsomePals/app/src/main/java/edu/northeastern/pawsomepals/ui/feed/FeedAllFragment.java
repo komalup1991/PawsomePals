@@ -3,6 +3,7 @@ package edu.northeastern.pawsomepals.ui.feed;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.FeedAdapter;
@@ -110,6 +112,7 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     PhotoVideo pv = doc.toObject(PhotoVideo.class);
+                    Log.d("yoo","pv item id "+pv.getPhotoVideoId() );
                     updateFeedItemList(pv);
                 }
             }
@@ -124,7 +127,7 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
     }
 
     private void updateFeedItemList(FeedItem e) {
-        if (!feedItemList.contains(e) && !feedItemList.isEmpty()) {
+        if (!feedItemList.contains(e)) {
             int index = 0;
             if (!feedItemList.isEmpty()) {
                 index = 1; // account for header
@@ -132,6 +135,17 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             feedItemList.add(index, e);
             feedAdapter.notifyItemChanged(index);
         }
+        else{
+            for(FeedItem feedItem: feedItemList) {
+                Log.d("yoo","feed item id "+feedItem.getFeedItemId() );
+                Log.d("yoo","e item id "+e.getFeedItemId() );
+                if (Objects.equals(feedItem.getFeedItemId(), e.getFeedItemId())) {
+                    feedItem.setCommentCount(e.getCommentCount());
+                }
+            }feedAdapter.notifyDataSetChanged();
+            }
+
+
     }
 
 
