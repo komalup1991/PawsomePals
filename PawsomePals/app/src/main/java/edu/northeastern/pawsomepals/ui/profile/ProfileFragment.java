@@ -29,11 +29,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -54,10 +63,13 @@ import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.DogProfileAdapter;
+import edu.northeastern.pawsomepals.adapters.FragmentAdapter;
+import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
 import edu.northeastern.pawsomepals.ui.feed.CreatePhotoVideoActivity;
+import edu.northeastern.pawsomepals.ui.feed.FeedCreateListDialogFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
 
 public class ProfileFragment extends Fragment {
@@ -68,11 +80,6 @@ public class ProfileFragment extends Fragment {
     private String userId;
     private ProgressBar progressBar;
 
-    private RecyclerView recyclerViewDogs;
-    private RecyclerView recyclerViewPhotos;
-    private RecyclerView recyclerViewRecipes;
-
-    private DogProfileAdapter dogProfileAdapter;
     private FloatingActionButton fabAddDogProfile;
 
     private TextView profileName;
@@ -91,7 +98,10 @@ public class ProfileFragment extends Fragment {
     private static final int PERMISSIONS_REQUEST_STORAGE = 4;
     private Uri photoUri;
 
+    private TabLayout tabLayout;
+    private ViewPager2 viewPager;
     private Boolean isUserProfile = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -115,16 +125,12 @@ public class ProfileFragment extends Fragment {
         postsCount = view.findViewById(R.id.postsCount);
         followersCount = view.findViewById(R.id.followersCount);
         followingCount = view.findViewById(R.id.followingCount);
-        recyclerViewDogs = view.findViewById(R.id.recyclerViewDogs);
-        recyclerViewDogs.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewPhotos = view.findViewById(R.id.recyclerViewPhotos);
-        recyclerViewRecipes = view.findViewById(R.id.recyclerViewRecipes);
-        fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
         editOrFollowButton = view.findViewById(R.id.editOrFollowButton);
         progressBar = view.findViewById(R.id.progressBar);
 
-
-
+        fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
+        tabLayout = view.findViewById(R.id.tabLayout);
+        viewPager = view.findViewById(R.id.viewPager);
 
         // Check if the profileId is the same as the current user's userId
         if (profileId.equals(userId)) {
@@ -132,7 +138,28 @@ public class ProfileFragment extends Fragment {
             isUserProfile = true;
         } else {
             setupFollowButton();
+            fabAddDogProfile.hide();
         }
+
+        ProfileFragmentAdapter fragmentAdapter = new ProfileFragmentAdapter(this.getActivity(), profileId, isUserProfile);
+        viewPager.setUserInputEnabled(false);
+        viewPager.setAdapter(fragmentAdapter);
+
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0 -> tab.setText("Dogs");
+                case 1 -> tab.setText("Recipes");
+                case 2 -> tab.setText("Favourites");
+            }
+        }).attach();
+
+        fabAddDogProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), NewDogProfileActivity.class);
+                getContext().startActivity(intent);
+            }
+        });
 
 
         editOrFollowButton.setOnClickListener(new View.OnClickListener() {
@@ -140,8 +167,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 String buttonText = editOrFollowButton.getText().toString();
 
-                if(buttonText.equals("Edit Profile"))
-                {
+                if (buttonText.equals("Edit Profile")) {
                     navigateToEditUserProfile();
                 } else if (buttonText.equals("Follow")) {
                     followProfile();
@@ -160,7 +186,6 @@ public class ProfileFragment extends Fragment {
             });
         }
 
-        fetchDogProfiles(profileId);
 
         // Call the method to display name and image of the user
         getUserInfo(profileId);
@@ -174,10 +199,12 @@ public class ProfileFragment extends Fragment {
         // Call the method to start listening for changes in the posts count
         getPostsCount(profileId);
 
+
         progressBar.setVisibility(View.GONE);
 
         return view;
     }
+
 
     private void navigateToEditUserProfile() {
     }
@@ -201,29 +228,44 @@ public class ProfileFragment extends Fragment {
                                             .addOnSuccessListener(profileDocumentSnapshot -> {
                                                 if (profileDocumentSnapshot.exists()) {
                                                     // Document exists, update the "followers" field
-                                                    firebaseFirestore.collection("follow")
-                                                            .document(profileId)
-                                                            .update("followers", FieldValue.arrayUnion(userId))
-                                                            .addOnSuccessListener(aVoid1 -> {
-                                                                // Update the UI and change the button text to "Following"
-                                                                editOrFollowButton.setText("Following");
-                                                                progressBar.setVisibility(View.GONE);
-                                                            })
-                                                            .addOnFailureListener(e -> {
-                                                                progressBar.setVisibility(View.GONE);
-                                                                Log.w("Follow Profile", "Error updating followers", e);
-                                                            });
+                                                    List<String> followersList = (List<String>) profileDocumentSnapshot.get("followers");
+                                                    if (followersList != null && !followersList.contains(userId)) {
+                                                        followersList.add(userId);
+                                                        firebaseFirestore.collection("follow")
+                                                                .document(profileId)
+                                                                .update("followers", followersList)
+                                                                .addOnSuccessListener(aVoid1 -> {
+                                                                    // Update the UI and change the button text to "Following"
+                                                                    editOrFollowButton.setText("Following");
+                                                                    progressBar.setVisibility(View.GONE);
+
+                                                                    // Update the Followers count in the UI
+                                                                    followersCountValue = followersList.size();
+                                                                    followersCount.setText(String.valueOf(followersCountValue));
+                                                                })
+                                                                .addOnFailureListener(e -> {
+                                                                    progressBar.setVisibility(View.GONE);
+                                                                    Log.w("Follow Profile", "Error updating followers", e);
+                                                                });
+                                                    } else {
+                                                        // The current user is already in the followers list
+                                                        progressBar.setVisibility(View.GONE);
+                                                    }
                                                 } else {
                                                     // Document does not exist, create it and set the "followers" field
-                                                    Map<String, Object> data = new HashMap<>();
-                                                    data.put("followers", Arrays.asList(userId));
+                                                    Map<String, Object> profileData = new HashMap<>();
+                                                    profileData.put("followers", Arrays.asList(userId));
                                                     firebaseFirestore.collection("follow")
                                                             .document(profileId)
-                                                            .set(data)
+                                                            .set(profileData)
                                                             .addOnSuccessListener(aVoid1 -> {
                                                                 // Update the UI and change the button text to "Following"
                                                                 editOrFollowButton.setText("Following");
                                                                 progressBar.setVisibility(View.GONE);
+
+                                                                // Update the Followers count in the UI
+                                                                followersCountValue = 1;
+                                                                followersCount.setText(String.valueOf(followersCountValue));
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 progressBar.setVisibility(View.GONE);
@@ -255,18 +297,29 @@ public class ProfileFragment extends Fragment {
                                             .addOnSuccessListener(profileDocumentSnapshot -> {
                                                 if (profileDocumentSnapshot.exists()) {
                                                     // Document exists, update the "followers" field
-                                                    firebaseFirestore.collection("follow")
-                                                            .document(profileId)
-                                                            .update("followers", FieldValue.arrayUnion(userId))
-                                                            .addOnSuccessListener(aVoid1 -> {
-                                                                // Update the UI and change the button text to "Following"
-                                                                editOrFollowButton.setText("Following");
-                                                                progressBar.setVisibility(View.GONE);
-                                                            })
-                                                            .addOnFailureListener(e -> {
-                                                                progressBar.setVisibility(View.GONE);
-                                                                Log.w("Follow Profile", "Error updating followers", e);
-                                                            });
+                                                    List<String> followersList = (List<String>) profileDocumentSnapshot.get("followers");
+                                                    if (followersList != null && !followersList.contains(userId)) {
+                                                        followersList.add(userId);
+                                                        firebaseFirestore.collection("follow")
+                                                                .document(profileId)
+                                                                .update("followers", followersList)
+                                                                .addOnSuccessListener(aVoid1 -> {
+                                                                    // Update the UI and change the button text to "Following"
+                                                                    editOrFollowButton.setText("Following");
+                                                                    progressBar.setVisibility(View.GONE);
+
+                                                                    // Update the Followers count in the UI
+                                                                    followersCountValue = followersList.size();
+                                                                    followersCount.setText(String.valueOf(followersCountValue));
+                                                                })
+                                                                .addOnFailureListener(e -> {
+                                                                    progressBar.setVisibility(View.GONE);
+                                                                    Log.w("Follow Profile", "Error updating followers", e);
+                                                                });
+                                                    } else {
+                                                        // The current user is already in the followers list
+                                                        progressBar.setVisibility(View.GONE);
+                                                    }
                                                 } else {
                                                     // Document does not exist, create it and set the "followers" field
                                                     Map<String, Object> profileData = new HashMap<>();
@@ -278,6 +331,10 @@ public class ProfileFragment extends Fragment {
                                                                 // Update the UI and change the button text to "Following"
                                                                 editOrFollowButton.setText("Following");
                                                                 progressBar.setVisibility(View.GONE);
+
+                                                                // Update the Followers count in the UI
+                                                                followersCountValue = 1;
+                                                                followersCount.setText(String.valueOf(followersCountValue));
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 progressBar.setVisibility(View.GONE);
@@ -301,6 +358,10 @@ public class ProfileFragment extends Fragment {
                     Log.w("Follow Profile", "Error checking if document exists", e);
                 });
     }
+
+
+
+
 
     private void unfollowProfile() {
         // Check if the document for the current user exists in the "follow" collection
@@ -328,6 +389,18 @@ public class ProfileFragment extends Fragment {
                                                                 // Update the UI and change the button text to "Follow"
                                                                 editOrFollowButton.setText("Follow");
                                                                 progressBar.setVisibility(View.GONE);
+
+                                                                // Update the Following count in the UI
+                                                                if (followingCountValue > 0) {
+                                                                    followingCountValue--;
+                                                                    followingCount.setText(String.valueOf(followingCountValue));
+                                                                }
+
+                                                                // Update the Followers count in the UI
+                                                                if (followersCountValue > 0) {
+                                                                    followersCountValue--;
+                                                                    followersCount.setText(String.valueOf(followersCountValue));
+                                                                }
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 progressBar.setVisibility(View.GONE);
@@ -359,6 +432,9 @@ public class ProfileFragment extends Fragment {
                     Log.w("Unfollow Profile", "Error checking if document exists", e);
                 });
     }
+
+
+
 
     private void getFollowingCount(String userIdValue) {
         firebaseFirestore.collection("follow")
@@ -392,9 +468,15 @@ public class ProfileFragment extends Fragment {
                     }
 
                     if (documentSnapshot != null && documentSnapshot.exists()) {
-                        List<String> followersList = (List<String>) documentSnapshot.get("follows");
-                        if (followersList != null) {
-                            followersCountValue = followersList.size();
+                        Object followersValue = documentSnapshot.get("followers");
+                        if (followersValue != null) {
+                            if (followersValue instanceof Number) {
+                                followersCountValue = ((Number) followersValue).longValue();
+                            } else if (followersValue instanceof List) {
+                                followersCountValue = ((List<?>) followersValue).size();
+                            } else {
+                                // Handle other data types if needed
+                            }
                             // Update the UI with the new followers count
                             followersCount.setText(String.valueOf(followersCountValue));
                         }
@@ -403,6 +485,8 @@ public class ProfileFragment extends Fragment {
                     }
                 });
     }
+
+
 
     private void getPostsCount(String userIdValue) {
         firebaseFirestore.collection("posts")
@@ -463,32 +547,6 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
-    private void fetchDogProfiles(String userIdValue) {
-        progressBar.setVisibility(View.VISIBLE);
-
-        firebaseFirestore.collection("dogs")
-                .whereEqualTo("userId", userIdValue)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    List<Dogs> dogProfiles = new ArrayList<>();
-
-                    for (DocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                        Dogs dogProfile = documentSnapshot.toObject(Dogs.class);
-                        dogProfile.setDogId(documentSnapshot.getId());
-                        dogProfiles.add(dogProfile);
-                    }
-
-                    dogProfileAdapter = new DogProfileAdapter(dogProfiles, getContext(), isUserProfile, firebaseFirestore);
-                    recyclerViewDogs.setAdapter(dogProfileAdapter);
-
-                    progressBar.setVisibility(View.GONE);
-                })
-                .addOnFailureListener(e -> {
-                    // Handle the error if needed
-                    progressBar.setVisibility(View.GONE);
-                    Log.e("Fetch Dog Profiles", "Error fetching dog profiles", e);
-                });
-    }
     private void openImageChooserDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Choose Profile Picture");
@@ -563,16 +621,15 @@ public class ProfileFragment extends Fragment {
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
-        else
-        {return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
-        }
-        else{
+        } else {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
         }
     }

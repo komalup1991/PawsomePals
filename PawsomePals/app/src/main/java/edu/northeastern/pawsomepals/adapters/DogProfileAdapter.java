@@ -1,12 +1,14 @@
 package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +28,8 @@ import java.util.Locale;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
+import edu.northeastern.pawsomepals.ui.profile.DogProfileActivity;
+import edu.northeastern.pawsomepals.ui.profile.EditDogUserActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 
 public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.DogProfileViewHolder> {
@@ -35,11 +39,15 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_DOG_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
-    public DogProfileAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile, FirebaseFirestore firebaseFirestore) {
+    public DogProfileAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile) {
         this.dogProfiles = dogProfiles;
         this.context = context;
         this.isUserProfile = isUserProfile;
-        this.firebaseFirestore = firebaseFirestore;
+        this.firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    public List<Dogs> getDogProfiles() {
+        return dogProfiles;
     }
 
     @NonNull
@@ -81,17 +89,30 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
 
                 if (isUserProfile) {
                     holder.editButton.setOnClickListener(v -> {
-                        // Handle edit dog profile action
-                        // Implement the action to edit the dog's profile here
+                        Intent intent = new Intent(context, EditDogUserActivity.class);
+                        intent.putExtra("dogId", dogProfile.getDogId());
+                        context.startActivity(intent);
+
                     });
 
                     holder.deleteButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+
                             deleteDogProfileFromFirebase(position);
                         }
                     });
                 }
+
+
+                holder.layoutDogInfo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, DogProfileActivity.class);
+                        intent.putExtra("dogId", dogProfile.getDogId());
+                        context.startActivity(intent);
+                    }
+                });
 
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -118,12 +139,18 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
         }
     }
 
+    public void setDogProfiles(List<Dogs> dogProfiles) {
+        this.dogProfiles = dogProfiles;
+
+    }
+
     public class DogProfileViewHolder extends RecyclerView.ViewHolder {
         private ImageView imageDog;
         private TextView nameTextView;
         private TextView breedTextView;
         private ImageButton editButton;
         private ImageButton deleteButton;
+        private LinearLayout layoutDogInfo;
 
         public DogProfileViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -133,6 +160,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
 
             editButton = itemView.findViewById(R.id.btnEdit);
             deleteButton = itemView.findViewById(R.id.btnDelete);
+            layoutDogInfo = itemView.findViewById(R.id.layoutDogInfo);
         }
 
         public void bind(Dogs dogProfile) throws ParseException {
@@ -166,6 +194,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
                 editButton.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
             }
+
 
         }
 
