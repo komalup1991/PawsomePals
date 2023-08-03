@@ -85,11 +85,12 @@ public class ChatFirebaseUtil {
 
     public static String getGroupRoomId(List<String> userIds) {
         StringBuilder groupChatId = new StringBuilder();
-        Collections.sort(userIds, new Comparator<String>() {
-
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.hashCode() - o2.hashCode();
+        userIds.sort((s1, s2) -> {
+            int hashCompare = Integer.compare(s1.hashCode(), s2.hashCode());
+            if (hashCompare != 0) {
+                return hashCompare;
+            } else {
+                return s1.compareTo(s2);
             }
         });
 

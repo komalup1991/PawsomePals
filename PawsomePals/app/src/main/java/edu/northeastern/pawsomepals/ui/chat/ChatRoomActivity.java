@@ -78,7 +78,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
 
-    private Users currentUser,otherUser;
+    private Users currentUser, otherUser;
     private String chatRoomId;
     private ChatRoomModel chatRoomModel;
     private ChatMessageRecyclerAdapter adapter;
@@ -152,13 +152,14 @@ public class ChatRoomActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot snapshot) {
                         Users user = snapshot.toObject(Users.class);
-                        if (user != null)
+                        if (user != null) {
                             if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
                                 otherGroupUsers.add(user);
                                 groupUsers.add(user);
                             }
-                        if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
-                            groupUsers.add(user);
+                            if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
+                                groupUsers.add(user);
+                            }
                         }
                     }
                 });
@@ -244,7 +245,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatRoomModel.setLastMessage(message);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        ChatMessageModel chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(),currentUser.getName());
+        ChatMessageModel chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
         ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -271,7 +272,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                             ""
                     );
                     chatRoomModel.setChatStyle(ChatStyle.ONEONONE);
-                    chatRoomModel.setOtherUserName(otherUser.getName());
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
             }
@@ -431,19 +431,19 @@ public class ChatRoomActivity extends AppCompatActivity {
             requestStoragePermission();
         }
     }
+
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
-        else
-        {return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
-        }
-        else{
+        } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
         }
     }

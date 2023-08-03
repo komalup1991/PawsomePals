@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +37,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
     FirestoreRecyclerOptions<Users> options;
 
     private List<Users> userList;
+    private Users currentUser;
     private Button createNewChat;
 
     @Override
@@ -52,7 +54,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Users currentUser = task.getResult().toObject(Users.class);
+                currentUser = task.getResult().toObject(Users.class);
                 userList.add(currentUser);
             }
         });
@@ -80,6 +82,8 @@ public class CreateNewGroupChat extends AppCompatActivity {
     }
 
     private void createGroupChat() {
+        userList.clear();
+        userList.add(currentUser);
 
         for (Users model : options.getSnapshots()) {
             if (model.isChatSelected()) {
@@ -87,11 +91,13 @@ public class CreateNewGroupChat extends AppCompatActivity {
             }
         }
 
-        if (userList.size() > 1) {
+        if (userList.size() > 1 && userList.size() <= 10) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
+        } else {
+            Toast.makeText(this,"Group members must be more than 1 and less than 11",Toast.LENGTH_SHORT).show();
         }
     }
 }
