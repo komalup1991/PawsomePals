@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:text="Other Name"
         android:textColor="#989494"
-        android:textSize="8sp" />
+        android:textSize="16sp" />
 
     <LinearLayout
         android:id="@+id/left_chat_layout"

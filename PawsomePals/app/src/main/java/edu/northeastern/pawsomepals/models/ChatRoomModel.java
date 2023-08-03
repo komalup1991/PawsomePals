@@ -6,6 +6,7 @@ import com.google.firebase.Timestamp;
 import java.util.List;
 
 public class ChatRoomModel {
+    private String otherUserName;
     private ChatStyle chatStyle;
     private String chatRoomId;
     private List<String> userIds;
@@ -23,6 +24,7 @@ public class ChatRoomModel {
         this.lastMessageTimestamp = lastMessageTimestamp;
         this.lastMessageSenderId = lastMessageSenderId;
         this.chatStyle = null;
+        this.otherUserName = "";
     }
 
     public ChatStyle getChatStyle() {
@@ -71,5 +73,13 @@ public class ChatRoomModel {
 
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
+    }
+
+    public String getOtherUserName() {
+        return otherUserName;
+    }
+
+    public void setOtherUserName(String otherUserName) {
+        this.otherUserName = otherUserName;
     }
 }

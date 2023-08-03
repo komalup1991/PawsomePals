@@ -3,6 +3,7 @@ package edu.northeastern.pawsomepals.models;
 import com.google.firebase.Timestamp;
 
 public class ChatMessageModel {
+    private String otherUserName;
     private String message;
     private String senderId;
     private Timestamp timestamp;
@@ -14,6 +15,7 @@ public class ChatMessageModel {
         this.message = message;
         this.senderId = senderId;
         this.timestamp = Timestamp;
+        this.otherUserName = "";
     }
 
     public String getMessage() {
@@ -38,5 +40,13 @@ public class ChatMessageModel {
 
     public void setTimestamp(Timestamp Timestamp) {
         this.timestamp = Timestamp;
+    }
+
+    public String getOtherUserName() {
+        return otherUserName;
+    }
+
+    public void setOtherUserName(String otherUserName) {
+        this.otherUserName = otherUserName;
     }
 }

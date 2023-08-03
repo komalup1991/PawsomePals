@@ -20,7 +20,7 @@
             android:layout_weight="1"
             android:background="@drawable/edit_text_round_corner"
             android:elevation="4dp"
-            android:hint="Search Chat"
+            android:hint="Search chats by username"
             android:padding="10dp" />
 
         <ImageButton

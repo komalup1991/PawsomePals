@@ -216,7 +216,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         FirestoreRecyclerOptions<ChatMessageModel> options = new FirestoreRecyclerOptions.Builder<ChatMessageModel>()
                 .setQuery(query, ChatMessageModel.class).build();
 
-        adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
+        adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext(),Arrays.asList(otherUser.getName()));
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);
@@ -264,6 +264,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             ""
                     );
                     chatRoomModel.setChatStyle(ChatStyle.ONEONONE);
+                    chatRoomModel.setOtherUserName(otherUser.getName());
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
             }
