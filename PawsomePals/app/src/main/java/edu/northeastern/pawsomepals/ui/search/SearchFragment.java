@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.ui.search;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,10 +29,15 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 
+import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
+import edu.northeastern.pawsomepals.adapters.SearchDogAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchRecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchUserAdapter;
+import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
+import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
 
 public class SearchFragment extends Fragment {
 
@@ -43,13 +50,19 @@ public class SearchFragment extends Fragment {
 
     List<Users> searchUserList;
 
-    SearchRecipeAdapter searchAdapter;
+    List<Dogs> searchDogList;
+
+    SearchRecipeAdapter searchRecipeAdapter;
 
     SearchUserAdapter searchUserAdapter;
 
-    private SearchRecipeAdapter.OnItemActionListener onItemActionListener;
+    SearchDogAdapter searchDogAdapter;
 
-    private SearchUserAdapter.OnItemActionListener OnItemActionListener;
+    private SearchRecipeAdapter.OnItemActionListener onItemActionListenerRecipe;
+
+    private SearchUserAdapter.OnItemActionListener onItemActionListenerUser;
+
+    private SearchDogAdapter.OnItemActionListener onItemActionListenerDog;
 
 
     @Nullable
@@ -62,14 +75,16 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+
         searchButton = view.findViewById(R.id.dog_search_btn);
 
         searchInput = view.findViewById(R.id.search);
 
         searchRecyclerView = view.findViewById(R.id.search_recycler_view);
-
-        searchAdapter = new SearchRecipeAdapter(new ArrayList<Recipe>(),onItemActionListener);
-        searchUserAdapter = new SearchUserAdapter(new ArrayList<Users>(), OnItemActionListener);
+        initializeItemActionListener();
+        searchRecipeAdapter = new SearchRecipeAdapter(new ArrayList<Recipe>(), onItemActionListenerRecipe);
+        searchUserAdapter = new SearchUserAdapter(new ArrayList<Users>(), onItemActionListenerUser);
+        searchDogAdapter = new SearchDogAdapter(new ArrayList<Dogs>(), onItemActionListenerDog);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         searchRecyclerView.setLayoutManager(layoutManager);
@@ -81,7 +96,7 @@ public class SearchFragment extends Fragment {
         dogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                searchRecyclerView.setAdapter(searchDogAdapter);
                 performSearch("dogs");
             }
         });
@@ -97,7 +112,7 @@ public class SearchFragment extends Fragment {
         recipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchRecyclerView.setAdapter(searchAdapter);
+                searchRecyclerView.setAdapter(searchRecipeAdapter);
                 performSearch("recipes");
             }
         });
@@ -122,6 +137,23 @@ public class SearchFragment extends Fragment {
         Query query;
 
         if (searchType.equals("dogs")) {
+            query = db.collection("dogs").whereGreaterThanOrEqualTo("name", inputSearch);
+
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        searchDogList = new ArrayList<>();
+                        for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+                            Dogs dog1 = documentSnapshot.toObject(Dogs.class);
+                            searchDogList.add(dog1);
+                        }
+                        Log.d("list",searchDogList.get(0).toString());
+                        searchDogAdapter.setDogs(searchDogList);
+                        searchDogAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
 
         } else if (searchType.equals("users")) {
 
@@ -155,14 +187,26 @@ public class SearchFragment extends Fragment {
                             searchRecipeList.add(recipe1);
                         }
 
-                        searchAdapter.setRecipes(searchRecipeList);
-                        searchAdapter.notifyDataSetChanged();
+                        searchRecipeAdapter.setRecipes(searchRecipeList);
+                        searchRecipeAdapter.notifyDataSetChanged();
                     } else {
                         // Handle the error if the search fails
                     }
                 }
             });
         }
+    }
+
+    private void initializeItemActionListener() {
+        onItemActionListenerDog = new SearchDogAdapter.OnItemActionListener() {
+            @Override
+            public void onDogsClick(Dogs dogs) {
+                Intent intent = new Intent(getActivity(), DogDetailActivity.class);
+                intent.putExtra("name", dogs.getName());
+                intent.putExtra("image",dogs.getProfileImage());
+                startActivity(intent);
+            }
+        };
     }
 
 
