@@ -78,7 +78,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
 
-    private Users otherUser;
+    private Users currentUser,otherUser;
     private String chatRoomId;
     private ChatRoomModel chatRoomModel;
     private ChatMessageRecyclerAdapter adapter;
@@ -127,6 +127,13 @@ public class ChatRoomActivity extends AppCompatActivity {
                                            }
                                        }
         );
+
+        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                currentUser = task.getResult().toObject(Users.class);
+            }
+        });
 
         if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("oneOnOne")) {
             otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
@@ -216,7 +223,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         FirestoreRecyclerOptions<ChatMessageModel> options = new FirestoreRecyclerOptions.Builder<ChatMessageModel>()
                 .setQuery(query, ChatMessageModel.class).build();
 
-        adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext(),Arrays.asList(otherUser.getName()));
+        adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);
@@ -237,7 +244,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatRoomModel.setLastMessage(message);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        ChatMessageModel chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now());
+        ChatMessageModel chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(),currentUser.getName());
         ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override

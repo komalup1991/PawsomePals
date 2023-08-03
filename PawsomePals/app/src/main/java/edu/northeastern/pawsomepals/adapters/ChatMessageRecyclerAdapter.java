@@ -23,13 +23,10 @@ import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageModel, ChatMessageRecyclerAdapter.ChatModelViewHolder> {
 
     private Context context;
-    private List<String> otherUserName;
 
-    public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatMessageModel> options, Context context,List<String> otherUserName) {
+    public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatMessageModel> options, Context context) {
         super(options);
         this.context = context;
-        if (otherUserName != null)
-            this.otherUserName = otherUserName;
     }
 
     @NonNull
@@ -50,7 +47,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
            holder.rightChatLayout.setVisibility(View.GONE);
            holder.leftChatLayout.setVisibility(View.VISIBLE);
            holder.leftChatTextView.setText(model.getMessage());
-           holder.otherUserNameTextView.setText(this.otherUserName.toString());
+           holder.otherUserNameTextView.setText(model.getSenderName());
        }
     }
 
