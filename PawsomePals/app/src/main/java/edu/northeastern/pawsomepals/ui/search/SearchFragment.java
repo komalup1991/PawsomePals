@@ -2,13 +2,21 @@ package edu.northeastern.pawsomepals.ui.search;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,6 +66,10 @@ public class SearchFragment extends Fragment {
 
     SearchDogAdapter searchDogAdapter;
 
+    private ArrayAdapter<String> autoCompleteAdapter;
+
+    private String selectedSearchType = "";
+
     private SearchRecipeAdapter.OnItemActionListener onItemActionListenerRecipe;
 
     private SearchUserAdapter.OnItemActionListener onItemActionListenerUser;
@@ -93,50 +105,88 @@ public class SearchFragment extends Fragment {
         Button userBtn = view.findViewById(R.id.user_btn);
         Button recipeBtn = view.findViewById(R.id.recipe_btn);
 
+        AutoCompleteTextView autoCompleteTextView = view.findViewById(R.id.search);
+        autoCompleteAdapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line,
+                new ArrayList<>()
+        );
+        autoCompleteTextView.setAdapter(autoCompleteAdapter);
+
+        autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedQuery = autoCompleteAdapter.getItem(position);
+                searchInput.setText(selectedQuery); // Set the selected suggestion in the EditText
+                performSearch(selectedSearchType);
+            }
+        });
+
+        autoCompleteTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String input = charSequence.toString().trim();
+                if (!input.isEmpty()) {
+                    fetchAutocompleteSuggestions(input);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (selectedSearchType.isEmpty()) {
+                    showToast("Please select a search type");
+                    return;
+                }
+
+                performSearch(selectedSearchType);
+            }
+        });
+
         dogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedSearchType = "dogs";
                 searchRecyclerView.setAdapter(searchDogAdapter);
-                performSearch("dogs");
+
             }
         });
 
         userBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedSearchType = "users";
                 searchRecyclerView.setAdapter(searchUserAdapter);
-                performSearch("users");
+
             }
         });
 
         recipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                selectedSearchType = "recipes";
                 searchRecyclerView.setAdapter(searchRecipeAdapter);
-                performSearch("recipes");
+
             }
         });
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                String inputSearch = searchInput.getText().toString();
-                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-                //FirestoreRecyclerOptions<Recipe> options = new FirestoreRecyclerOptions.Builder<Recipe>()
-                //        .setQuery(query, Recipe.class).build();
-
-            }
-
-        });
     }
     private void performSearch(String searchType) {
         String inputSearch = searchInput.getText().toString().trim();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query;
 
-        if (searchType.equals("dogs")) {
+        if (selectedSearchType.equals("dogs")) {
             query = db.collection("dogs").whereGreaterThanOrEqualTo("name", inputSearch);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -155,7 +205,7 @@ public class SearchFragment extends Fragment {
                 }
             });
 
-        } else if (searchType.equals("users")) {
+        } else if (selectedSearchType.equals("users")) {
 
              query = db.collection("user").whereGreaterThanOrEqualTo("name", inputSearch);
 
@@ -173,7 +223,7 @@ public class SearchFragment extends Fragment {
                      }
                  }
              });
-        } else if (searchType.equals("recipes")) {
+        } else if (selectedSearchType.equals("recipes")) {
 
             query = db.collection("recipes").whereGreaterThanOrEqualTo("title", inputSearch);
 
@@ -197,6 +247,10 @@ public class SearchFragment extends Fragment {
         }
     }
 
+    private void showToast(String message) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
     private void initializeItemActionListener() {
         onItemActionListenerDog = new SearchDogAdapter.OnItemActionListener() {
             @Override
@@ -208,6 +262,65 @@ public class SearchFragment extends Fragment {
             }
         };
     }
+
+    private void fetchAutocompleteSuggestions(String input) {
+        if (selectedSearchType.isEmpty()) {
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Query suggestionsQuery;
+
+        if (selectedSearchType.equals("dogs")) {
+            suggestionsQuery = db.collection("dogs")
+                    .orderBy("name")
+                    .startAt(input)
+                    .endAt(input + "\uf8ff")
+                    .limit(10);
+
+        } else if (selectedSearchType.equals("users")) {
+            suggestionsQuery = db.collection("user")
+                    .orderBy("name")
+                    .startAt(input)
+                    .endAt(input + "\uf8ff")
+                    .limit(10);
+
+        } else if (selectedSearchType.equals("recipes")) {
+            suggestionsQuery = db.collection("recipes")
+                    .orderBy("title")
+                    .startAt(input)
+                    .endAt(input + "\uf8ff")
+                    .limit(10);
+
+        } else {
+            return;
+        }
+
+        suggestionsQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    List<String> suggestions = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        if (selectedSearchType.equals("dogs")) {
+                            String dogName = document.getString("name");
+                            suggestions.add(dogName);
+                        } else if (selectedSearchType.equals("users")) {
+                            String userName = document.getString("name");
+                            suggestions.add(userName);
+                        } else if (selectedSearchType.equals("recipes")) {
+                            String recipeTitle = document.getString("title");
+                            suggestions.add(recipeTitle);
+                        }
+                    }
+                    autoCompleteAdapter.clear();
+                    autoCompleteAdapter.addAll(suggestions);
+                    autoCompleteAdapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
 
 
 
