@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -23,14 +24,18 @@ import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
 import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
 import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
+import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeRecyclerViewHolder extends RecyclerView.ViewHolder {
     private final RecyclerView recipeRecyclerView;
     private final RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
+    private Context context;
 
     private OnItemActionListener onItemActionListener = new OnItemActionListener() {
         @Override
@@ -87,20 +92,15 @@ public class RecipeRecyclerViewHolder extends RecyclerView.ViewHolder {
             recipeAdapter.notifyDataSetChanged();
         });
     }
-
-
     public void getUsernameByUserId(String userId, Recipe recipe, List<Recipe> recipeList) {
-        FirebaseFirestore.getInstance().collection("user")
-                .whereEqualTo("userId", userId).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Users user = task.getResult().getDocuments().get(0).toObject(Users.class);
-                            recipe.setUsername(user.getName());
-                            recipe.setUserProfileImage(user.getProfileImage());
-                        }
-                        recipeAdapter.notifyDataSetChanged();
-                    }
-                });
+        FirebaseUtil.fetchUserInfoFromFirestore( userId, new BaseDataCallback() {
+            @Override
+            public void onUserReceived(Users user) {
+                recipe.setUsername(user.getName());
+                recipe.setUserProfileImage(user.getProfileImage());
+                recipeAdapter.notifyDataSetChanged();
+            } }
+                );
     }
+
 }

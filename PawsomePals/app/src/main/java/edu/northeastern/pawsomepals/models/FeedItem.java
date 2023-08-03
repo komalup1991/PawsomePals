@@ -1,13 +1,5 @@
 package edu.northeastern.pawsomepals.models;
 
-import android.icu.text.SimpleDateFormat;
-
-import androidx.annotation.Nullable;
-
-import java.text.ParseException;
-import java.util.Date;
-import java.util.Locale;
-
 public abstract class FeedItem  implements Comparable<FeedItem> {
 
     public static final int TYPE_RECIPE_HEADER = 0;
@@ -24,11 +16,15 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
     private String createdBy;
     private String feedItemId;
     private Long commentCount;
+    private Long likeCount;
+
+    private boolean isFavorite;
+    private boolean isLiked;
 
     public FeedItem() {
     }
 
-    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, Long commentCount) {
+    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, Long commentCount, Long likeCount) {
         this.username = username;
         this.userProfileImage = userProfileImage;
         this.createdAt = createdAt;
@@ -36,7 +32,7 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         this.locationTagged = locationTagged;
         this.createdBy = createdBy;
         this.commentCount = commentCount;
-
+        this.likeCount = likeCount;
     }
 
     public String getUserProfileImage() {
@@ -93,8 +89,13 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         this.commentCount = commentCount;
     }
 
+    public Long getLikeCount() {
+        return likeCount;
+    }
 
-
+    public void setLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
+    }
 
     @Override
     public int compareTo(FeedItem feedItem) {
@@ -110,6 +111,22 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
 //            throw new RuntimeException(e);
 //        }
         return 0;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 }
 
