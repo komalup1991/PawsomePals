@@ -144,49 +144,13 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             }
             feedAdapter.notifyDataSetChanged();
         }
-
-
     }
 
 
     @Override
-    public void onDataLoaded(List<QuerySnapshot> querySnapshots) {
-        feedItemList.clear();
-        feedItemList.add(new FeedItem() {
-            @Override
-            public int compareTo(FeedItem feedItem) {
-                return 0;
-            }
-
-            @Override
-            public int getType() {
-                return FeedItem.TYPE_RECIPE_HEADER;
-            }
-        });
-        for (QuerySnapshot querySnapshot : querySnapshots) {
-            for (QueryDocumentSnapshot document : querySnapshot) {
-                int type = Math.toIntExact((Long) document.getData().get("type"));
-                FeedItem feedItem = null;
-                switch (type) {
-                    case FeedItem.TYPE_PHOTO_VIDEO ->
-                            feedItem = document.toObject(PhotoVideo.class);
-                    case FeedItem.TYPE_EVENT -> feedItem = document.toObject(Event.class);
-                    case FeedItem.TYPE_POST -> feedItem = document.toObject(Post.class);
-                    case FeedItem.TYPE_SERVICE -> feedItem = document.toObject(Services.class);
-                }
-                if (feedItem != null) {
-                    try {
-                        feedItem.setCreatedAt(TimeUtil.formatTime(feedItem.getCreatedAt()));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
-                    feedItemList.add(feedItem);
-                }
-            }
-        }
-
-
-        Collections.sort(feedItemList);
+    public void onDataLoaded(List<FeedItem> feedItems) {
+        this.feedItemList.clear();
+        this.feedItemList.addAll(feedItems);
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -194,8 +158,6 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             }
         });
     }
-
-
 }
 
 

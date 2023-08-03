@@ -18,6 +18,7 @@ import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Objects;
 
@@ -26,6 +27,7 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.ui.feed.CommentActivity;
 import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class EventFeedViewHolder extends RecyclerView.ViewHolder {
     CircleImageView userProfilePic;
@@ -37,9 +39,10 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
     TextView eventDetailsTextView;
     TextView eventDateTextView;
     TextView eventTimeTextView, eventNameTextView;
-    ImageButton likeButton, commentButton, shareButton;
+    ImageButton likeButton, commentButton, shareButton,favImageButton;
     TextView likeCountTextView, commentCountTextView;
     int likeCount = 0;
+    private boolean isLiked, isFav;
 
     public EventFeedViewHolder(@NonNull View itemView) {
         super(itemView);
@@ -58,6 +61,9 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         commentButton = itemView.findViewById(R.id.commentButton);
         commentCountTextView = itemView.findViewById(R.id.commentCountTextView);
         shareButton = itemView.findViewById(R.id.shareButton);
+        favImageButton = itemView.findViewById(R.id.favImageButton);
+        isLiked = false;
+        isFav = false;
     }
 
     public void bindData(Activity activity, Event event) {
@@ -66,9 +72,13 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
                 .into(userProfilePic);
         usernameTextView.setText(event.getUsername());
         timestampTextView.setText(event.getCreatedAt());
+
         if(event.getCommentCount()!=null){
         commentCountTextView.
                 setText(String.valueOf(Math.toIntExact(event.getCommentCount())));}
+        if(event.getLikeCount()!=null){
+            likeCountTextView.
+                    setText(String.valueOf(Math.toIntExact(event.getLikeCount())));}
 
         String userTagged = event.getUserTagged();
         String locationTagged = event.getLocationTagged();
@@ -118,13 +128,45 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         } else {
             eventImage.setVisibility(View.GONE);
         }
+        if (event.isFavorite()) {
+            favImageButton.setImageResource(R.drawable.pawprintfull);
+        }
+        if (event.isLiked()) {
+            likeButton.setImageResource(R.drawable.like);
+        }
 
+        favImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isFav) {
+                    isFav = false;
+                    favImageButton.setImageResource(R.drawable.pawprintempty);
+                    FirebaseUtil.removeFavFromFirestore(event.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), "events");
+                } else {
+                    isFav = true;
+                    favImageButton.setImageResource(R.drawable.pawprintfull);
+                    FirebaseUtil.addFavToFirestore(event.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), "events");
+                }
+            }
+        });
 
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                likeCount++;
-                likeCountTextView.setText("(" + likeCount + ")");
+                if (isLiked) {
+                    // Unlike the post
+                    isLiked = false;
+                //    likeCount--;
+                    likeButton.setImageResource(R.drawable.likenew);
+                    FirebaseUtil.removeLikeFromFirestore(event.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), "events");
+                } else {
+                    // Like the post
+                    isLiked = true;
+              //      likeCount++;
+                    likeButton.setImageResource(R.drawable.like);
+                    FirebaseUtil.addLikeToFirestore(event.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), "events");
+                }
+              //  likeCountTextView.setText("(" + likeCount + ")");
             }
         });
 
