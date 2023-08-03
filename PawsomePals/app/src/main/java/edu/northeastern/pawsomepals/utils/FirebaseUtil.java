@@ -1,7 +1,7 @@
 package edu.northeastern.pawsomepals.utils;
 
-import android.app.Activity;
-import android.app.Dialog;
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import android.net.Uri;
 import android.util.Log;
 
@@ -13,7 +13,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -93,7 +95,45 @@ public class FirebaseUtil {
         }
     }
 
-    public static void createCollectionInFirestore(Map<String, Object> feedTypeObj,String feedType, DataCallback dataCallback) {
+    public static void updateFeedWithCommentCount(String postType,String postId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection(postType)
+                .whereEqualTo("feedItemId", postId)
+                .limit(1)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            DocumentSnapshot documentSnapshot = queryDocumentSnapshots.getDocuments().get(0);
+                            Integer currentCommentCount = documentSnapshot.getLong("commentCount") != null
+                                    ? documentSnapshot.getLong("commentCount").intValue() : 0;
+                            int newCommentCount = currentCommentCount + 1;
+                            documentSnapshot.getReference().update("commentCount", newCommentCount)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                        }
+                                    });
+                        } else {
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+
+    }
+
+    public static void createCollectionInFirestore(Map<String, Object> feedTypeObj, String feedType, DataCallback dataCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         //Add a new document with a generated ID
         db.collection(feedType)

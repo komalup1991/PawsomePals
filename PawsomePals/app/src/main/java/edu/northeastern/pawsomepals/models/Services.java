@@ -1,20 +1,14 @@
 package edu.northeastern.pawsomepals.models;
 
+import androidx.annotation.Nullable;
+
 public class Services extends FeedItem {
     private String serviceType;
     private String serviceName;
     private String serviceNotes;
-    private String serviceId;
 
     public Services() {
 
-    }
-
-    public Services(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, String serviceType, String serviceName, String serviceNotes) {
-        super(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy);
-        this.serviceType = serviceType;
-        this.serviceName = serviceName;
-        this.serviceNotes = serviceNotes;
     }
 
     @Override
@@ -33,13 +27,21 @@ public class Services extends FeedItem {
     public String getServiceNotes() {
         return serviceNotes;
     }
-
-    public String getServiceId() {
-        return serviceId;
+    @Override
+    public int hashCode() {
+        return getFeedItemId().hashCode();
     }
 
-    public void setServiceId(String serviceId) {
-        this.serviceId = serviceId;
-    }
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Services otherServices)) {
+            return false;
+        }
 
+        if (otherServices.getFeedItemId() == null || this.getFeedItemId() == null) {
+            return false;
+        }
+
+        return this.getFeedItemId().equals(otherServices.getFeedItemId());
+    }
 }

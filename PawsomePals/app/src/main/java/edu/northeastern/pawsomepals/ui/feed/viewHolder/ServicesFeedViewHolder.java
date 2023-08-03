@@ -1,6 +1,9 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +16,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.ui.feed.CommentActivity;
 
 public class ServicesFeedViewHolder extends RecyclerView.ViewHolder{
     CircleImageView userProfilePic ;
@@ -23,6 +27,9 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder{
     TextView serviceDetailTextView ;
     TextView userTaggedTextView;
     TextView locationTaggedTextView;
+    ImageButton likeButton, commentButton, shareButton;
+    TextView likeCountTextView, commentCountTextView;
+    int likeCount = 0;
     public ServicesFeedViewHolder(@NonNull View itemView) {
         super(itemView);
          userProfilePic = itemView.findViewById(R.id.userProfilePic);
@@ -33,17 +40,43 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder{
          serviceDetailTextView = itemView.findViewById(R.id.serviceDetailTextView);
          userTaggedTextView = itemView.findViewById(R.id.userTaggedTextView);
          locationTaggedTextView = itemView.findViewById(R.id.locationTaggedTextView);
+        likeButton = itemView.findViewById(R.id.likeButton);
+        likeCountTextView = itemView.findViewById(R.id.likeCountTextView);
+        commentButton = itemView.findViewById(R.id.commentButton);
+        commentCountTextView = itemView.findViewById(R.id.commentCountTextView);
+        shareButton = itemView.findViewById(R.id.shareButton);
     }
-    public void bindData(Services services) {
+    public void bindData(Activity activity, Services services) {
         Glide.with(userProfilePic.getContext())
                 .load(services.getUserProfileImage())
                 .into(userProfilePic);
         usernameTextView.setText(services.getUsername());
         timestampTextView.setText(services.getCreatedAt());
+        if(services.getCommentCount()!=null){
+            commentCountTextView.
+                    setText(String.valueOf(Math.toIntExact(services.getCommentCount())));}
         userTaggedTextView.setText(services.getUserTagged());
         locationTaggedTextView.setText(services.getLocationTagged());
         serviceTypeTextView.setText(services.getServiceType());
         serviceNameTextView.setText(services.getServiceName());
         serviceDetailTextView.setText(services.getServiceNotes());
+        likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                likeCount++;
+                likeCountTextView.setText("(" + likeCount + ")");
+            }
+        });
+
+        commentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), CommentActivity.class);
+                intent.putExtra("feedItemId",services.getFeedItemId());
+                intent.putExtra("postType","services");
+                activity.startActivity(intent);
+            }
+        });
+
     }
 }

@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.models;
 
-public class Dogs {
+import java.io.Serializable;
+
+public class Dogs implements Serializable {
     private String dogId;
     private String userId;
     private String name;

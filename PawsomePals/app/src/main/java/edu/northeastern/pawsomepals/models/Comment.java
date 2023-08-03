@@ -2,16 +2,22 @@ package edu.northeastern.pawsomepals.models;
 
 public class Comment {
     private String comment;
-    private String publisher;
+    private String createdBy;
     private String commentId;
+    private String createdAt;
+    private String username;
+    private String userProfileImage;
 
     public Comment() {
     }
 
-    public Comment(String comment, String publisher, String commentId) {
+    public Comment(String comment, String createdBy, String commentId, String createdAt, String username, String userProfileImage) {
         this.comment = comment;
-        this.publisher = publisher;
+        this.createdBy = createdBy;
         this.commentId = commentId;
+        this.createdAt = createdAt;
+        this.username = username;
+        this.userProfileImage = userProfileImage;
     }
 
     public String getComment() {
@@ -22,12 +28,12 @@ public class Comment {
         this.comment = comment;
     }
 
-    public String getPublisher() {
-        return publisher;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getCommentId() {
@@ -36,5 +42,21 @@ public class Comment {
 
     public void setCommentId(String commentId) {
         this.commentId = commentId;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getUserProfileImage() {
+        return userProfileImage;
     }
 }

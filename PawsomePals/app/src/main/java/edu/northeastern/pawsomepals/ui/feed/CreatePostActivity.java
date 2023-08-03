@@ -10,6 +10,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +31,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.hasankucuk.socialtextview.SocialTextView;
+import com.hasankucuk.socialtextview.model.LinkedType;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -65,11 +70,11 @@ public class CreatePostActivity extends AppCompatActivity {
     private String userProfileUrlToSaveInFeed;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
+
 
         allUsers = new HashMap<>();
         selectedUsers = new ArrayList<>();
@@ -109,6 +114,8 @@ public class CreatePostActivity extends AppCompatActivity {
             }
         });
 
+
+
         tagPeopleTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,8 +146,6 @@ public class CreatePostActivity extends AppCompatActivity {
                 searchLocationDisplayTextView.setVisibility(View.VISIBLE);
             }
         });
-
-
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -288,6 +293,7 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("username",userNameToSaveInFeed);
         post.put("userProfileImage",userProfileUrlToSaveInFeed);
         post.put("type",4);
+        post.put("feedItemId", UUID.randomUUID().toString());
 
         FirebaseUtil.createCollectionInFirestore(post,"posts" ,new BaseDataCallback() {
             @Override

@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -288,6 +289,7 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("username",userNameToSaveInFeed);
         services.put("userProfileImage",userProfileUrlToSaveInFeed);
         services.put("type",2);
+        services.put("feedItemId", UUID.randomUUID().toString());
 
         FirebaseUtil.createCollectionInFirestore(services,"services" ,new BaseDataCallback() {
             @Override
