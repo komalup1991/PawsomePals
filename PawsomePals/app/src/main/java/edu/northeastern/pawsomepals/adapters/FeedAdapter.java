@@ -27,9 +27,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<FeedItem> feedItems;
     private Context context;
 
-    public FeedAdapter(List<FeedItem> feedItems, Context context) {
+    private LocationClickListener locationClickListener;
+
+    public FeedAdapter(List<FeedItem> feedItems, Context context, LocationClickListener locationClickListener) {
         this.feedItems = feedItems;
         this.context = context;
+        this.locationClickListener = locationClickListener;
     }
 
     @NonNull
@@ -73,7 +76,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case FeedItem.TYPE_PHOTO_VIDEO ->
                     ((PhotoVideoFeedViewHolder) holder).bindData(((Activity)context), (PhotoVideo) feedItem);
             case FeedItem.TYPE_EVENT ->
-                    ((EventFeedViewHolder) holder).bindData(((Activity)context), (Event) feedItem);
+                    ((EventFeedViewHolder) holder).bindData(((Activity)context), (Event) feedItem, locationClickListener);
             case FeedItem.TYPE_SERVICE ->
                     ((ServicesFeedViewHolder) holder).bindData(((Activity)context), (Services) feedItem);
         }
@@ -91,5 +94,8 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return this.feedItems.size();
     }
 
+    public interface LocationClickListener {
+        void onClick(FeedItem feedItem);
+    }
 
 }

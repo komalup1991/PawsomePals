@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,17 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.Objects;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.ui.feed.CommentActivity;
-import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class EventFeedViewHolder extends RecyclerView.ViewHolder {
@@ -66,7 +62,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         isFav = false;
     }
 
-    public void bindData(Activity activity, Event event) {
+    public void bindData(Activity activity, Event event, FeedAdapter.LocationClickListener onLocationClickListener) {
         Glide.with(userProfilePic.getContext())
                 .load(event.getUserProfileImage())
                 .into(userProfilePic);
@@ -97,6 +93,12 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
 
         if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
             locationTaggedTextView.setText(locationTagged);
+            locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onLocationClickListener.onClick(event);
+                }
+            });
         } else {
             locationTaggedTextView.setText("No Location Tagged!!! ☹️");
         }

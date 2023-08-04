@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.models;
 
-public abstract class FeedItem  implements Comparable<FeedItem> {
+import java.io.Serializable;
+
+public abstract class FeedItem  implements Comparable<FeedItem>, Serializable {
 
     public static final int TYPE_RECIPE_HEADER = 0;
     public static final int TYPE_PHOTO_VIDEO = 1;

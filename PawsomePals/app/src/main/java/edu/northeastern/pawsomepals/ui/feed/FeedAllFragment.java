@@ -35,6 +35,7 @@ import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class FeedAllFragment extends Fragment implements FirestoreDataLoader.FirestoreDataListener {
@@ -56,7 +57,16 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         feedsRecyclerView.setLayoutManager(verticalLayoutManager);
 
-        feedAdapter = new FeedAdapter(feedItemList, requireContext());
+        feedAdapter = new FeedAdapter(feedItemList, requireContext(), new FeedAdapter.LocationClickListener() {
+            @Override
+            public void onClick(FeedItem feedItem) {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("feedItem", feedItem);
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .add(R.id.fragment_container_view, MapFragment.class,bundle, "MapFragment")
+                        .commit();
+            }
+        });
         feedsRecyclerView.setAdapter(feedAdapter);
 
         fetchFeeds();
