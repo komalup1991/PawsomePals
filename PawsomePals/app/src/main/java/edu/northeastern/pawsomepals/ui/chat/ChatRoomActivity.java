@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -120,8 +122,9 @@ public class ChatRoomActivity extends AppCompatActivity {
             if (message.isEmpty() && img_preview == null) return;
             if (img_preview != null) {
                 sendImageToUser();
+            } else {
+                sendMessageToUser(message);
             }
-            sendMessageToUser(message);
         });
 
         backBtn.setOnClickListener(v -> onBackPressed());
@@ -248,20 +251,20 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatRoomModel.setLastMessage(message);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
-
         if (fileUri == null) {
+            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
             chatMessageModel.setPicture(false);
+            ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            messageInput.setText("");
+                            sendNotification(message);
+                        }
+                    });
         } else {
-            uploadPicture(fileUri, chatMessageModel);
+
         }
-        ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        messageInput.setText("");
-                        sendNotification(message);
-                    }
-                });
+
     }
 
     private void submitChatToFileBase(ChatMessageModel chatMessageModel, boolean picture) {
@@ -419,6 +422,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             requestCameraPermission();
         }
     }
+
     private void requestCameraPermission() {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
     }
@@ -467,7 +471,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     img_preview.setVisibility(View.VISIBLE);
                     imgPreviewTextView.setVisibility(View.VISIBLE);
                     fileUri = imageUri;
-                }  catch (IOException e) {
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             } else {
@@ -475,21 +479,33 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         }
     }
+
     private void sendImageToUser() {
         ChatMessageModel chatMessageModel;
         chatRoomModel.setLastMessageTimestamp(Timestamp.now());
         chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
-        chatRoomModel.setLastMessage("<Image>");
+        chatRoomModel.setLastMessage("<Image>" + fileUri);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
         chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
+        chatMessageModel.setPicture(true);
 
-        if (fileUri == null) {
-            chatMessageModel.setPicture(false);
-        } else {
+        if (fileUri != null)
             uploadPicture(fileUri, chatMessageModel);
-        }
+        ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        messageInput.setText("");
+                        sendNotification("You receive an <image>");
+                    }
+                });
+        imgPreviewTextView.setVisibility(View.INVISIBLE);
+        img_preview.setVisibility(View.INVISIBLE);
+        img_preview = null;
+        fileUri = null;
     }
+
+
 
     private void uploadPicture(Uri fileUri, ChatMessageModel chatMessageModel) {
         AlertDialog dialog = new AlertDialog.Builder(ChatRoomActivity.this)
@@ -503,8 +519,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .append("/")
                 .append(fileName)
                 .toString();
+//        StorageReference imageRef = storageRef.child("chat_message_images/" + imageName);
         storageReference = FirebaseStorage.getInstance()
-                .getReference()
+                .getReference("chat_message_images/")
                 .child(path);
         UploadTask uploadTask = storageReference.putFile(fileUri);
         //create task
@@ -531,7 +548,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
     }
 
-    @SuppressLint("Range")
+
     private String getFileName(ContentResolver contentResolver, Uri fileUri) {
         String result = null;
 
@@ -539,7 +556,14 @@ public class ChatRoomActivity extends AppCompatActivity {
             Cursor cursor = contentResolver.query(fileUri, null, null, null);
             try {
                 if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (index != -1) {
+                        // Column exists, do something with the data
+                        result = cursor.getString(index);
+                    } else {
+                        // Column does not exist, handle the error
+                        Log.e(TAG, "Column 'column_name' does not exist in cursor");
+                    }
                 }
             } finally {
                 cursor.close();

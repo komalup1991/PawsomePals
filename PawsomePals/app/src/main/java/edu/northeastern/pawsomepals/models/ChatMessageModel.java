@@ -10,6 +10,7 @@ public class ChatMessageModel {
     private String senderId;
     private Timestamp timestamp;
     private boolean picture;
+    private String pictureUrl;
 
     public ChatMessageModel(){
     }
@@ -19,6 +20,7 @@ public class ChatMessageModel {
         this.senderId = senderId;
         this.timestamp = Timestamp;
         this.senderName = senderName;
+        this.pictureUrl = "";
     }
 
     public String getMessage() {
@@ -62,5 +64,9 @@ public class ChatMessageModel {
     }
 
     public void setPictureLink(String url) {
+        this.pictureUrl = url;
+    }
+    public void getImage(){
+        return pictureUrl;
     }
 }

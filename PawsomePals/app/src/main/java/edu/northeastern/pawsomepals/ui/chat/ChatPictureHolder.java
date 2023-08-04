@@ -3,8 +3,6 @@
 //import android.view.View;
 //import android.widget.ImageView;
 //
-//import butterknife.ButterKnife;
-//import butterknife.Unbinder;
 //import edu.northeastern.pawsomepals.R;
 //
 //import androidx.annotation.NonNull;
