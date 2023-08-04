@@ -103,7 +103,7 @@ public class CreateNewChatActivity extends AppCompatActivity {
 
     private void setupSearchRecyclerView(String searchTerm) {
         Query query = ChatFirebaseUtil.allUserCollectionReference()
-                .whereGreaterThanOrEqualTo("name", searchTerm);
+                .whereGreaterThanOrEqualTo("searchName", searchTerm.toLowerCase());
 
         FirestoreRecyclerOptions<Users> options = new FirestoreRecyclerOptions.Builder<Users>()
                 .setQuery(query, Users.class).build();

@@ -236,6 +236,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                 userData.put("dob", dob);
                 userData.put("gender", gender);
                 userData.put("profileImage", downloadUri.toString());
+                userData.put("searchName",name.toLowerCase());
 
                 // Save the user data to Firebase Firestore
                 firebaseFirestore.collection("user")

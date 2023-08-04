@@ -38,7 +38,7 @@ public class ChatFirebaseUtil {
         intent.putExtra("userId", model.getUserId());
         intent.putExtra("email", model.getEmail());
         intent.putExtra("fcmToken", model.getFcmToken());
-        intent.putExtra("chatStyle","oneOnOne");
+        intent.putExtra("chatStyle", "oneOnOne");
     }
 
     public static void passGroupChatModelAsIntent(Intent intent, List<Users> users) {
@@ -46,12 +46,14 @@ public class ChatFirebaseUtil {
         StringBuilder idBuilder = new StringBuilder();
 
         for (Users user : users) {
-            nameBuilder.append(user.getName() + " ");
-            idBuilder.append(user.getUserId() + " ");
+            if (user != null) {
+                nameBuilder.append(user.getName() + " ");
+                idBuilder.append(user.getUserId() + " ");
+            }
         }
         intent.putExtra("name", nameBuilder.toString());
         intent.putExtra("ids", idBuilder.toString());
-        intent.putExtra("chatStyle","group");
+        intent.putExtra("chatStyle", "group");
     }
 
     public static DocumentReference currentUserDetails() {
@@ -112,7 +114,8 @@ public class ChatFirebaseUtil {
 
         return new Users(userName, userId, email, fcmToken);
     }
-    public static String getChatStyleFromIntent(Intent intent){
+
+    public static String getChatStyleFromIntent(Intent intent) {
         return intent.getStringExtra("chatStyle");
     }
 
@@ -137,9 +140,9 @@ public class ChatFirebaseUtil {
         }
     }
 
-    public static List<DocumentReference> getGroupFromChatRoom(List<String> userIds){
+    public static List<DocumentReference> getGroupFromChatRoom(List<String> userIds) {
         List<DocumentReference> references = new ArrayList<>();
-        for(int i = 0; i < userIds.size(); i++){
+        for (int i = 0; i < userIds.size(); i++) {
             references.add(allUserCollectionReference().document(userIds.get(i)));
         }
         return references;

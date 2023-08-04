@@ -32,7 +32,7 @@ import edu.northeastern.pawsomepals.models.ChatRoomModel;
 public class ChatFragment extends Fragment {
     private EditText searchInput;
     private ImageButton searchButton;
-    private Button createNewChatButton, createNewGroupButton;
+    private Button createNewGroupButton;
     private RecyclerView chatRecyclerview;
     private RecentChatRecyclerAdapter adapter;
 
@@ -51,7 +51,7 @@ public class ChatFragment extends Fragment {
 
         searchInput = view.findViewById(R.id.chat_search_chat);
         searchButton = view.findViewById(R.id.chat_search_chat_btn);
-        createNewChatButton = view.findViewById(R.id.new_chat_btn);
+//        createNewChatButton = view.findViewById(R.id.new_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewGroupButton = view.findViewById(R.id.new_group_chat_btn);
 
@@ -70,13 +70,13 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        createNewChatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), CreateNewChatActivity.class);
-                startActivity(intent);
-            }
-        });
+//        createNewChatButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getContext(), CreateNewChatActivity.class);
+//                startActivity(intent);
+//            }
+//        });
         createNewGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
