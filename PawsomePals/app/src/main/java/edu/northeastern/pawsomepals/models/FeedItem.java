@@ -21,6 +21,8 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
     private boolean isFavorite;
     private boolean isLiked;
 
+    private LatLng latLng;
+
     public FeedItem() {
     }
 
@@ -127,6 +129,14 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
 
     public void setFavorite(boolean favorite) {
         isFavorite = favorite;
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
     }
 }
 

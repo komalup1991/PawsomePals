@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -26,7 +28,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.model.AddressComponent;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -42,6 +52,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +87,7 @@ public class CreateEventsActivity extends AppCompatActivity {
     private String loggedInUserId;
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
-    private AutoCompleteTextView searchLocationDisplayTextView;
+    private TextView searchLocationDisplayTextView;
     private ImageView selectPhoto, eventImageView;
     private Uri galleryImageUri, cameraImageUri;
 
@@ -143,8 +154,8 @@ public class CreateEventsActivity extends AppCompatActivity {
         FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-                userNameToSaveInFeed=user.getName();
-                userProfileUrlToSaveInFeed=user.getProfileImage();
+                userNameToSaveInFeed = user.getName();
+                userProfileUrlToSaveInFeed = user.getProfileImage();
 
                 Glide.with(CreateEventsActivity.this)
                         .load(user.getProfileImage())
@@ -195,17 +206,18 @@ public class CreateEventsActivity extends AppCompatActivity {
         locationSuggestions.add("Los Angeles, USA");
         locationSuggestions.add("London, UK");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, locationSuggestions);
-        searchLocationDisplayTextView.setAdapter(adapter);
-
-
-        addLocationTextView.setOnClickListener(new View.OnClickListener() {
+        searchLocationDisplayTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchLocationDisplayTextView.setVisibility(View.VISIBLE);
+                List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                        Place.Field.ADDRESS, Place.Field.LAT_LNG);
+
+                // Start the autocomplete intent.
+                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                        .build(CreateEventsActivity.this);
+                startAutocomplete.launch(intent);
             }
         });
-
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -248,11 +260,29 @@ public class CreateEventsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 DialogHelper.showCancelConfirmationDialog(context, CreateEventsActivity.this);
-           //     finish();
+                //     finish();
             }
         });
-
     }
+
+    private LatLng currentLatLng;
+    private final ActivityResultLauncher<Intent> startAutocomplete = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent intent = result.getData();
+                    if (intent != null) {
+                        Place place = Autocomplete.getPlaceFromIntent(intent);
+                        currentLatLng = place.getLatLng();
+                        String displayText = place.getName() + "\n" + place.getAddress();
+                        searchLocationDisplayTextView.setText(displayText);
+
+                    }
+                } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                    // The user canceled the operation.
+                    Log.i("yoo", "User canceled autocomplete");
+                }
+            });
 
     private void showTimePicker() {
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
@@ -385,10 +415,10 @@ public class CreateEventsActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                 isDeleteConfirmationDialogVisible = false;
+                isDeleteConfirmationDialogVisible = false;
             }
         });
-         isDeleteConfirmationDialogVisible = true;
+        isDeleteConfirmationDialogVisible = true;
         dialog.show();
     }
 
@@ -418,6 +448,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("eventDetails", eventDetails);
         events.put("userTagged", userTagged);
         events.put("locationTagged", locationTagged);
+        events.put("latLng", currentLatLng);
         events.put("createdAt", createdAt);
         events.put("username", userNameToSaveInFeed);
         events.put("userProfileImage", userProfileUrlToSaveInFeed);
@@ -425,7 +456,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("feedItemId", UUID.randomUUID().toString());
         events.put("img", imageUrlFromFirebaseStorage);
 
-        FirebaseUtil.createCollectionInFirestore(events,"events" ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(events, "events", new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
