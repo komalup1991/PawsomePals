@@ -1,8 +1,7 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
-import static edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil.allUserCollectionReference;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -10,7 +9,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,31 +25,40 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,8 +68,10 @@ import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.ChatStyle;
+import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.ImageUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
@@ -73,18 +91,20 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageButton functionBtn;
     private ImageButton backBtn;
     private ImageButton infoBtn;
+    private ImageView img_preview;
     private TextView chatRoomName;
     private RecyclerView chatRoomRecyclerView;
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
 
-    private Users currentUser,otherUser;
+    private Users currentUser, otherUser;
     private String chatRoomId;
     private ChatRoomModel chatRoomModel;
     private ChatMessageRecyclerAdapter adapter;
 
     private GroupChatModel group;
-
+    private Uri fileUri;
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +118,10 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String message = messageInput.getText().toString().trim();
-                if (message.isEmpty()) return;
+                if (message.isEmpty() && img_preview == null) return;
+                if (img_preview != null){
+                    sendImageToUser();
+                }
                 sendMessageToUser(message);
             }
         });
@@ -152,13 +175,14 @@ public class ChatRoomActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot snapshot) {
                         Users user = snapshot.toObject(Users.class);
-                        if (user != null)
+                        if (user != null) {
                             if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
                                 otherGroupUsers.add(user);
                                 groupUsers.add(user);
                             }
-                        if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
-                            groupUsers.add(user);
+                            if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
+                                groupUsers.add(user);
+                            }
                         }
                     }
                 });
@@ -170,6 +194,22 @@ public class ChatRoomActivity extends AppCompatActivity {
         setupChatRecyclerView();
     }
 
+    private void sendImageToUser() {
+        ChatMessageModel chatMessageModel;
+        chatRoomModel.setLastMessageTimestamp(Timestamp.now());
+        chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
+        chatRoomModel.setLastMessage("<Image>");
+        ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+
+        chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
+
+        if (fileUri == null) {
+            chatMessageModel.setPicture(false);
+        } else {
+            uploadPicture(fileUri, chatMessageModel);
+        }
+    }
+
     private void initialView() {
         chatRoomName = findViewById(R.id.userName);
         messageInput = findViewById(R.id.message_input);
@@ -178,6 +218,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         infoBtn = findViewById(R.id.chatroom_more_button);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
         backBtn = findViewById(R.id.message_back_button);
+        img_preview = findViewById(R.id.chat_image_preview);
     }
 
     private void showDialog() {
@@ -239,12 +280,19 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void sendMessageToUser(String message) {
+        ChatMessageModel chatMessageModel;
         chatRoomModel.setLastMessageTimestamp(Timestamp.now());
         chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
         chatRoomModel.setLastMessage(message);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        ChatMessageModel chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(),currentUser.getName());
+        chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
+
+        if (fileUri == null) {
+            chatMessageModel.setPicture(false);
+        } else {
+            uploadPicture(fileUri, chatMessageModel);
+        }
         ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                 .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                     @Override
@@ -255,6 +303,75 @@ public class ChatRoomActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void submitChatToFileBase(ChatMessageModel chatMessageModel, boolean picture) {
+
+    }
+
+    private void uploadPicture(Uri fileUri, ChatMessageModel chatMessageModel) {
+        AlertDialog dialog = new AlertDialog.Builder(ChatRoomActivity.this)
+                .setCancelable(false)
+                .setMessage("Please wait...")
+                .create();
+        dialog.show();
+
+        String fileName = getFileName(getContentResolver(), fileUri);
+        String path = new StringBuilder(ChatFirebaseUtil.currentUserId())
+                .append("/")
+                .append(fileName)
+                .toString();
+        storageReference = FirebaseStorage.getInstance()
+                .getReference()
+                .child(path);
+        UploadTask uploadTask = storageReference.putFile(fileUri);
+        //create task
+        Task<Uri> task = uploadTask.continueWithTask(task1->{
+            if (!task1.isSuccessful()){
+                Toast.makeText(this,"Failed to upload",Toast.LENGTH_SHORT).show();
+            }
+            return storageReference.getDownloadUrl();
+        }).addOnCompleteListener(task12 ->{
+            if(task12.isSuccessful()){
+                String url = task12.getResult().toString();
+                dialog.dismiss();
+
+                chatMessageModel.setPicture(true);
+                chatMessageModel.setPictureLink(url);
+
+                submitChatToFileBase(chatMessageModel,chatMessageModel.isPicture());
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ChatRoomActivity.this,e.getMessage(),Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @SuppressLint("Range")
+    private String getFileName(ContentResolver contentResolver, Uri fileUri) {
+        String result = null;
+
+        if (fileUri.getScheme().equals("content")) {
+            Cursor cursor = contentResolver.query(fileUri, null, null, null);
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        if (result == null) {
+            result = fileUri.getPath();
+            int cut = result.lastIndexOf("/");
+            if (cut != -1) {
+                result = result.substring(cut + 1);
+            }
+        }
+        return result;
     }
 
     private void getOrCreateChatRoomModel() {
@@ -271,7 +388,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                             ""
                     );
                     chatRoomModel.setChatStyle(ChatStyle.ONEONONE);
-                    chatRoomModel.setOtherUserName(otherUser.getName());
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
             }
@@ -403,8 +519,13 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void handleImageCaptureFromCamera() {
         // Check if camera permissions are granted
         if (checkCameraPermission()) {
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Images.Media.TITLE, "New Picture");
+            values.put(MediaStore.Images.Media.DESCRIPTION, "From your Camera");
+            fileUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         } else {
@@ -425,27 +546,94 @@ public class ChatRoomActivity extends AppCompatActivity {
         // Check if storage permissions are granted
         if (checkStoragePermission()) {
             Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            pickPhotoIntent.setType("image/*");
             startActivityForResult(pickPhotoIntent, REQUEST_IMAGE_GALLERY);
         } else {
             // Request storage permissions if not granted
             requestStoragePermission();
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == REQUEST_IMAGE_CAPTURE) {
+            if (requestCode == RESULT_OK) {
+                // Handle image capture from the camera
+                try {
+//                    cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
+//                    selectPhoto.setVisibility(View.GONE);
+//                    Glide.with(this).load(cameraImageUri).centerCrop().into(eventImageView);
+
+                    Bitmap bitmap = MediaStore.Images.Media
+                            .getBitmap(getContentResolver(), fileUri);
+
+                    img_preview.setImageBitmap(bitmap);
+                    img_preview.setVisibility(View.VISIBLE);
+                } catch (IOException e) {
+                    Toast.makeText(this, "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
+
+                    throw new RuntimeException(e);
+                }
+
+//                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+//                    imageProfile.setImageBitmap(bitmap);
+//
+//                    // Convert the Bitmap to a URI and set it to the photoUri
+//                    photoUri = getImageUriFromBitmap(bitmap);
+            } else if (requestCode == REQUEST_IMAGE_GALLERY) {
+                if (requestCode == RESULT_OK) {
+                    try {
+                        final Uri imageUri = data.getData();
+                        InputStream inputStream = getContentResolver()
+                                .openInputStream(imageUri);
+                        Bitmap selectedImage = BitmapFactory.decodeStream(inputStream);
+                        img_preview.setImageBitmap(selectedImage);
+                        img_preview.setVisibility(View.VISIBLE);
+                        fileUri = imageUri;
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Please choose image", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
-        else
-        {return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
-        }
-        else{
+        } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
         }
     }
+
+//    @NonNull
+//    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+//        View view;
+//        if(viewType == 0){
+//            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_item,parent,false);
+//            return new ChatModelViewHolder(view);
+//        } else if (viewType == 1){
+//            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_picture_friend,parent,false);
+//            return new ChatPictureReceiveHolder(view);
+//        } else if(viewType == 2){
+//            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_item,parent,false);
+//            return new ChatModelViewHolder(view);
+//        } else {
+//            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chat_message_picture_own,parent,false);
+//            return new ChatPictureHolder(view);
+//        }
+//
+//    }
 
 }

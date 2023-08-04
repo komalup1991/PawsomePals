@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
+import android.graphics.Bitmap;
+
 import com.google.firebase.Timestamp;
 
 public class ChatMessageModel {
@@ -7,6 +9,7 @@ public class ChatMessageModel {
     private String message;
     private String senderId;
     private Timestamp timestamp;
+    private boolean picture;
 
     public ChatMessageModel(){
     }
@@ -48,5 +51,16 @@ public class ChatMessageModel {
 
     public void setSenderName(String senderName) {
         this.senderName = senderName;
+    }
+
+    public boolean isPicture() {
+        return picture;
+    }
+
+    public void setPicture(boolean picture) {
+        this.picture = picture;
+    }
+
+    public void setPictureLink(String url) {
     }
 }

@@ -20,6 +20,7 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 
+
 public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageModel, ChatMessageRecyclerAdapter.ChatModelViewHolder> {
 
     private Context context;
