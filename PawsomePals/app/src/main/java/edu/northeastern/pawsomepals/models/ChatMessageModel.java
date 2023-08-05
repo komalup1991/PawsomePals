@@ -15,12 +15,12 @@ public class ChatMessageModel {
     public ChatMessageModel(){
     }
 
-    public ChatMessageModel(String message, String senderId, Timestamp Timestamp,String senderName){
+    public ChatMessageModel(String message, String senderId, Timestamp Timestamp,String senderName,String pictureUrl){
         this.message = message;
         this.senderId = senderId;
         this.timestamp = Timestamp;
         this.senderName = senderName;
-        this.pictureUrl = "";
+        this.pictureUrl = pictureUrl;
     }
 
     public String getMessage() {
@@ -66,7 +66,7 @@ public class ChatMessageModel {
     public void setPictureLink(String url) {
         this.pictureUrl = url;
     }
-    public void getImage(){
+    public String getImage(){
         return pictureUrl;
     }
 }

@@ -252,7 +252,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
         if (fileUri == null) {
-            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
+            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),null);
             chatMessageModel.setPicture(false);
             ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                     .addOnCompleteListener(task -> {
@@ -481,33 +481,20 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void sendImageToUser() {
-        ChatMessageModel chatMessageModel;
-        chatRoomModel.setLastMessageTimestamp(Timestamp.now());
-        chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
-        chatRoomModel.setLastMessage("<Image>" + fileUri);
-        ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+        if (fileUri != null){
 
-        chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName());
-        chatMessageModel.setPicture(true);
+            chatRoomModel.setLastMessageTimestamp(Timestamp.now());
+            chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
+            chatRoomModel.setLastMessage("<Image>");
+            ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        if (fileUri != null)
-            uploadPicture(fileUri, chatMessageModel);
-        ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        messageInput.setText("");
-                        sendNotification("You receive an <image>");
-                    }
-                });
-        imgPreviewTextView.setVisibility(View.INVISIBLE);
-        img_preview.setVisibility(View.INVISIBLE);
-        img_preview = null;
-        fileUri = null;
+            uploadPicture(fileUri);
+        }
     }
 
 
 
-    private void uploadPicture(Uri fileUri, ChatMessageModel chatMessageModel) {
+    private void uploadPicture(Uri fileUri) {
         AlertDialog dialog = new AlertDialog.Builder(ChatRoomActivity.this)
                 .setCancelable(false)
                 .setMessage("Please wait...")
@@ -532,13 +519,22 @@ public class ChatRoomActivity extends AppCompatActivity {
             return storageReference.getDownloadUrl();
         }).addOnCompleteListener(task12 -> {
             if (task12.isSuccessful()) {
+                ChatMessageModel chatMessageModel;
                 String url = task12.getResult().toString();
                 dialog.dismiss();
-
+                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),url);
                 chatMessageModel.setPicture(true);
-                chatMessageModel.setPictureLink(url);
-
-                submitChatToFileBase(chatMessageModel, chatMessageModel.isPicture());
+                ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
+                        .addOnCompleteListener(addTask -> {
+                            if (addTask.isSuccessful()) {
+                                messageInput.setText("");
+                                sendNotification("You receive an <image>");
+                            }
+                        });
+                imgPreviewTextView.setVisibility(View.INVISIBLE);
+                img_preview.setVisibility(View.INVISIBLE);
+                img_preview = null;
+//                fileUri = null;
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
