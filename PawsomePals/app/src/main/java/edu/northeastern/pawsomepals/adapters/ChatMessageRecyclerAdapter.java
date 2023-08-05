@@ -104,6 +104,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.leftImageView);
 //                imageViewHolder.leftImageView.setImageBitmap(ChatImgUtil.getBitmapFromURL(message.getImage()));
                 imageViewHolder.otherUserNameTextView.setText(model.getSenderName());
+                imageViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
             }
         }
     }

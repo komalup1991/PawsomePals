@@ -84,14 +84,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
     }
 
     private void setupUsersRecyclerView(String searchTerm) {
-        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                currentUser = task.getResult().toObject(Users.class);
-                userList.add(currentUser);
-            }
-        });
-
         Query query = ChatFirebaseUtil.allUserCollectionReference()
                 .whereGreaterThanOrEqualTo("searchName", searchTerm.toLowerCase());
 
@@ -101,15 +93,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
         usersRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         usersRecyclerview.setAdapter(adapter);
         adapter.startListening();
-
-//        Query query = ChatFirebaseUtil.allUserCollectionReference().orderBy("name");
-//
-//        options = new FirestoreRecyclerOptions.Builder<Users>()
-//                .setQuery(query, Users.class).build();
-//        adapter = new ChatGroupUserRecyclerAdapter(options, getApplicationContext());
-//        usersRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-//        usersRecyclerview.setAdapter(adapter);
-//        adapter.startListening();
     }
 
     private void createGroupChat() {
@@ -118,15 +101,27 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 userList.add(model);
             }
         }
+        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                currentUser = task.getResult().toObject(Users.class);
+                if (!userList.contains(currentUser)){
+                    userList.add(currentUser);
+                }
+            }
+        });
+        for(Users user:userList){
+            Log.i("create",user.getName()+"info");
+        }
 
-        if (userList.size() > 2 && userList.size() <= 10) {
+        if (userList.size() > 1 && userList.size() <= 9) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
-        } else if (userList.size() == 2) {
+        } else if (userList.size() == 1) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-            ChatFirebaseUtil.passUserModelAsIntent(intent,userList.get(1));
+            ChatFirebaseUtil.passUserModelAsIntent(intent,userList.get(0));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
         } else {
