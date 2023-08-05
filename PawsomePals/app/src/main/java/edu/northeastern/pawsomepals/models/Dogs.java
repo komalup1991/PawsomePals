@@ -13,7 +13,7 @@ public class Dogs implements Serializable {
     private String gender;
     private String dob;
     private String size;
-
+    private Boolean isDeleted;
     public Dogs() {
     }
 
@@ -28,6 +28,7 @@ public class Dogs implements Serializable {
         this.gender = gender;
         this.dob = dob;
         this.size = size;
+        this.isDeleted = false;
     }
 
     public String getDogId() {
@@ -110,5 +111,13 @@ public class Dogs implements Serializable {
 
     public String getMixedBreed() {
         return mixedBreed;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

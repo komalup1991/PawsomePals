@@ -262,6 +262,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
 
     private void navigateToEditDogProfileActivity() {
         Intent intent = new Intent(EditUserProfileActivity.this, NewDogProfileActivity.class);
+        intent.putExtra("redirectTo", "Home");
         startActivity(intent);
     }
 
