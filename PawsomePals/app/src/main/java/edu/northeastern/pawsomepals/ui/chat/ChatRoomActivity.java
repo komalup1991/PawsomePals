@@ -455,6 +455,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     img_preview.setImageBitmap(bitmap);
                     img_preview.setVisibility(View.VISIBLE);
                     imgPreviewTextView.setVisibility(View.VISIBLE);
+                    fileUri = cameraUri;
                 } catch (Exception e) {
                     Toast.makeText(this, "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
                     throw new RuntimeException(e);
@@ -491,14 +492,14 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
     }
 
-    private void uploadPicture(Uri fileUri) {
+    private void uploadPicture(Uri imageUri) {
         AlertDialog dialog = new AlertDialog.Builder(ChatRoomActivity.this)
                 .setCancelable(false)
                 .setMessage("Please wait...")
                 .create();
         dialog.show();
 
-        String fileName = getFileName(getContentResolver(), fileUri);
+        String fileName = getFileName(getContentResolver(), imageUri);
         String path = new StringBuilder(ChatFirebaseUtil.currentUserId())
                 .append("/")
                 .append(fileName)
@@ -507,7 +508,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance()
                 .getReference("chat_message_images/")
                 .child(path);
-        UploadTask uploadTask = storageReference.putFile(fileUri);
+        UploadTask uploadTask = storageReference.putFile(imageUri);
         //create task
         Task<Uri> task = uploadTask.continueWithTask(task1 -> {
             if (!task1.isSuccessful()) {
@@ -533,7 +534,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 sendNotification("You receive an <image>");
                             }
                         });
-//                fileUri = null;
+                fileUri = null;
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
