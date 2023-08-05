@@ -19,7 +19,7 @@ public abstract class FeedItem implements Serializable {
     private String locationTagged;
     private String createdBy;
     private String feedItemId;
-    private Long commentCount;
+    private long commentCount;
     private long likeCount;
 
     private boolean isFavorite;
@@ -89,7 +89,7 @@ public abstract class FeedItem implements Serializable {
         this.feedItemId = feedItemId;
     }
 
-    public Long getCommentCount() {
+    public long getCommentCount() {
         return commentCount;
     }
 

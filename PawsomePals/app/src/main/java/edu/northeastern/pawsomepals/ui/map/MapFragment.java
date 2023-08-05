@@ -116,12 +116,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                     for (FeedItem item : feedItems) {
                         if (item.getLatLng() != null) {
                             MarkerOptions marker = new MarkerOptions()
-                                    .title(((Event) item).getEventName())
+                                    .title(item.getLatLng().toString())
                                     .icon(bitmapFromVector(
                                             activity.getApplicationContext(),
                                             R.drawable.dogpawheart,
                                             80))
-                                    .snippet(((Event) item).getEventDetails())
+                                    .snippet(item.getCreatedBy())
                                     .position(new LatLng(item.getLatLng().getLatitude(), item.getLatLng().getLongitude()));
                             Marker m = googleMap.addMarker(marker);
                             if (selectedFeedItem != null && item.getFeedItemId().equals(selectedFeedItem.getFeedItemId())) {

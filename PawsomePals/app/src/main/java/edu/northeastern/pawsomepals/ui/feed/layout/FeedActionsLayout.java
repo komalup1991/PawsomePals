@@ -56,12 +56,10 @@ public class FeedActionsLayout extends LinearLayout {
     }
 
     public void bindView(Activity activity, FeedItem feedItem) {
-        if (feedItem.getCommentCount() != null) {
-            commentCountTextView.
-                    setText(String.valueOf(Math.toIntExact(feedItem.getCommentCount())));
-        }
+        commentCountTextView.
+                setText("(" + feedItem.getCommentCount() + ")");
         likeCountTextView.
-                setText(String.valueOf(Math.toIntExact(feedItem.getLikeCount())));
+                setText("(" + feedItem.getLikeCount() + ")");
         if (feedItem.isLiked()) {
             likeButton.setImageResource(R.drawable.like);
         }
@@ -72,13 +70,13 @@ public class FeedActionsLayout extends LinearLayout {
                 if (feedItem.isLiked()) {
                     feedItem.setLiked(false);
                     feedItem.setLikeCount(feedItem.getLikeCount() - 1);
-                    likeCountTextView.setText(String.valueOf(feedItem.getLikeCount()));
+                    likeCountTextView.setText(getLikeCount(feedItem.getLikeCount()));
                     likeButton.setImageResource(R.drawable.likenew);
                     FirebaseUtil.removeLikeFromFirestore(feedItem.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), getPostType(feedItem));
                 } else {
                     feedItem.setLiked(true);
                     feedItem.setLikeCount(feedItem.getLikeCount() + 1);
-                    likeCountTextView.setText(String.valueOf(feedItem.getLikeCount()));
+                    likeCountTextView.setText(getLikeCount(feedItem.getLikeCount()));
                     likeButton.setImageResource(R.drawable.like);
                     FirebaseUtil.addLikeToFirestore(feedItem.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), getPostType(feedItem));
                 }
@@ -131,5 +129,9 @@ public class FeedActionsLayout extends LinearLayout {
             case FeedItem.TYPE_RECIPE -> "recipes";
             default -> throw new IllegalStateException("Unexpected value: " + feedItem.getType());
         };
+    }
+
+    private String getLikeCount(long likeCount) {
+        return "(" + likeCount + ")";
     }
 }

@@ -46,6 +46,10 @@ public class FirestoreDataLoader {
     }
 
     public void loadDataFromCollections() {
+        loadDataFromCollections(new ArrayList<>());
+    }
+
+    public void loadDataFromCollections(List<String> feedItemIds) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -54,7 +58,13 @@ public class FirestoreDataLoader {
                 List<QuerySnapshot> querySnapshots = new ArrayList<>();
                 try {
                     for (CollectionReference collection : collections) {
-                        Query query = collection.orderBy(orderByField, Query.Direction.DESCENDING);
+                        Query query = null;
+                        if (!feedItemIds.isEmpty()) {
+                            collection.whereIn("feedItemId", feedItemIds)
+                                    .orderBy(orderByField, Query.Direction.DESCENDING);
+                        } else {
+                            collection.orderBy(orderByField, Query.Direction.DESCENDING);
+                        }
                         Task<QuerySnapshot> task = query.get();
                         Tasks.await(task);
                         if (task.isSuccessful()) {

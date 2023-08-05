@@ -1,13 +1,5 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -16,27 +8,24 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.model.AddressComponent;
 import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
-import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -48,11 +37,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +50,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -76,20 +64,20 @@ public class CreateEventsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
     private String eventsDocId;
-    private TextView userNameTextView, tagPeopleTextView, addLocationTextView, taggedUserDisplayTextView;
+    private TextView userNameTextView, tagPeopleTextView, taggedUserDisplayTextView;
     private EditText eventNameEditText, eventDetailsEditText;
     private Dialog progressDialog;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
     private FirebaseStorage storage;
-    private StorageReference storageRef;
     private String loggedInUserId;
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
-    private TextView searchLocationDisplayTextView;
     private ImageView selectPhoto, eventImageView;
     private Uri galleryImageUri, cameraImageUri;
+
+    private TagLocationLayout tagLocationLayout;
 
     int selectedHour = 0;
     int selectedMinute = 0;
@@ -97,11 +85,13 @@ public class CreateEventsActivity extends AppCompatActivity {
     private String userProfileUrlToSaveInFeed;
 
     private Context context;
-    private boolean isDeleteConfirmationDialogVisible;
+    private LatLng currentLatLng;
+    private String locationTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getBaseContext();
         setContentView(R.layout.activity_create_events);
         setEventDateTextView = findViewById(R.id.setEventDateTextView);
         allUsers = new HashMap<>();
@@ -113,10 +103,16 @@ public class CreateEventsActivity extends AppCompatActivity {
         eventDetailsEditText = findViewById(R.id.eventDetailsEditText);
         tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
         taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
-        addLocationTextView = findViewById(R.id.addLocationTextView);
-        searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
         eventImageView = findViewById(R.id.photoVideoImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
+        tagLocationLayout = findViewById(R.id.tag_location_layout);
+        tagLocationLayout.bindView(this, new TagLocationLayout.OnLocationFetchListener() {
+            @Override
+            public void onLocation(LatLng latLng, String locationTagged) {
+                currentLatLng = latLng;
+                CreateEventsActivity.this.locationTagged = locationTagged;
+            }
+        });
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
         ImageView editImageView = findViewById(R.id.editImageView);
 
@@ -126,7 +122,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
         currentUser = auth.getCurrentUser();
         loggedInUserId = currentUser.getUid();
 
@@ -201,24 +196,6 @@ public class CreateEventsActivity extends AppCompatActivity {
 
         fetchAllUsersFromFirestore();
 
-        List<String> locationSuggestions = new ArrayList<>();
-        locationSuggestions.add("New York, USA");
-        locationSuggestions.add("Los Angeles, USA");
-        locationSuggestions.add("London, UK");
-
-        searchLocationDisplayTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
-                        Place.Field.ADDRESS, Place.Field.LAT_LNG);
-
-                // Start the autocomplete intent.
-                Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
-                        .build(CreateEventsActivity.this);
-                startAutocomplete.launch(intent);
-            }
-        });
-
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -264,25 +241,6 @@ public class CreateEventsActivity extends AppCompatActivity {
             }
         });
     }
-
-    private LatLng currentLatLng;
-    private final ActivityResultLauncher<Intent> startAutocomplete = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Intent intent = result.getData();
-                    if (intent != null) {
-                        Place place = Autocomplete.getPlaceFromIntent(intent);
-                        currentLatLng = place.getLatLng();
-                        String displayText = place.getName() + "\n" + place.getAddress();
-                        searchLocationDisplayTextView.setText(displayText);
-
-                    }
-                } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                    // The user canceled the operation.
-                    Log.i("yoo", "User canceled autocomplete");
-                }
-            });
 
     private void showTimePicker() {
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
@@ -415,10 +373,8 @@ public class CreateEventsActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                isDeleteConfirmationDialogVisible = false;
             }
         });
-        isDeleteConfirmationDialogVisible = true;
         dialog.show();
     }
 
@@ -438,7 +394,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         String eventDate = setEventDateTextView.getText().toString();
         String eventTime = setEventTimeTextView.getText().toString();
         String userTagged = taggedUserDisplayTextView.getText().toString();
-        String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
         Map<String, Object> events = new HashMap<>();
         events.put("createdBy", loggedInUserId);
@@ -505,7 +460,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         builder.setTitle("Select Users")
                 .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
                     Users user = allUsers.get(userIdsArray[which]);
-                    Log.d("yoo", " " + user.getName());
                     if (isChecked) {
                         selectedUsers.add(user);
                     } else {
@@ -523,7 +477,6 @@ public class CreateEventsActivity extends AppCompatActivity {
     private void updateSelectedUsersTextView() {
         List<String> selectedNames = new ArrayList<>();
         for (Users user : selectedUsers) {
-            Log.d("yoo", " " + user.getName());
             selectedNames.add(user.getName());
         }
 

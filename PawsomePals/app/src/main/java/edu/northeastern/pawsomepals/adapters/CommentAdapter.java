@@ -35,8 +35,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-        View view = LayoutInflater.from(context).inflate(R.layout.comment_item , parent , false);
+        View view = LayoutInflater.from(context).inflate(R.layout.comment_item, parent, false);
         return new CommentAdapter.ViewHolder(view);
     }
 
@@ -46,9 +45,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         Comment comment = comments.get(position);
         holder.comment.setText(comment.getComment());
         Glide.with(context).load(comment.getUserProfileImage())
-                        .into(holder.image_profile);
-                holder.username.setText(comment.getUsername());
+                .into(holder.image_profile);
+        holder.username.setText(comment.getUsername());
     }
+
     @Override
     public int getItemCount() {
         return comments.size();
@@ -59,13 +59,13 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-
         public ImageView image_profile;
         public TextView username;
         public TextView comment;
         public FirebaseFirestore db = FirebaseFirestore.getInstance();
         public FirebaseAuth auth = FirebaseAuth.getInstance();
         public FirebaseUser currentUser = auth.getCurrentUser();
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -76,5 +76,4 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     }
 
 
-
-    }
+}

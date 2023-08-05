@@ -67,7 +67,6 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Comments");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,7 +91,6 @@ public class CommentActivity extends AppCompatActivity {
         postType = getIntent().getStringExtra("postType");
 
         createdBy = intent.getStringExtra("createdBy");
-
 
         commentRecyclerView = findViewById(R.id.recycler_view);
         commentRecyclerView.setHasFixedSize(true);

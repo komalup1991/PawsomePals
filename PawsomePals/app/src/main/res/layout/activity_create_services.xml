@@ -155,42 +155,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tagPeopleTextView" />
 
-            <TextView
-                android:id="@+id/addLocationTextView"
-                android:layout_width="wrap_content"
+            <edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout
+                android:id="@+id/tag_location_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/add_location"
-                android:textAllCaps="true"
-                android:textColor="@color/darkPink"
-                android:textSize="14sp"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.025"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/taggedUserDisplayTextView" />
-            <AutoCompleteTextView
-                android:id="@+id/searchLocationDisplayTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/border"
-                android:ems="10"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.125"
-                android:hint="Tag a location"
-                android:imeOptions="actionDone"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/addLocationTextView" />
-
-
-
-
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -44,6 +45,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -62,9 +64,11 @@ public class CreateServicesActivity extends AppCompatActivity {
     private String serviceDocId;
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
-    private AutoCompleteTextView searchLocationDisplayTextView;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
+    private TagLocationLayout tagLocationLayout;
+    private LatLng currentLatLng;
+    private String locationTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +84,14 @@ public class CreateServicesActivity extends AppCompatActivity {
         notesOnServiceEditTextView = findViewById(R.id.notesOnServiceEditTextView);
         tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
         taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
-        addLocationTextView = findViewById(R.id.addLocationTextView);
-        searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
+        tagLocationLayout = findViewById(R.id.tag_location_layout);
+        tagLocationLayout.bindView(this, new TagLocationLayout.OnLocationFetchListener() {
+            @Override
+            public void onLocation(LatLng latLng, String locationTagged) {
+                currentLatLng = latLng;
+                CreateServicesActivity.this.locationTagged = locationTagged;
+            }
+        });
 
         Button saveButton = findViewById(R.id.saveButton);
         Button cancelButton = findViewById(R.id.cancelButton);
@@ -124,23 +134,6 @@ public class CreateServicesActivity extends AppCompatActivity {
         });
 
         fetchAllUsersFromFirestore();
-
-        List<String> locationSuggestions = new ArrayList<>();
-        locationSuggestions.add("New York, USA");
-        locationSuggestions.add("Los Angeles, USA");
-        locationSuggestions.add("London, UK");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, locationSuggestions);
-        searchLocationDisplayTextView.setAdapter(adapter);
-
-
-        addLocationTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchLocationDisplayTextView.setVisibility(View.VISIBLE);
-            }
-        });
-
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -210,7 +203,6 @@ public class CreateServicesActivity extends AppCompatActivity {
         builder.setTitle("Select Users")
                 .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
                     Users user = allUsers.get(userIdsArray[which]);
-                    Log.d("yoo", " " + user.getName());
                     if (isChecked) {
                         selectedUsers.add(user);
                     } else {
@@ -228,7 +220,6 @@ public class CreateServicesActivity extends AppCompatActivity {
     private void updateSelectedUsersTextView() {
         List<String> selectedNames = new ArrayList<>();
         for (Users user : selectedUsers) {
-            Log.d("yoo", " " + user.getName());
             selectedNames.add(user.getName());
         }
 
@@ -275,7 +266,6 @@ public class CreateServicesActivity extends AppCompatActivity {
         String serviceName = serviceNameEditTextView.getText().toString();
         String serviceNotes = notesOnServiceEditTextView.getText().toString();
         String userTagged = taggedUserDisplayTextView.getText().toString();
-        String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> services = new HashMap<>();
@@ -285,6 +275,7 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("serviceNotes", serviceNotes);
         services.put("userTagged", userTagged);
         services.put("locationTagged", locationTagged);
+        services.put("latLng", currentLatLng);
         services.put("createdAt", createdAt);
         services.put("username",userNameToSaveInFeed);
         services.put("userProfileImage",userProfileUrlToSaveInFeed);

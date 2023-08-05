@@ -1,18 +1,9 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -22,20 +13,24 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -45,10 +40,10 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
-import edu.northeastern.pawsomepals.utils.LocationUtil;
 
 public class CreatePostActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -64,17 +59,18 @@ public class CreatePostActivity extends AppCompatActivity {
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
     private Context context;
-    private AutoCompleteTextView searchLocationDisplayTextView;
+
+    private TagLocationLayout tagLocationLayout;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
 
+    private LatLng currentLatLng;
+    private String locationTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_post);
-
-
         allUsers = new HashMap<>();
         selectedUsers = new ArrayList<>();
         toolbar = findViewById(R.id.toolbar);
@@ -84,8 +80,15 @@ public class CreatePostActivity extends AppCompatActivity {
         postContentEditTextView = findViewById(R.id.postContentEditTextView);
         tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
         taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
-        addLocationTextView = findViewById(R.id.addLocationTextView);
-      searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
+        tagLocationLayout = findViewById(R.id.tag_location_layout);
+        tagLocationLayout.bindView(this, new TagLocationLayout.OnLocationFetchListener() {
+
+            @Override
+            public void onLocation(LatLng latLng, String locationTagged) {
+                currentLatLng = latLng;
+                CreatePostActivity.this.locationTagged = locationTagged;
+            }
+        });
 
         Button saveButton = findViewById(R.id.saveButton);
         Button cancelButton = findViewById(R.id.cancelButton);
@@ -130,21 +133,6 @@ public class CreatePostActivity extends AppCompatActivity {
         });
 
         fetchAllUsersFromFirestore();
-        List<String> locationSuggestions = new ArrayList<>();
-        locationSuggestions.add("New York, USA");
-        locationSuggestions.add("Los Angeles, USA");
-        locationSuggestions.add("London, UK");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, locationSuggestions);
-        searchLocationDisplayTextView.setAdapter(adapter);
-
-
-        addLocationTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchLocationDisplayTextView.setVisibility(View.VISIBLE);
-            }
-        });
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -214,7 +202,6 @@ public class CreatePostActivity extends AppCompatActivity {
         builder.setTitle("Select Users")
                 .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
                     Users user = allUsers.get(userIdsArray[which]);
-                    Log.d("yoo", " " + user.getName());
                     if (isChecked) {
                         selectedUsers.add(user);
                     } else {
@@ -232,7 +219,6 @@ public class CreatePostActivity extends AppCompatActivity {
     private void updateSelectedUsersTextView() {
         List<String> selectedNames = new ArrayList<>();
         for (Users user : selectedUsers) {
-            Log.d("yoo", " " + user.getName());
             selectedNames.add(user.getName());
         }
 
@@ -270,16 +256,12 @@ public class CreatePostActivity extends AppCompatActivity {
                 .show();
     }
 
-
-
-
     private void createFeedMap() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String caption = captionEditTextView.getText().toString();
         String postContent = postContentEditTextView.getText().toString();
         String userTagged = taggedUserDisplayTextView.getText().toString();
-        String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> post = new HashMap<>();
@@ -288,6 +270,7 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("postContent", postContent);
         post.put("userTagged", userTagged);
         post.put("locationTagged", locationTagged);
+        post.put("latLng", currentLatLng);
         post.put("createdAt", createdAt);
         post.put("username",userNameToSaveInFeed);
         post.put("userProfileImage",userProfileUrlToSaveInFeed);
@@ -302,8 +285,6 @@ public class CreatePostActivity extends AppCompatActivity {
             }
         });
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

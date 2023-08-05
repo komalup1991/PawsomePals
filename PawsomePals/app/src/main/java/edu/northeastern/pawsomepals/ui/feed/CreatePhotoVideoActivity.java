@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,6 +49,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -61,7 +63,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
     private String photoVideoPostDocId;
-    private TextView userNameTextView, tagPeopleTextView, addLocationTextView, taggedUserDisplayTextView;
+    private TextView userNameTextView, tagPeopleTextView, taggedUserDisplayTextView;
     private EditText captionEditTextView;
     private Dialog progressDialog;
     private FirebaseFirestore db;
@@ -72,14 +74,14 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private String loggedInUserId;
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
-    private AutoCompleteTextView searchLocationDisplayTextView;
-    private ImageView selectPhoto,photoVideoImageView;
+    private ImageView selectPhoto, photoVideoImageView;
     private Uri galleryImageUri, cameraImageUri;
-    private boolean isEditImageDialogVisible = false;
-    private boolean isDeleteConfirmationDialogVisible = false;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
     private Context context;
+    private LatLng currentLatLng;
+    private String locationTagged;
+    private TagLocationLayout tagLocationLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +96,16 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         captionEditTextView = findViewById(R.id.captionEditTextView);
         tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
         taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
-        addLocationTextView = findViewById(R.id.addLocationTextView);
-        searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
         photoVideoImageView = findViewById(R.id.photoVideoImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
+        tagLocationLayout = findViewById(R.id.tag_location_layout);
+        tagLocationLayout.bindView(this, new TagLocationLayout.OnLocationFetchListener() {
+            @Override
+            public void onLocation(LatLng latLng, String locationTagged) {
+                currentLatLng = latLng;
+                CreatePhotoVideoActivity.this.locationTagged = locationTagged;
+            }
+        });
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
         ImageView editImageView = findViewById(R.id.editImageView);
 
@@ -120,8 +128,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-                userNameToSaveInFeed=user.getName();
-                userProfileUrlToSaveInFeed=user.getProfileImage();
+                userNameToSaveInFeed = user.getName();
+                userProfileUrlToSaveInFeed = user.getProfileImage();
 
                 Glide.with(CreatePhotoVideoActivity.this)
                         .load(user.getProfileImage())
@@ -166,23 +174,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         });
 
         fetchAllUsersFromFirestore();
-
-        List<String> locationSuggestions = new ArrayList<>();
-        locationSuggestions.add("New York, USA");
-        locationSuggestions.add("Los Angeles, USA");
-        locationSuggestions.add("London, UK");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, locationSuggestions);
-        searchLocationDisplayTextView.setAdapter(adapter);
-
-
-        addLocationTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchLocationDisplayTextView.setVisibility(View.VISIBLE);
-            }
-        });
-
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -229,6 +220,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             }
         });
     }
+
     private void showEditImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Photo");
@@ -259,10 +251,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                isEditImageDialogVisible = false;
             }
         });
-        isEditImageDialogVisible = true;
         dialog.show();
     }
 
@@ -272,7 +262,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
                 galleryImageUri = null;
-                cameraImageUri = ImageUtil.saveCameraImageToFile(data,this);
+                cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
                 selectPhoto.setVisibility(View.GONE);
                 Glide.with(this).load(cameraImageUri).centerCrop().into(photoVideoImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
@@ -283,8 +273,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             }
         }
     }
-
-
 
 
     @Override
@@ -304,7 +292,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     }
 
 
-
     private void showDeleteConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you want to delete the selected image?");
@@ -319,10 +306,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                isDeleteConfirmationDialogVisible = false;
             }
         });
-        isDeleteConfirmationDialogVisible = true;
         dialog.show();
     }
 
@@ -334,13 +319,11 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     }
 
 
-
     private void createFeedMap(String imageUrlFromFirebaseStorage) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String caption = captionEditTextView.getText().toString();
         String userTagged = taggedUserDisplayTextView.getText().toString();
-        String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> photoVideoPosts = new HashMap<>();
@@ -348,14 +331,15 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         photoVideoPosts.put("caption", caption);
         photoVideoPosts.put("userTagged", userTagged);
         photoVideoPosts.put("locationTagged", locationTagged);
+        photoVideoPosts.put("latLng", currentLatLng);
         photoVideoPosts.put("createdAt", createdAt);
-        photoVideoPosts.put("username",userNameToSaveInFeed);
-        photoVideoPosts.put("userProfileImage",userProfileUrlToSaveInFeed);
-        photoVideoPosts.put("type",1);
+        photoVideoPosts.put("username", userNameToSaveInFeed);
+        photoVideoPosts.put("userProfileImage", userProfileUrlToSaveInFeed);
+        photoVideoPosts.put("type", 1);
         photoVideoPosts.put("img", imageUrlFromFirebaseStorage);
         photoVideoPosts.put("feedItemId", UUID.randomUUID().toString());
 
-        FirebaseUtil.createCollectionInFirestore(photoVideoPosts, "photovideo",new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(photoVideoPosts, "photovideo", new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
@@ -404,7 +388,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         builder.setTitle("Select Users")
                 .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
                     Users user = allUsers.get(userIdsArray[which]);
-                    Log.d("yoo", " " + user.getName());
                     if (isChecked) {
                         selectedUsers.add(user);
                     } else {
@@ -422,7 +405,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private void updateSelectedUsersTextView() {
         List<String> selectedNames = new ArrayList<>();
         for (Users user : selectedUsers) {
-            Log.d("yoo", " " + user.getName());
             selectedNames.add(user.getName());
         }
 
@@ -487,8 +469,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-
-
 
 
 }
