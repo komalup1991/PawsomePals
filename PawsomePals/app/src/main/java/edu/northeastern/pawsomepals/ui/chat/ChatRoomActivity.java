@@ -120,7 +120,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         sendMessageBtn.setOnClickListener(view -> {
             String message = messageInput.getText().toString().trim();
             if (message.isEmpty() && img_preview == null) return;
-            if (img_preview != null) {
+            if (img_preview != null && fileUri != null) {
                 sendImageToUser();
             } else {
                 sendMessageToUser(message);
@@ -482,7 +482,6 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private void sendImageToUser() {
         if (fileUri != null){
-
             chatRoomModel.setLastMessageTimestamp(Timestamp.now());
             chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
             chatRoomModel.setLastMessage("<Image>");
@@ -491,8 +490,6 @@ public class ChatRoomActivity extends AppCompatActivity {
             uploadPicture(fileUri);
         }
     }
-
-
 
     private void uploadPicture(Uri fileUri) {
         AlertDialog dialog = new AlertDialog.Builder(ChatRoomActivity.this)
@@ -522,6 +519,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                 ChatMessageModel chatMessageModel;
                 String url = task12.getResult().toString();
                 dialog.dismiss();
+
+                imgPreviewTextView.setVisibility(View.INVISIBLE);
+                img_preview.setVisibility(View.INVISIBLE);
+                img_preview = null;
+
                 chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),url);
                 chatMessageModel.setPicture(true);
                 ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
@@ -531,9 +533,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 sendNotification("You receive an <image>");
                             }
                         });
-                imgPreviewTextView.setVisibility(View.INVISIBLE);
-                img_preview.setVisibility(View.INVISIBLE);
-                img_preview = null;
 //                fileUri = null;
             }
         }).addOnFailureListener(new OnFailureListener() {

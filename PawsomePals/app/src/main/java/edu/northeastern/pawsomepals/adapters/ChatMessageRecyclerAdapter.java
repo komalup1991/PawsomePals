@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-
-import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
+import edu.northeastern.pawsomepals.ui.chat.ChatImgUtil;
 
 
 public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageModel, RecyclerView.ViewHolder> {
@@ -31,13 +32,21 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
     private Context context;
     private FirestoreRecyclerOptions<ChatMessageModel> options;
 
-    public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<RecyclerView.ViewHolder> options, Context context) {
+    /**
+     * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
+     * FirestoreRecyclerOptions} for configuration options.
+     *
+     * @param options
+     */
+    public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatMessageModel> options,Context context) {
         super(options);
         this.context = context;
     }
+
+
     @Override
     public int getItemViewType(int position) {
-        ChatMessageModel message = options.getSnapshots().get(position);
+        ChatMessageModel message = getItem(position);
 
         if (message.isPicture()) {
             return VIEW_TYPE_IMAGE_MESSAGE;
@@ -66,8 +75,6 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
 
     @Override
     protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull ChatMessageModel model) {
-        ChatMessageModel message = options.getSnapshots().get(position);
-
         if (holder.getItemViewType() == VIEW_TYPE_TEXT_MESSAGE) {
             ChatModelViewHolder textViewHolder = (ChatModelViewHolder) holder;
             // Set data to text view holder
@@ -89,14 +96,15 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 imageViewHolder.otherUserNameTextView.setVisibility(View.GONE);
                 imageViewHolder.leftCardView.setVisibility(View.GONE);
                 imageViewHolder.rightCardView.setVisibility(View.VISIBLE);
-                imageViewHolder.rightImageView.setImageBitmap(message.getImage());
+                Glide.with(context).load(model.getImage()).into(imageViewHolder.rightImageView);
+//                imageViewHolder.rightImageView.setImageBitmap(ChatImgUtil.getBitmapFromURL(message.getImage()));
             } else {
-                imageViewHolder.rightChatLayout.setVisibility(View.GONE);
-                imageViewHolder.leftChatLayout.setVisibility(View.VISIBLE);
-                imageViewHolder.leftChatTextView.setText(model.getMessage());
+                imageViewHolder.rightCardView.setVisibility(View.GONE);
+                imageViewHolder.leftCardView.setVisibility(View.VISIBLE);
+                Glide.with(context).load(model.getImage()).into(imageViewHolder.leftImageView);
+//                imageViewHolder.leftImageView.setImageBitmap(ChatImgUtil.getBitmapFromURL(message.getImage()));
                 imageViewHolder.otherUserNameTextView.setText(model.getSenderName());
             }
-            imageViewHolder.imageView.setImageBitmap(message.getImage());
         }
     }
 

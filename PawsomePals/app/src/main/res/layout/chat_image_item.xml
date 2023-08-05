@@ -15,9 +15,9 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_friend"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/accentColor"
+        app:cardBackgroundColor="@color/orange"
         app:cardCornerRadius="8dp"
         app:cardElevation="8dp"
         android:layout_toRightOf="@id/other_user_name"
@@ -32,8 +32,8 @@
 
             <ImageView
                 android:id="@+id/img_friend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/baseline_person_24"/>
 
@@ -42,9 +42,9 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_own"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/accentColor"
+        app:cardBackgroundColor="@color/yellow"
         android:layout_alignParentRight="true"
         app:cardCornerRadius="8dp"
         app:cardElevation="8dp"
@@ -58,8 +58,8 @@
 
             <ImageView
                 android:id="@+id/img_own"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="160dp"
+                android:layout_height="160dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/baseline_person_24"
                 android:layout_alignParentRight="true" />
