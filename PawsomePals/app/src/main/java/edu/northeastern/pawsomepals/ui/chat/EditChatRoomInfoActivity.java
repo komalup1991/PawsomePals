@@ -2,10 +2,15 @@ package edu.northeastern.pawsomepals.ui.chat;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -16,15 +21,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class EditChatRoomInfoActivity extends AppCompatActivity {
     private GroupChatModel groupChatModel;
+    private LinearLayout groupNameLayout, groupNoticeLayout;
     private List<Users> groupUsers;
     private ImageButton backBtn;
     private TextView groupName, groupNotice, membersNames;
+    private EditText editTextField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +51,19 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        groupNameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createDialog();
+            }
+        });
 
     }
 
     private String createMembersDetails() {
         StringBuilder builder = new StringBuilder();
         for (Users user : groupUsers) {
-            Log.i("info",user.getName());
+            Log.i("info", user.getName());
             builder.append(user.getName());
             builder.append("  ");
         }
@@ -63,6 +75,8 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         groupNotice = findViewById(R.id.group_notice_text);
         membersNames = findViewById(R.id.group_members_text);
         backBtn = findViewById(R.id.info_back_button);
+        groupNameLayout = findViewById(R.id.groupNameLayout);
+        groupNoticeLayout = findViewById(R.id.groupNoticeLayout);
     }
 
     private void getGroupUsers() {
@@ -77,5 +91,23 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void createDialog() {
+        editTextField = new EditText(this.getApplicationContext());
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Edit Group Name")
+                .setView(editTextField)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        String editTextInput = editTextField.getText().toString();
+                        Log.d("onclick", "editext value is: " + editTextInput);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
     }
 }

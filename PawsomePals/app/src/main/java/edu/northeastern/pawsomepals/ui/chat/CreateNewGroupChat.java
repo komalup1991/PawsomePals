@@ -1,11 +1,15 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -45,6 +49,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private List<Users> userList;
     private Users currentUser;
     private Button createNewChat;
+    private String groupName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +86,15 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 createGroupChat();
             }
         });
+        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                currentUser = task.getResult().toObject(Users.class);
+                if (!userList.contains(currentUser)) {
+                    userList.add(currentUser);
+                }
+            }
+        });
     }
 
     private void setupUsersRecyclerView(String searchTerm) {
@@ -101,31 +115,55 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 userList.add(model);
             }
         }
-        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                currentUser = task.getResult().toObject(Users.class);
-                if (!userList.contains(currentUser)){
-                    userList.add(currentUser);
-                }
-            }
-        });
-        for(Users user:userList){
-            Log.i("create",user.getName()+"info");
+        for (Users user : userList) {
+            Log.i("create", user.getName() + "info");
         }
 
-        if (userList.size() > 1 && userList.size() <= 9) {
+        if (userList.size() > 2 && userList.size() <= 5) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
-        } else if (userList.size() == 1) {
+        } else if (userList.size() == 2) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-            ChatFirebaseUtil.passUserModelAsIntent(intent,userList.get(0));
+            ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(1));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
         } else {
-            Toast.makeText(this, "Group members must be more than 1 and less than 10", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Group members must be more than 1 and less than 5", Toast.LENGTH_SHORT).show();
         }
     }
+//
+//    private void createGroupDialog() {
+//        LayoutInflater li = LayoutInflater.from(this.getApplicationContext());
+//        View viewInflated = li.inflate(R.layout.chat_create_group_dialog, null);
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this.getApplicationContext());
+//
+//        // set prompts.xml to alertdialog builder
+//        builder.setView(viewInflated);
+//        builder.setTitle("Create A Group");
+//
+//        // Set up the input
+//        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
+//        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+//        builder.setView(viewInflated);
+//
+//        // Set up the buttons
+//        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//                groupName = input.getText().toString();
+//            }
+//        });
+//        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//
+//        builder.show();
+//    }
 }

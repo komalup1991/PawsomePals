@@ -103,4 +103,6 @@
     <string name="recipe_ingredients">Recipe Ingredients</string>
     <string name="recipe_serving_size">Serving Size</string>
 
+    <string name="create_group_name">Create a group name</string>
+
 </resources>
