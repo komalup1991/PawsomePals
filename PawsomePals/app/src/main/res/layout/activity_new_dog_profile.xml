@@ -40,19 +40,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
+            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/imageProfile"
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_marginTop="32dp"
-                android:src="@drawable/dog"
                 android:scaleType="centerCrop"
-                app:civ_border_width="2dp"
+                android:src="@drawable/dog"
                 app:civ_border_color="#FFFFFF"
+                app:civ_border_width="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvUserProfileHeader"/>
+                app:layout_constraintTop_toBottomOf="@+id/tvUserProfileHeader" />
 
             <ImageView
                 android:id="@+id/imageAddIcon"
@@ -162,12 +161,12 @@
                     android:id="@+id/radioButtonSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/white"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="Small"
                     android:textColor="@color/white"
-                    android:textColorHint="@color/white"
-                    android:buttonTint="@color/white"/>
+                    android:textColorHint="@color/white" />
 
                 <RadioButton
                     android:id="@+id/radioButtonMedium"
@@ -195,6 +194,20 @@
 
             </RadioGroup>
 
+            <CheckBox
+                android:id="@+id/checkBoxMixedBreed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/input_bg"
+                android:buttonTint="@color/white"
+                android:paddingRight="10dp"
+                android:text="Mixed Breed"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                app:layout_constraintStart_toStartOf="@+id/radioGroupSize"
+                app:layout_constraintTop_toBottomOf="@+id/radioGroupSize" />
+
             <Spinner
                 android:id="@+id/spinnerDogBreed"
                 android:layout_width="0dp"
@@ -205,17 +218,15 @@
                 android:spinnerMode="dropdown"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
-                app:layout_constraintEnd_toStartOf="@id/spinnerMixedBreed"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
                 app:layout_constraintStart_toStartOf="@id/editTextName"
-                app:layout_constraintTop_toBottomOf="@id/radioGroupSize" />
+                app:layout_constraintTop_toBottomOf="@id/checkBoxMixedBreed" />
 
             <Spinner
                 android:id="@+id/spinnerMixedBreed"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
                 android:background="@drawable/input_bg"
                 android:dropDownSelector="@drawable/custom_spinner_selector"
                 android:popupBackground="@color/accentColor"
@@ -223,22 +234,9 @@
                 android:textColor="@color/white"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@id/editTextName"
-                app:layout_constraintStart_toEndOf="@id/spinnerDogBreed"
-                app:layout_constraintTop_toBottomOf="@id/radioGroupSize" />
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/spinnerDogBreed" />
 
-            <CheckBox
-                android:id="@+id/checkBoxMixedBreed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/input_bg"
-                android:paddingRight="10dp"
-                android:text="Mixed Breed"
-                android:textColor="@color/white"
-                android:textColorHint="@color/white"
-                android:buttonTint="@color/white"
-                app:layout_constraintStart_toStartOf="@+id/spinnerDogBreed"
-                app:layout_constraintTop_toBottomOf="@+id/spinnerDogBreed" />
 
             <Button
                 android:id="@+id/btnSave"
@@ -249,9 +247,10 @@
                 android:text="@string/new_profile_save_button"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                app:layout_constraintEnd_toEndOf="@id/radioGroupSize"
-                app:layout_constraintStart_toStartOf="@id/radioGroupSize"
-                app:layout_constraintTop_toBottomOf="@id/checkBoxMixedBreed" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/spinnerMixedBreed" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
