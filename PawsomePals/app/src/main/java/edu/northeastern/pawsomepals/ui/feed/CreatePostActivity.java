@@ -31,8 +31,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.hasankucuk.socialtextview.SocialTextView;
-import com.hasankucuk.socialtextview.model.LinkedType;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

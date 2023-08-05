@@ -52,6 +52,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -72,13 +73,12 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private ImageView selectPhoto;
     private EditText recipeNameEditText;
     private EditText descriptionEditTextView;
-    private EditText ingredientsEditTextView;
+    private EditText ingredientsEditTextView,instructionsEditTextView;
     private String currentPhotoPath;
     private FirebaseFirestore db;
     private StorageReference storageRef;
     private Uri galleryImageUri, cameraImageUri;
     private TextView setServingSizeTextView, setPrepTextView, setCookTextView, valueTextView;
-    private String recipeDocId;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
     private boolean isQuantityPickerDialogVisible = false;
@@ -89,13 +89,14 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private int selectedPrepMinutes;
     private int selectedCookHours;
     private int selectedCookMinutes;
-    private Dialog progressDialog;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
     String loggedInUserId;
-    private Context context;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
+    private Dialog progressDialog;
+    private Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +128,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
         descriptionEditTextView = findViewById(R.id.descriptionEditTextView);
         ingredientsEditTextView = findViewById(R.id.ingredientsEditTextView);
+        instructionsEditTextView = findViewById(R.id.instructionsEditTextView);
         setServingSizeTextView = findViewById(R.id.setServingSizeTextView);
         setPrepTextView = findViewById(R.id.setPrepTextView);
         setCookTextView = findViewById(R.id.setCookTextView);
@@ -196,6 +198,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
                 showTimePickerDialog("Cook Time", "How long does it take to cook this recipe?", setCookTextView);
             }
         });
+
+
+
 
 
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -317,6 +322,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeTitle = recipeNameEditText.getText().toString();
         String recipeDescription = descriptionEditTextView.getText().toString();
         String recipeIngredients = ingredientsEditTextView.getText().toString();
+        String recipeInstructions = instructionsEditTextView.getText().toString();
         String recipeServing = setServingSizeTextView.getText().toString();
         String recipePrepTime = setPrepTextView.getText().toString();
         String recipeCookTime = setCookTextView.getText().toString();
@@ -327,11 +333,13 @@ public class CreateRecipeActivity extends AppCompatActivity {
         recipeCollection.put("title", recipeTitle);
         recipeCollection.put("desc", recipeDescription);
         recipeCollection.put("ingredients", recipeIngredients);
+        recipeCollection.put("instructions", recipeInstructions);
         recipeCollection.put("serving", recipeServing);
         recipeCollection.put("prepTime", recipePrepTime);
         recipeCollection.put("cookTime", recipeCookTime);
         recipeCollection.put("createdAt", createdAt);
         recipeCollection.put("img", imageUrlFromFirebaseStorage);
+        recipeCollection.put("recipeId", UUID.randomUUID().toString());
 
         FirebaseUtil.createCollectionInFirestore(recipeCollection,"recipes" ,new BaseDataCallback() {
             @Override

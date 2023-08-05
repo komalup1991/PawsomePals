@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.models;
 
-public class Recipe {
+import java.io.Serializable;
+
+public class Recipe implements Serializable {
     private String recipeId;
     private String title;
     private String img;
@@ -14,21 +16,12 @@ public class Recipe {
     private String userProfileImage;
     private String createdAt;
 
+
+
+    private String instructions;
+
     public Recipe() {
     }
-
-    public Recipe(String recipeId, String title, String img, String desc, String createdBy, String ingredients, String serving, String prepTime, String cookTime) {
-        this.recipeId = recipeId;
-        this.title = title;
-        this.img = img;
-        this.desc = desc;
-        this.createdBy = createdBy;
-        this.ingredients = ingredients;
-        this.serving = serving;
-        this.prepTime = prepTime;
-        this.cookTime = cookTime;
-    }
-
     public String getRecipeId() {
         return recipeId;
     }
@@ -123,6 +116,13 @@ public class Recipe {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package edu.northeastern.pawsomepals.utils;
 
+import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class BaseDataCallback implements FirebaseUtil.DataCallback {
@@ -20,6 +21,11 @@ public class BaseDataCallback implements FirebaseUtil.DataCallback {
 
     @Override
     public void onDismiss() {
+
+    }
+
+    @Override
+    public void onRecipeReceived(Recipe recipe) {
 
     }
 }

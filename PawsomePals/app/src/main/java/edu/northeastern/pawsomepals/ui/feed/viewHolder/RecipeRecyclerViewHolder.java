@@ -16,6 +16,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +32,22 @@ import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
-public class RecipeRecyclerViewHolder extends RecyclerView.ViewHolder {
+public class RecipeRecyclerViewHolder extends RecyclerView.ViewHolder   {
     private final RecyclerView recipeRecyclerView;
     private final RecipeAdapter recipeAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
     private Context context;
 
     private OnItemActionListener onItemActionListener = new OnItemActionListener() {
+
         @Override
         public void onRecipeClick(Recipe recipe) {
-                Intent intent = new Intent(itemView.getContext(), RecipeDetailActivity.class);
-                intent.putExtra("recipeId", recipe.getRecipeId());
-                itemView.getContext().startActivity(intent);
+            Intent intent = new Intent(itemView.getContext(), RecipeDetailActivity.class);
+            //   intent.putExtra("user", (CharSequence) user);
+            intent.putExtra("recipe",recipe);
+            //    intent.putExtra("user", (Serializable) user);
+            itemView.getContext().startActivity(intent);
+
         }
 
         @Override

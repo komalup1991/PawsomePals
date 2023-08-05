@@ -57,27 +57,27 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
         holder.recipeImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onRecipeClick(recipes.get(position));
+                onItemActionListener.onRecipeClick(recipes.get(holder.getBindingAdapterPosition()));
             }
         });
 
         holder.recipeName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onRecipeClick(recipes.get(position));
+                onItemActionListener.onRecipeClick(recipes.get(holder.getBindingAdapterPosition()));
             }
         });
 
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onUserClick(recipes.get(position));
+                onItemActionListener.onUserClick(recipes.get(holder.getBindingAdapterPosition()));
             }
         });
         holder.userProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onUserClick(recipes.get(position));
+                onItemActionListener.onUserClick(recipes.get(holder.getBindingAdapterPosition()));
             }
         });
 

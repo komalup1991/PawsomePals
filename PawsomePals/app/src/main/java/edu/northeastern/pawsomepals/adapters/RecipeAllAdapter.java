@@ -77,13 +77,13 @@ public class RecipeAllAdapter extends RecyclerView.Adapter<RecipeAllAdapter.Reci
         holder.username.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onUserClick(recipes.get(position));
+                onItemActionListener.onUserClick(recipes.get(holder.getAbsoluteAdapterPosition()));
             }
         });
         holder.userProfilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemActionListener.onUserClick(recipes.get(position));
+                onItemActionListener.onUserClick(recipes.get(holder.getAbsoluteAdapterPosition()));
             }
         });
 
