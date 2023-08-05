@@ -159,6 +159,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), NewDogProfileActivity.class);
+                intent.putExtra("redirectTo", "Profile");
                 getContext().startActivity(intent);
             }
         });
