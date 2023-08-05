@@ -2,7 +2,7 @@ package edu.northeastern.pawsomepals.models;
 
 import java.io.Serializable;
 
-public class Recipe implements Serializable {
+public class Recipe extends FeedItem implements Serializable {
     private String recipeId;
     private String title;
     private String img;
@@ -56,6 +56,11 @@ public class Recipe implements Serializable {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    @Override
+    public int getType() {
+        return FeedItem.TYPE_RECIPE;
     }
 
     public void setCreatedBy(String createdBy) {

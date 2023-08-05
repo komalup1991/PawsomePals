@@ -91,9 +91,6 @@ public class CommentActivity extends AppCompatActivity {
         feedItemId = getIntent().getStringExtra("feedItemId");
         postType = getIntent().getStringExtra("postType");
 
-        Log.d("yoo", "comment" + postType);
-        Log.d("yoo", "comment " + feedItemId);
-
         createdBy = intent.getStringExtra("createdBy");
 
 
@@ -139,11 +136,7 @@ public class CommentActivity extends AppCompatActivity {
                     List<Comment> commentList = new ArrayList<>();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         Comment comment = document.toObject(Comment.class);
-                        try {
-                            comment.setCreatedAt(TimeUtil.formatTime(comment.getCreatedAt()));
-                        } catch (ParseException e) {
-                            throw new RuntimeException(e);
-                        }
+                        comment.setCreatedAt(TimeUtil.formatTime(comment.getCreatedAt()));
                         commentList.add(comment);
                     }
                     commentAdapter.setComments(commentList);
@@ -176,7 +169,6 @@ public class CommentActivity extends AppCompatActivity {
 
             }
         });
-        Log.d("yoo", "comment" + postType + IdField + feedItemId);
         FirebaseUtil.updateFeedWithCommentCount(postType, feedItemId);
 
 

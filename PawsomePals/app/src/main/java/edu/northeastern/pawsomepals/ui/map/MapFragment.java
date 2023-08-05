@@ -94,7 +94,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
 //            selectedFeedItem = null;
         }
-        Log.d("yoo", "onMapReady = " + googleMap.toString());
     }
 
     private void loadMarkersOnMap() {
@@ -215,7 +214,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                     @Override
                     public void onSuccess(Location location) {
                         if (location != null) {
-                            Log.d("yoo", "location success = " + location.toString());
                             moveMapToCurrentLocation(location.getLatitude(), location.getLongitude(), 9);
                         }
                     }

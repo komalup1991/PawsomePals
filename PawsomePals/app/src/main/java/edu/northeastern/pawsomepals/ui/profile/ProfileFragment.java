@@ -542,7 +542,6 @@ public class ProfileFragment extends Fragment {
 
                         }
                     } else {
-                        Log.e("yoo", "Error getting user's info.", task.getException());
                     }
                 });
     }

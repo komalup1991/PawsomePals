@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +33,8 @@ import edu.northeastern.pawsomepals.utils.TimeUtil;
 import edu.northeastern.pawsomepals.adapters.RecipeAllAdapter;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
 
-public class FeedRecipeFragment extends Fragment {
+public class FeedRecipeFragment extends Fragment implements Serializable {
     private RecyclerView recipeAllRecyclerView;
     private RecipeAllAdapter recipeAllAdapter;
     private OnItemActionListener onItemActionListener;
@@ -51,7 +51,7 @@ public class FeedRecipeFragment extends Fragment {
         recipeAllRecyclerView = view.findViewById(R.id.recipeAllRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         recipeAllRecyclerView.setLayoutManager(layoutManager);
-        recipeAllAdapter = new RecipeAllAdapter(new ArrayList<>(), new ArrayList<Users>(), onItemActionListener);
+        recipeAllAdapter = new RecipeAllAdapter(getActivity(), new ArrayList<>(), new ArrayList<Users>(), onItemActionListener);
         recipeAllRecyclerView.setAdapter(recipeAllAdapter);
         fetchRecipesFromFirestore();
     }
@@ -66,12 +66,6 @@ public class FeedRecipeFragment extends Fragment {
             List<Recipe> recipeList = new ArrayList<>();
             for (QueryDocumentSnapshot document : querySnapshot) {
                 Recipe recipe = document.toObject(Recipe.class);
-                try {
-                    recipe.setCreatedAt(TimeUtil.formatTime(recipe.getCreatedAt()));
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
-                }
-                recipe.setRecipeId(document.getId());
                 String userId = recipe.getCreatedBy();
                 fetchUserNameFromFirestore(userId, recipe, recipeList);
                 recipeList.add(recipe);
@@ -105,8 +99,9 @@ public class FeedRecipeFragment extends Fragment {
             @Override
             public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
-                intent.putExtra("recipeId", recipe.getRecipeId());
+                intent.putExtra("recipe", recipe);
                 startActivity(intent);
+
             }
 
             @Override

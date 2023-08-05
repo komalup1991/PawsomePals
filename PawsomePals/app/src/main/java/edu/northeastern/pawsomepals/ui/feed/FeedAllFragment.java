@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -42,11 +43,14 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
     private RecyclerView feedsRecyclerView;
     private final List<FeedItem> feedItemList = new ArrayList<>();
     private FeedAdapter feedAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_feed_all, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_feed_all, container, false);
+        swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
+        return rootView;
     }
 
     @Override
@@ -56,6 +60,12 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
         feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         feedsRecyclerView.setLayoutManager(verticalLayoutManager);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshFeeds();
+            }
+        });
 
         feedAdapter = new FeedAdapter(feedItemList, requireContext(), new FeedAdapter.LocationClickListener() {
             @Override
@@ -70,6 +80,13 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
         feedsRecyclerView.setAdapter(feedAdapter);
 
         fetchFeeds();
+    }
+
+    private void refreshFeeds() {
+        feedItemList.clear();
+        feedAdapter.notifyDataSetChanged();
+        fetchFeeds();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void fetchFeeds() {
@@ -110,7 +127,6 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     Services s = doc.toObject(Services.class);
-                    Log.d("yoo", "s item id " + s.getFeedItemId());
                     updateFeedItemList(s);
                 }
             }
@@ -123,7 +139,6 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
                 for (DocumentSnapshot doc : value.getDocuments()) {
                     PhotoVideo pv = doc.toObject(PhotoVideo.class);
-                    Log.d("yoo", "pv item id " + pv.getFeedItemId());
                     updateFeedItemList(pv);
                 }
             }

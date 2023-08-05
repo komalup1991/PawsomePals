@@ -11,10 +11,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -66,7 +70,7 @@ public class FirestoreDataLoader {
                 }
 
                 if (listener != null) {
-                    listener.onDataLoaded(process(querySnapshots, list,likeList));
+                    listener.onDataLoaded(process(querySnapshots, list, likeList));
                 }
             }
         }).start();
@@ -95,14 +99,9 @@ public class FirestoreDataLoader {
         return likeFeedIds;
     }
 
-    private List<FeedItem> process(List<QuerySnapshot> querySnapshots, Set<String> favoriteFeedIds,Set<String> likeFeedIds) {
+    private List<FeedItem> process(List<QuerySnapshot> querySnapshots, Set<String> favoriteFeedIds, Set<String> likeFeedIds) {
         List<FeedItem> feedItemList = new ArrayList<>();
         feedItemList.add(new FeedItem() {
-            @Override
-            public int compareTo(FeedItem feedItem) {
-                return 0;
-            }
-
             @Override
             public int getType() {
                 return FeedItem.TYPE_RECIPE_HEADER;
@@ -127,18 +126,26 @@ public class FirestoreDataLoader {
                     if (likeFeedIds.contains(feedItem.getFeedItemId())) {
                         feedItem.setLiked(true);
                     }
-                    try {
-                        feedItem.setCreatedAt(TimeUtil.formatTime(feedItem.getCreatedAt()));
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
+//                    try {
+//                        feedItem.setDisplayTime(TimeUtil.formatTime(feedItem.getCreatedAt()));
+//                    } catch (ParseException e) {
+//                        throw new RuntimeException(e);
+//                    }
                     feedItemList.add(feedItem);
                 }
             }
         }
 
 
-        Collections.sort(feedItemList);
+        Collections.sort(feedItemList, new Comparator<FeedItem>() {
+            @Override
+            public int compare(FeedItem feedItem, FeedItem feedItem2) {
+                if (feedItem.getType() == FeedItem.TYPE_RECIPE_HEADER || feedItem2.getType() == FeedItem.TYPE_RECIPE_HEADER) {
+                    return 1;
+                }
+                return convertStringToDate(feedItem2.getCreatedAt()).compareTo(convertStringToDate(feedItem.getCreatedAt()));
+            }
+        });
         return feedItemList;
     }
 
@@ -163,6 +170,15 @@ public class FirestoreDataLoader {
             throw new RuntimeException(e);
         }
         return favoriteFeedIds;
+    }
+
+    private Date convertStringToDate(String createdAt) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        try {
+            return sdf.parse(createdAt);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public interface FirestoreDataListener {
