@@ -8,42 +8,25 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.DogProfileAdapter;
-import edu.northeastern.pawsomepals.adapters.FeedAdapter;
+import edu.northeastern.pawsomepals.adapters.ProfileDogAdapter;
 import edu.northeastern.pawsomepals.models.Dogs;
-import edu.northeastern.pawsomepals.models.Event;
-import edu.northeastern.pawsomepals.models.FeedItem;
-import edu.northeastern.pawsomepals.models.PhotoVideo;
-import edu.northeastern.pawsomepals.models.Post;
-import edu.northeastern.pawsomepals.models.Recipe;
-import edu.northeastern.pawsomepals.models.Services;
-import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
-import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class DogsFragment extends Fragment {
     private RecyclerView recyclerViewDogs;
-    private DogProfileAdapter dogProfileAdapter;
+    private ProfileDogAdapter dogProfileAdapter;
     private final List<Dogs> dogProfiles = new ArrayList<>();
     private TextView textNoDogProfiles;
     public DogsFragment() {
@@ -63,14 +46,14 @@ public class DogsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_dogs, container, false);
+        return inflater.inflate(R.layout.fragment_profile_tabs, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        recyclerViewDogs = view.findViewById(R.id.recyclerViewDogs);
+        recyclerViewDogs = view.findViewById(R.id.recyclerView);
         textNoDogProfiles = view.findViewById(R.id.textViewEmptyList);
 
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
@@ -80,7 +63,7 @@ public class DogsFragment extends Fragment {
         if (args != null) {
             boolean isUserProfile = args.getBoolean("is_user_profile");
             String userId = args.getString("profile_id");
-            dogProfileAdapter = new DogProfileAdapter(dogProfiles, requireContext(), isUserProfile);
+            dogProfileAdapter = new ProfileDogAdapter(dogProfiles, requireContext(), isUserProfile);
 
             recyclerViewDogs.setAdapter(dogProfileAdapter);
 
@@ -92,11 +75,13 @@ public class DogsFragment extends Fragment {
                 textNoDogProfiles.setVisibility(View.GONE);
             } else {
                 recyclerViewDogs.setVisibility(View.GONE);
+                textNoDogProfiles.setText("No dog profiles available");
                 textNoDogProfiles.setVisibility(View.VISIBLE);
             }
         } else {
             // Handle the case when the arguments are null or not available
             recyclerViewDogs.setVisibility(View.GONE);
+            textNoDogProfiles.setText("No dog profiles available");
             textNoDogProfiles.setVisibility(View.VISIBLE);
         }
 
@@ -116,6 +101,7 @@ public class DogsFragment extends Fragment {
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         Dogs dogProfile = document.toObject(Dogs.class);
                         dogProfile.setDogId(document.getId());
+                        dogProfile.setIsDeleted(false);
                         dogUserProfiles.add(dogProfile);
 
                     }
@@ -125,6 +111,7 @@ public class DogsFragment extends Fragment {
                         textNoDogProfiles.setVisibility(View.GONE);
                     } else {
                         recyclerViewDogs.setVisibility(View.GONE);
+                        textNoDogProfiles.setText("No dog profiles available");
                         textNoDogProfiles.setVisibility(View.VISIBLE);
                     }
                     dogProfileAdapter.notifyDataSetChanged();

@@ -2,7 +2,6 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,30 +15,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.ui.profile.DogProfileActivity;
 import edu.northeastern.pawsomepals.ui.profile.EditDogUserActivity;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 
-public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.DogProfileViewHolder> {
+public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.DogProfileViewHolder> {
     private List<Dogs> dogProfiles;
     private Context context;
     private FirebaseFirestore firebaseFirestore;
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_DOG_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
-    public DogProfileAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile) {
+    public ProfileDogAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile) {
         this.dogProfiles = dogProfiles;
         this.context = context;
         this.isUserProfile = isUserProfile;
@@ -53,7 +46,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
     @NonNull
     @Override
     public DogProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.dogs_items_row, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.profile_dogs_items_row, parent, false);
         return new DogProfileViewHolder(view);
     }
     private void deleteDogProfileFromFirebase(int position) {
@@ -67,8 +60,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
                     // Dog profile deleted successfully
                     Toast.makeText(context, "Dog profile deleted successfully.", Toast.LENGTH_SHORT).show();
                     // You can also remove the dog profile from the local list to update the RecyclerView
-                    dogProfiles.remove(position);
-                    notifyItemRemoved(position);
+
                 })
                 .addOnFailureListener(e -> {
                     // Failed to delete dog profile
@@ -100,6 +92,8 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
                         public void onClick(View view) {
 
                             deleteDogProfileFromFirebase(position);
+                            dogProfiles.remove(position);
+                            notifyItemRemoved(position);
                         }
                     });
                 }
