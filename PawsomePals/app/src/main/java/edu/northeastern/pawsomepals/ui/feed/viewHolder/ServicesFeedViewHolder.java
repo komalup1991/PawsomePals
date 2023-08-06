@@ -79,5 +79,19 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder {
         serviceTypeTextView.setText(services.getServiceType());
         serviceNameTextView.setText(services.getServiceName());
         serviceDetailTextView.setText(services.getServiceNotes());
+
+        userProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(services.getCreatedBy());
+            }
+        });
+
+        usernameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(services.getCreatedBy());
+            }
+        });
     }
 }

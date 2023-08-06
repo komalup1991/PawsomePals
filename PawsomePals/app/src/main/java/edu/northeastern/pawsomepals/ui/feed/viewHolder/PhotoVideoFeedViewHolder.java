@@ -76,5 +76,19 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         Glide.with(photoVideoImageView.getContext())
                 .load(photoVideo.getImg())
                 .into(photoVideoImageView);
+
+        userProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(photoVideo.getCreatedBy());
+            }
+        });
+
+        usernameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(photoVideo.getCreatedBy());
+            }
+        });
     }
 }

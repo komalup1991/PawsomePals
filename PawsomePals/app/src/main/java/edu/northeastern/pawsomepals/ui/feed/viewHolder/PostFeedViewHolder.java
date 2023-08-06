@@ -44,7 +44,7 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindData(Activity activity, Post post, OnItemActionListener onLocationClickListener) {
+    public void bindData(Activity activity, Post post, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, post);
         Glide.with(userProfilePic.getContext())
                 .load(post.getUserProfileImage())
@@ -68,12 +68,26 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onLocationClickListener.onLocationClick(post);
+                    onItemActionListener.onLocationClick(post);
                 }
             });
         } else {
             locationTaggedTextView.setVisibility(View.GONE);
             locationTaggedImageView.setVisibility(View.GONE);
         }
+
+        userProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(post.getCreatedBy());
+            }
+        });
+
+        usernameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(post.getCreatedBy());
+            }
+        });
     }
 }

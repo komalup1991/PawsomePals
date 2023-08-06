@@ -51,7 +51,6 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
             recipeList.clear();
             for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                 Recipe recipe = document.toObject(Recipe.class);
-//                recipe.setRecipeId(document.getId());
                 String userId = recipe.getCreatedBy();
                 getUsernameByUserId(userId, recipe, recipeList);
                 recipeList.add(recipe);

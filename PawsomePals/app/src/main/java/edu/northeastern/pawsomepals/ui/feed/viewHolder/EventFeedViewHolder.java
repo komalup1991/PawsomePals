@@ -115,5 +115,19 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         } else {
             eventImage.setVisibility(View.GONE);
         }
+
+        userProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(event.getCreatedBy());
+            }
+        });
+
+        usernameTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemActionListener.onUserClick(event.getCreatedBy());
+            }
+        });
     }
 }
