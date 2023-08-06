@@ -1,10 +1,5 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,12 +11,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +66,6 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Comments");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -91,11 +89,7 @@ public class CommentActivity extends AppCompatActivity {
         feedItemId = getIntent().getStringExtra("feedItemId");
         postType = getIntent().getStringExtra("postType");
 
-        Log.d("yoo", "comment" + postType);
-        Log.d("yoo", "comment " + feedItemId);
-
         createdBy = intent.getStringExtra("createdBy");
-
 
         commentRecyclerView = findViewById(R.id.recycler_view);
         commentRecyclerView.setHasFixedSize(true);
@@ -139,11 +133,7 @@ public class CommentActivity extends AppCompatActivity {
                     List<Comment> commentList = new ArrayList<>();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         Comment comment = document.toObject(Comment.class);
-                        try {
-                            comment.setCreatedAt(TimeUtil.formatTime(comment.getCreatedAt()));
-                        } catch (ParseException e) {
-                            throw new RuntimeException(e);
-                        }
+                        comment.setCreatedAt(TimeUtil.formatTime(comment.getCreatedAt()));
                         commentList.add(comment);
                     }
                     commentAdapter.setComments(commentList);
@@ -176,7 +166,6 @@ public class CommentActivity extends AppCompatActivity {
 
             }
         });
-        Log.d("yoo", "comment" + postType + IdField + feedItemId);
         FirebaseUtil.updateFeedWithCommentCount(postType, feedItemId);
 
 

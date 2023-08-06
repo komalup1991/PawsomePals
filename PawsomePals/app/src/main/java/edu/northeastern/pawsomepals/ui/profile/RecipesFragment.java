@@ -100,7 +100,6 @@ public class RecipesFragment extends Fragment {
                     List<Recipe> userRecipes = new ArrayList<>();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         Recipe userRecipe = document.toObject(Recipe.class);
-                        userRecipe.setRecipeId(document.getId());
                         userRecipes.add(userRecipe);
                     }
                     profileRecipeAdapter.setRecipes(userRecipes);

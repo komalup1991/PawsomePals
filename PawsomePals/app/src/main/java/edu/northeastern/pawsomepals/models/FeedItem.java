@@ -1,12 +1,16 @@
 package edu.northeastern.pawsomepals.models;
 
-public abstract class FeedItem  implements Comparable<FeedItem> {
+import java.io.Serializable;
+
+public abstract class FeedItem implements Serializable {
 
     public static final int TYPE_RECIPE_HEADER = 0;
     public static final int TYPE_PHOTO_VIDEO = 1;
     public static final int TYPE_SERVICE = 2;
     public static final int TYPE_EVENT = 3;
     public static final int TYPE_POST = 4;
+
+    public static final int TYPE_RECIPE = 5;
 
     private String username;
     private String userProfileImage;
@@ -15,16 +19,20 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
     private String locationTagged;
     private String createdBy;
     private String feedItemId;
-    private Long commentCount;
-    private Long likeCount;
+    private long commentCount;
+    private long likeCount;
 
     private boolean isFavorite;
     private boolean isLiked;
 
+    private LatLng latLng;
+
+    private String displayTime;
+
     public FeedItem() {
     }
 
-    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, Long commentCount, Long likeCount) {
+    public FeedItem(String username, String userProfileImage, String createdAt, String userTagged, String locationTagged, String createdBy, long commentCount, Long likeCount) {
         this.username = username;
         this.userProfileImage = userProfileImage;
         this.createdAt = createdAt;
@@ -39,16 +47,20 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         return userProfileImage;
     }
 
+    public void setUserProfileImage(String userProfileImage) {
+        this.userProfileImage = userProfileImage;
+    }
+
     public String getCreatedAt() {
         return createdAt;
     }
 
-    public String getUserTagged() {
-        return userTagged;
-    }
-
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getUserTagged() {
+        return userTagged;
     }
 
     public String getLocationTagged() {
@@ -69,10 +81,6 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         this.username = username;
     }
 
-    public void setUserProfileImage(String userProfileImage) {
-        this.userProfileImage = userProfileImage;
-    }
-
     public String getFeedItemId() {
         return feedItemId;
     }
@@ -81,7 +89,7 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         this.feedItemId = feedItemId;
     }
 
-    public Long getCommentCount() {
+    public long getCommentCount() {
         return commentCount;
     }
 
@@ -89,28 +97,12 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
         this.commentCount = commentCount;
     }
 
-    public Long getLikeCount() {
+    public long getLikeCount() {
         return likeCount;
     }
 
     public void setLikeCount(Long likeCount) {
         this.likeCount = likeCount;
-    }
-
-    @Override
-    public int compareTo(FeedItem feedItem) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-//
-//        try {
-//            Date thisDate = sdf.parse(this.getCreatedAt());
-//            Date otherDate = sdf.parse(feedItem.getCreatedAt());
-//
-//            // Compare the dates and return the result
-//            return thisDate.compareTo(otherDate);
-//        } catch (ParseException e) {
-//            throw new RuntimeException(e);
-//        }
-        return 0;
     }
 
     public boolean isLiked() {
@@ -128,16 +120,20 @@ public abstract class FeedItem  implements Comparable<FeedItem> {
     public void setFavorite(boolean favorite) {
         isFavorite = favorite;
     }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
+    }
+
+    public String getDisplayTime() {
+        return displayTime;
+    }
+
+    public void setDisplayTime(String displayTime) {
+        this.displayTime = displayTime;
+    }
 }
-
-
-//    private Date convertStringToDate(String createdAt) {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-//        try {
-//            return sdf.parse(createdAt);
-//        } catch (ParseException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
-

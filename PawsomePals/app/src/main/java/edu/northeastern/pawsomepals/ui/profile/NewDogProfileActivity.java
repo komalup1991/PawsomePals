@@ -464,7 +464,6 @@ public class NewDogProfileActivity extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 progressBar.setVisibility(View.GONE);
-                Log.e("yoo", "Error uploading profile picture", e);
                 Toast.makeText(NewDogProfileActivity.this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });

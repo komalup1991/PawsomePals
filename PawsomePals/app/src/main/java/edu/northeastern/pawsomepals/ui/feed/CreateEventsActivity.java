@@ -1,11 +1,5 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -14,31 +8,30 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -52,6 +45,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -65,20 +59,20 @@ public class CreateEventsActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
     private String eventsDocId;
-    private TextView userNameTextView, tagPeopleTextView, addLocationTextView, taggedUserDisplayTextView;
+    private TextView userNameTextView, tagPeopleTextView, taggedUserDisplayTextView;
     private EditText eventNameEditText, eventDetailsEditText;
     private Dialog progressDialog;
     private FirebaseFirestore db;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
     private FirebaseStorage storage;
-    private StorageReference storageRef;
     private String loggedInUserId;
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
-    private AutoCompleteTextView searchLocationDisplayTextView;
     private ImageView selectPhoto, eventImageView;
     private Uri galleryImageUri, cameraImageUri;
+
+    private TaggingOptionsLayout taggingOptionsLayout;
 
     int selectedHour = 0;
     int selectedMinute = 0;
@@ -86,11 +80,14 @@ public class CreateEventsActivity extends AppCompatActivity {
     private String userProfileUrlToSaveInFeed;
 
     private Context context;
-    private boolean isDeleteConfirmationDialogVisible;
+    private LatLng currentLatLng;
+    private String locationTagged;
+    private String usersTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getBaseContext();
         setContentView(R.layout.activity_create_events);
         setEventDateTextView = findViewById(R.id.setEventDateTextView);
         allUsers = new HashMap<>();
@@ -100,12 +97,22 @@ public class CreateEventsActivity extends AppCompatActivity {
         userNameTextView = findViewById(R.id.userNameTextView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDetailsEditText = findViewById(R.id.eventDetailsEditText);
-        tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
-        taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
-        addLocationTextView = findViewById(R.id.addLocationTextView);
-        searchLocationDisplayTextView = findViewById(R.id.searchLocationDisplayTextView);
         eventImageView = findViewById(R.id.photoVideoImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
+        taggingOptionsLayout = findViewById(R.id.tag_location_layout);
+        taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
+            @Override
+            public void onLocation(LatLng latLng, String locationTagged) {
+                currentLatLng = latLng;
+                CreateEventsActivity.this.locationTagged = locationTagged;
+            }
+
+            @Override
+            public void onTaggedUsersGet(String usersTagged) {
+                CreateEventsActivity.this.usersTagged = usersTagged;
+
+            }
+        });
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
         ImageView editImageView = findViewById(R.id.editImageView);
 
@@ -115,7 +122,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
         currentUser = auth.getCurrentUser();
         loggedInUserId = currentUser.getUid();
 
@@ -143,8 +149,8 @@ public class CreateEventsActivity extends AppCompatActivity {
         FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-                userNameToSaveInFeed=user.getName();
-                userProfileUrlToSaveInFeed=user.getProfileImage();
+                userNameToSaveInFeed = user.getName();
+                userProfileUrlToSaveInFeed = user.getProfileImage();
 
                 Glide.with(CreateEventsActivity.this)
                         .load(user.getProfileImage())
@@ -174,38 +180,6 @@ public class CreateEventsActivity extends AppCompatActivity {
             }
         });
 
-        tagPeopleTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserSelectionDialog();
-            }
-        });
-
-        taggedUserDisplayTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserSelectionDialog();
-            }
-        });
-
-        fetchAllUsersFromFirestore();
-
-        List<String> locationSuggestions = new ArrayList<>();
-        locationSuggestions.add("New York, USA");
-        locationSuggestions.add("Los Angeles, USA");
-        locationSuggestions.add("London, UK");
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, locationSuggestions);
-        searchLocationDisplayTextView.setAdapter(adapter);
-
-
-        addLocationTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchLocationDisplayTextView.setVisibility(View.VISIBLE);
-            }
-        });
-
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,6 +192,11 @@ public class CreateEventsActivity extends AppCompatActivity {
                 if (eventDetailsEditText.getText().toString().isEmpty()) {
                     eventDetailsEditText.setError("This field is required");
                     Toast.makeText(CreateEventsActivity.this, "Event Detail is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (cameraImageUri==null && galleryImageUri==null ) {
+                    eventDetailsEditText.setError("This field is required");
+                    Toast.makeText(CreateEventsActivity.this, "Event Image is mandatory.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -248,10 +227,9 @@ public class CreateEventsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 DialogHelper.showCancelConfirmationDialog(context, CreateEventsActivity.this);
-           //     finish();
+                //     finish();
             }
         });
-
     }
 
     private void showTimePicker() {
@@ -385,10 +363,8 @@ public class CreateEventsActivity extends AppCompatActivity {
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                 isDeleteConfirmationDialogVisible = false;
             }
         });
-         isDeleteConfirmationDialogVisible = true;
         dialog.show();
     }
 
@@ -407,8 +383,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         String eventDetails = eventDetailsEditText.getText().toString();
         String eventDate = setEventDateTextView.getText().toString();
         String eventTime = setEventTimeTextView.getText().toString();
-        String userTagged = taggedUserDisplayTextView.getText().toString();
-        String locationTagged = searchLocationDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
         Map<String, Object> events = new HashMap<>();
         events.put("createdBy", loggedInUserId);
@@ -416,8 +390,9 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("eventTime", eventTime);
         events.put("eventDate", eventDate);
         events.put("eventDetails", eventDetails);
-        events.put("userTagged", userTagged);
+        events.put("userTagged", usersTagged);
         events.put("locationTagged", locationTagged);
+        events.put("latLng", currentLatLng);
         events.put("createdAt", createdAt);
         events.put("username", userNameToSaveInFeed);
         events.put("userProfileImage", userProfileUrlToSaveInFeed);
@@ -425,89 +400,13 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("feedItemId", UUID.randomUUID().toString());
         events.put("img", imageUrlFromFirebaseStorage);
 
-        FirebaseUtil.createCollectionInFirestore(events,"events" ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(events, "events", new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
                 finish();
             }
         });
-    }
-
-    private void fetchAllUsersFromFirestore() {
-        db.collection("user")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        allUsers.clear();
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            Users user = document.toObject(Users.class);
-                            if (!user.getUserId().equals(loggedInUserId)) {
-                                allUsers.putIfAbsent(user.getUserId(), user);
-                            }
-                        }
-                    }
-                });
-    }
-
-
-    private void showUserSelectionDialog() {
-        List<String> userNames = new ArrayList<>();
-        List<String> userIds = new ArrayList<>();
-        boolean[] checkedItems = new boolean[allUsers.size()];
-
-        int i = 0;
-        for (Map.Entry<String, Users> entry : allUsers.entrySet()) {
-            Users user = entry.getValue();
-            if (user.getName() != null) {
-                userNames.add(user.getName());
-                userIds.add(user.getUserId());
-            }
-            checkedItems[i++] = selectedUsers.contains(user);
-        }
-
-        String[] userNamesArray = userNames.toArray(new String[userNames.size()]);
-        String[] userIdsArray = userIds.toArray(new String[userNames.size()]);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle("Select Users")
-                .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
-                    Users user = allUsers.get(userIdsArray[which]);
-                    Log.d("yoo", " " + user.getName());
-                    if (isChecked) {
-                        selectedUsers.add(user);
-                    } else {
-                        selectedUsers.remove(user);
-                    }
-                })
-                .setPositiveButton("OK", (dialog, which) -> {
-                    updateSelectedUsersTextView();
-
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private void updateSelectedUsersTextView() {
-        List<String> selectedNames = new ArrayList<>();
-        for (Users user : selectedUsers) {
-            Log.d("yoo", " " + user.getName());
-            selectedNames.add(user.getName());
-        }
-
-        StringBuilder commaSeparatedNames = new StringBuilder();
-        for (int i = 0; i < selectedNames.size(); i++) {
-
-            commaSeparatedNames.append(selectedNames.get(i));
-            if (i < selectedNames.size() - 1) {
-                commaSeparatedNames.append(", ");
-            }
-        }
-
-        taggedUserDisplayTextView.setVisibility(View.VISIBLE);
-        taggedUserDisplayTextView.setText(commaSeparatedNames.toString());
-
     }
 
 

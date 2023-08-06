@@ -5,12 +5,18 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class TimeUtil {
-    public static String formatTime(String timeCreated) throws ParseException {
+public class
+TimeUtil {
+    public static String formatTime(String timeCreated) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         String timeAgoText = null;
 
-        Date firebaseTimestamp = dateFormat.parse(timeCreated);
+        Date firebaseTimestamp = null;
+        try {
+            firebaseTimestamp = dateFormat.parse(timeCreated);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         long currentTimeMillis = System.currentTimeMillis();
         long firebaseTimeMillis = firebaseTimestamp.getTime();
         long timeDifferenceMillis = currentTimeMillis - firebaseTimeMillis;

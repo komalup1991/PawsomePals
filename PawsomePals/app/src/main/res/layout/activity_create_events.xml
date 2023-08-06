@@ -15,6 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -60,6 +61,7 @@
                 android:src="@drawable/dog_paw"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/cl" />
+
             <TextView
                 android:id="@+id/userNameTextView"
                 android:layout_width="0dp"
@@ -79,7 +81,6 @@
 
             <EditText
                 android:id="@+id/eventNameEditText"
-                android:required="true"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
@@ -90,6 +91,7 @@
                 android:ems="10"
                 android:hint="@string/give_your_event_a_name"
                 android:inputType="text"
+                android:required="true"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -101,6 +103,7 @@
                 android:layout_width="0dp"
                 android:layout_height="200dp"
                 android:layout_margin="8dp"
+                android:required="true"
                 android:background="@drawable/border"
                 android:contentDescription="@string/photoVideo"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -218,7 +221,6 @@
 
             <EditText
                 android:id="@+id/eventDetailsEditText"
-                android:required="true"
                 android:layout_width="0dp"
                 android:layout_height="100dp"
                 android:layout_margin="8dp"
@@ -229,6 +231,7 @@
                 android:ems="10"
                 android:hint="@string/about_the_event"
                 android:inputType="text"
+                android:required="true"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -237,75 +240,19 @@
 
 
 
-            <TextView
-                android:id="@+id/tagPeopleTextView"
-                android:layout_width="wrap_content"
+
+
+
+            <edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout
+                android:id="@+id/tag_location_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="@string/tag_people"
-                android:textAllCaps="true"
-                android:textColor="@color/darkPink"
-                android:textSize="14sp"
-                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.025"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/eventDetailsEditText" />
-
-            <TextView
-                android:id="@+id/taggedUserDisplayTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/border"
-                android:ems="10"
-                android:hint="@string/tagged_user"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.125"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tagPeopleTextView" />
-
-            <TextView
-                android:id="@+id/addLocationTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/add_location"
-                android:textAllCaps="true"
-                android:textColor="@color/darkPink"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.025"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/taggedUserDisplayTextView" />
-
-            <AutoCompleteTextView
-                android:id="@+id/searchLocationDisplayTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/border"
-                android:ems="10"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.125"
-                android:hint="Tag a location"
-                android:imeOptions="actionDone"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/addLocationTextView" />
-
-
-
-
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
