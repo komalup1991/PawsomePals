@@ -130,7 +130,8 @@ public class ProfileFragment extends Fragment {
             switch (position) {
                 case 0 -> tab.setText("Dogs");
                 case 1 -> tab.setText("Recipes");
-                case 2 -> tab.setText("Favourites");
+                case 2 -> tab.setText("Photos");
+                case 3 -> tab.setText("Favourites");
             }
         }).attach();
 
