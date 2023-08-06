@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,9 +29,11 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
     private GroupChatModel groupChatModel;
     private LinearLayout groupNameLayout, groupNoticeLayout;
     private List<Users> groupUsers;
+    private String membersNamesTxt;
     private ImageButton backBtn;
     private TextView groupName, groupNotice, membersNames;
     private EditText editTextField;
+    private String newGroupName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +45,8 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         groupChatModel = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
         groupName.setText(groupChatModel.getGroupName());
 
-        getGroupUsers();
-        membersNames.setText(groupChatModel.getGroupName());
+        membersNamesTxt = ChatFirebaseUtil.getGroupUsersNamesAsIntent(getIntent());
+        membersNames.setText(membersNamesTxt);
 //        membersNames.setText(createMembersDetails());
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,6 +58,9 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 createDialog();
+
+                Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                ChatFirebaseUtil.passGroupNameAsIntent(intent,newGroupName);
             }
         });
 
@@ -79,7 +85,15 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         groupNoticeLayout = findViewById(R.id.groupNoticeLayout);
     }
 
-    private void getGroupUsers() {
+    private String getUserNames(List<Users> users){
+        StringBuilder builder = new StringBuilder();
+        for(Users theUser:groupUsers){
+            builder.append(theUser.getName()+"  ");
+        }
+        return membersNamesTxt = builder.toString();
+    }
+
+    private List<Users> getGroupUsers() {
         List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(groupChatModel.getGroupMembers());
         for (DocumentReference reference : references) {
             reference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -91,6 +105,7 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
                 }
             });
         }
+        return groupUsers;
     }
 
     private void createDialog() {
@@ -102,8 +117,12 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        String editTextInput = editTextField.getText().toString();
-                        Log.d("onclick", "editext value is: " + editTextInput);
+                        Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+
+                        newGroupName = editTextField.getText().toString();
+                        groupName.setText(newGroupName);
+                        groupChatModel.setGroupName(newGroupName);
+                        ChatFirebaseUtil.passGroupNameAsIntent(intent,newGroupName);
                     }
                 })
                 .setNegativeButton("Cancel", null)

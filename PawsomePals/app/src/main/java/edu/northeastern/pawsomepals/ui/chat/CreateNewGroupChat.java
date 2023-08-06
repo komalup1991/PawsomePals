@@ -50,6 +50,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private Users currentUser;
     private Button createNewChat;
     private String groupName;
+    private EditText editTextField;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -120,10 +121,13 @@ public class CreateNewGroupChat extends AppCompatActivity {
         }
 
         if (userList.size() > 2 && userList.size() <= 5) {
-            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getApplicationContext().startActivity(intent);
+            createDialogAndCreateIntent();
+
+//            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+//            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList, groupName);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            getApplicationContext().startActivity(intent);
+
         } else if (userList.size() == 2) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(1));
@@ -133,37 +137,25 @@ public class CreateNewGroupChat extends AppCompatActivity {
             Toast.makeText(this, "Group members must be more than 1 and less than 5", Toast.LENGTH_SHORT).show();
         }
     }
-//
-//    private void createGroupDialog() {
-//        LayoutInflater li = LayoutInflater.from(this.getApplicationContext());
-//        View viewInflated = li.inflate(R.layout.chat_create_group_dialog, null);
-//
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this.getApplicationContext());
-//
-//        // set prompts.xml to alertdialog builder
-//        builder.setView(viewInflated);
-//        builder.setTitle("Create A Group");
-//
-//        // Set up the input
-//        final EditText input = (EditText) viewInflated.findViewById(R.id.input);
-//        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-//        builder.setView(viewInflated);
-//
-//        // Set up the buttons
-//        builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.dismiss();
-//                groupName = input.getText().toString();
-//            }
-//        });
-//        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        builder.show();
-//    }
+
+    private void createDialogAndCreateIntent() {
+        editTextField = new EditText(this.getApplicationContext());
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Create A Group Name")
+                .setView(editTextField)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        groupName = editTextField.getText().toString();
+                        Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                        ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList, groupName);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getApplicationContext().startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+    }
 }

@@ -60,7 +60,7 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                                     users.add(user);
                                 if (users.size() > 1) {
                                     boolean lastMessageSentByMe = model.getLastMessageSenderId().equals(ChatFirebaseUtil.currentUserId());
-                                    holder.userNameText.setText("Group Chat");
+                                    holder.userNameText.setText(model.getChatRoomName());
                                     holder.profilePic.setImageResource(R.drawable.group_chat_icon);
 
                                     if (lastMessageSentByMe)
@@ -73,14 +73,14 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                                     }
 
                                 }
-                                if (users.size() == references.size()) {
-                                    StringBuilder builder = new StringBuilder();
-                                    for (Users theUser : users) {
-                                        builder.append(theUser.getName());
-                                        builder.append(" ");
-                                    }
-                                    holder.userNameText.setText(builder.toString());
-                                }
+//                                if (users.size() == references.size()) {
+//                                    StringBuilder builder = new StringBuilder();
+//                                    for (Users theUser : users) {
+//                                        builder.append(theUser.getName());
+//                                        builder.append(" ");
+//                                    }
+//                                    holder.userNameText.setText(builder.toString());
+//                                }
                             }
                         }
                     });
@@ -90,7 +90,7 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                     public void onClick(View v) {
                         //navigate to chat activity;
                         Intent intent = new Intent(context, ChatRoomActivity.class);
-                        ChatFirebaseUtil.passGroupChatModelAsIntent(intent, users);
+                        ChatFirebaseUtil.passGroupChatModelAsIntent(intent, users,model.getChatRoomName());
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent);
                     }

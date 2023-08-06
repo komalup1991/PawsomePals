@@ -99,6 +99,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private RecyclerView chatRoomRecyclerView;
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
+    private List<String> groupUsersNames;
 
     private Users currentUser, otherUser;
     private String chatRoomId;
@@ -117,6 +118,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         initialView();
         otherGroupUsers = new ArrayList<>();
         groupUsers = new ArrayList<>();
+        groupUsersNames = new ArrayList<>();
         sendMessageBtn.setOnClickListener(view -> {
             String message = messageInput.getText().toString().trim();
             if (message.isEmpty() && img_preview == null) return;
@@ -132,7 +134,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         infoBtn.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
             //check
-            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers);
+            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers,chatRoomName.getText().toString());
+            StringBuilder builder = new StringBuilder();
+
+            for(String name:groupUsersNames){
+                builder.append(name + "    ");
+            }
+            ChatFirebaseUtil.passGroupUsersNamesAsIntent(intent,builder.toString());
             startActivity(intent);
         });
 
@@ -142,9 +150,16 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> currentUser = task.getResult().toObject(Users.class));
 
         if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("oneOnOne")) {
+            infoBtn.setVisibility(View.INVISIBLE);
             otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
-            chatRoomName.setText(otherUser.getName());
+
+            if(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null){
+                chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
+            }else{
+                chatRoomName.setText(otherUser.getName());
+            }
+
             getOrCreateChatRoomModel();
 
         } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")) {
@@ -160,9 +175,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                         if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
                             otherGroupUsers.add(user);
                             groupUsers.add(user);
+                            groupUsersNames.add(user.getName());
                         }
                         if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
                             groupUsers.add(user);
+                            groupUsersNames.add(user.getName());
                         }
                     }
                 });
@@ -280,6 +297,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     //first time chat
                     chatRoomModel = new ChatRoomModel(
                             chatRoomId,
+                            otherUser.getName(),
                             Arrays.asList(ChatFirebaseUtil.currentUserId(), otherUser.getUserId()),
                             Timestamp.now(),
                             ""
@@ -300,6 +318,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     //first time chat
                     chatRoomModel = new ChatRoomModel(
                             chatRoomId,
+                            group.getGroupName(),
                             group.getGroupMembers(),
                             Timestamp.now(),
                             ""
@@ -595,4 +614,24 @@ public class ChatRoomActivity extends AppCompatActivity {
 //
 //    }
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null){
+            chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
+            Log.i("info",chatRoomName.getText().toString()+"start");
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 }

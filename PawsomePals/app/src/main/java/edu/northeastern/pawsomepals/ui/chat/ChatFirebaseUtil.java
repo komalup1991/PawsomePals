@@ -53,17 +53,22 @@ public class ChatFirebaseUtil {
         intent.putExtra("chatStyle", "oneOnOne");
     }
 
-    public static void passGroupChatModelAsIntent(Intent intent, List<Users> users) {
-        StringBuilder nameBuilder = new StringBuilder();
+    public static void passGroupNameAsIntent(Intent intent, String newGroupName) {
+        intent.putExtra("groupName", newGroupName);
+    }
+    public static void passGroupUsersNamesAsIntent(Intent intent, String groupUsersNames) {
+        intent.putExtra("groupUserNames",groupUsersNames);
+    }
+
+    public static void passGroupChatModelAsIntent(Intent intent, List<Users> users, String groupName) {
         StringBuilder idBuilder = new StringBuilder();
 
         for (Users user : users) {
             if (user != null) {
-                nameBuilder.append(user.getName() + " ");
                 idBuilder.append(user.getUserId() + " ");
             }
         }
-        intent.putExtra("name", nameBuilder.toString());
+        intent.putExtra("name", groupName);
         intent.putExtra("ids", idBuilder.toString());
         intent.putExtra("chatStyle", "group");
     }
@@ -81,7 +86,7 @@ public class ChatFirebaseUtil {
         return FirebaseFirestore.getInstance().collection("recipes");
     }
 
-    public static StorageReference  allChatRoomImagesCollectionReference(){
+    public static StorageReference allChatRoomImagesCollectionReference() {
         return FirebaseStorage.getInstance().getReference().child("chat_message_images");
     }
 
@@ -141,6 +146,14 @@ public class ChatFirebaseUtil {
         List idList = Arrays.asList(ids.split(" "));
 
         return new GroupChatModel(idList, groupName);
+    }
+
+    public static String getGroupNameFromIntent(Intent intent) {
+        return intent.getStringExtra("groupName");
+    }
+
+    public static String getGroupUsersNamesAsIntent(Intent intent) {
+        return intent.getStringExtra("groupUserNames");
     }
 
 
