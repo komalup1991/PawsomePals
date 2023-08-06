@@ -181,6 +181,16 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        followingCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
+                intent.putExtra("profileId", profileId);
+                intent.putExtra("clickedValue", "following");
+                getContext().startActivity(intent);
+            }
+        });
+
         if (isUserProfile) {
             profileImage.setOnClickListener(new View.OnClickListener() {
                 @Override

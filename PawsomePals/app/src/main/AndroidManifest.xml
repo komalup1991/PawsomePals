@@ -29,6 +29,9 @@
         android:theme="@style/Theme.PawsomePals"
         tools:targetApi="31">
         <activity
+            android:name=".ui.profile.FollowersFollowingActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.chat.ChatSearchChatroomActivity"
             android:exported="false" />
         <activity
@@ -36,9 +39,13 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="pawsomepals" />
+
+                <data
+                    android:host="pawsomepals"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
