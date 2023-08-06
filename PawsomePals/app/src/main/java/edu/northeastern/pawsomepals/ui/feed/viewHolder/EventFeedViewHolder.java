@@ -3,7 +3,6 @@ package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 import android.app.Activity;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,9 +16,9 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class EventFeedViewHolder extends RecyclerView.ViewHolder {
@@ -52,7 +51,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
     }
 
-    public void bindData(Activity activity, Event event, FeedAdapter.LocationClickListener onLocationClickListener) {
+    public void bindData(Activity activity, Event event, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, event);
         Glide.with(userProfilePic.getContext())
                 .load(event.getUserProfileImage())
@@ -81,7 +80,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onLocationClickListener.onClick(event);
+                    onItemActionListener.onLocationClick(event);
                 }
             });
         } else {

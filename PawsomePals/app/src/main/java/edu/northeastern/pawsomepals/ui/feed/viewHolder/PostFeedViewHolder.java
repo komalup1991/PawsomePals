@@ -12,9 +12,9 @@ import com.bumptech.glide.Glide;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class PostFeedViewHolder extends RecyclerView.ViewHolder {
@@ -44,7 +44,7 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindData(Activity activity, Post post, FeedAdapter.LocationClickListener onLocationClickListener) {
+    public void bindData(Activity activity, Post post, OnItemActionListener onLocationClickListener) {
         feedActionsLayout.bindView(activity, post);
         Glide.with(userProfilePic.getContext())
                 .load(post.getUserProfileImage())
@@ -68,7 +68,7 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    onLocationClickListener.onClick(post);
+                    onLocationClickListener.onLocationClick(post);
                 }
             });
         } else {

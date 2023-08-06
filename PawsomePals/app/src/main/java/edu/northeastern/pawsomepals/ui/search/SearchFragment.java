@@ -6,8 +6,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,15 +35,12 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 
-import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchDogAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchRecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchUserAdapter;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
-import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
 
 public class SearchFragment extends Fragment {
 

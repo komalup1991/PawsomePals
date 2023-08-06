@@ -9,8 +9,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import edu.northeastern.pawsomepals.ui.feed.FeedAllFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
-import edu.northeastern.pawsomepals.ui.feed.FeedFriendsFragment;
-import edu.northeastern.pawsomepals.ui.feed.FeedRecipeFragment;
 
 public class FragmentAdapter extends FragmentStateAdapter {
     private static final int NUM_TABS = 3;

@@ -30,7 +30,6 @@ import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
-import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class FirestoreDataLoader {
 

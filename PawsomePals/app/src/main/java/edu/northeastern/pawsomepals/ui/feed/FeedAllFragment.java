@@ -1,5 +1,9 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
+import static android.content.Context.MODE_PRIVATE;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -36,8 +41,10 @@ import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class FeedAllFragment extends Fragment {
     private RecyclerView feedsRecyclerView;
@@ -70,9 +77,31 @@ public class FeedAllFragment extends Fragment {
             }
         });
 
-        feedAdapter = new FeedAdapter(feedItemList, requireContext(), new FeedAdapter.LocationClickListener() {
+        feedAdapter = new FeedAdapter(feedItemList, requireContext(), new OnItemActionListener() {
             @Override
-            public void onClick(FeedItem feedItem) {
+            public void onRecipeClick(Recipe recipe) {
+                Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
+                intent.putExtra("recipe", recipe);
+                getActivity().startActivity(intent);
+            }
+
+            @Override
+            public void onUserClick(String userId) {
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("ProfileId", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("profileId", userId);
+                editor.apply();
+
+                //Navigate to Profile Fragment
+                ProfileFragment profileFragment = new ProfileFragment();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container_view, profileFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+
+            @Override
+            public void onLocationClick(FeedItem feedItem) {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("feedItem", feedItem);
                 getActivity().getSupportFragmentManager().beginTransaction()
