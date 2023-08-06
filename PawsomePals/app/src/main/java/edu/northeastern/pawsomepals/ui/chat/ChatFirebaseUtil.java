@@ -37,6 +37,7 @@ public class ChatFirebaseUtil {
     public static String currentUserId() {
         return FirebaseAuth.getInstance().getUid();
     }
+    public static String currentUserName(){return FirebaseAuth.getInstance().getCurrentUser().getDisplayName();}
 
     public static boolean isLoggedIn() {
         if (currentUserId() != null) {
@@ -62,13 +63,16 @@ public class ChatFirebaseUtil {
 
     public static void passGroupChatModelAsIntent(Intent intent, List<Users> users, String groupName) {
         StringBuilder idBuilder = new StringBuilder();
+        StringBuilder nameBuilder = new StringBuilder();
 
         for (Users user : users) {
             if (user != null) {
                 idBuilder.append(user.getUserId() + " ");
+                nameBuilder.append(user.getName() +" ");
             }
         }
         intent.putExtra("name", groupName);
+        intent.putExtra("groupUserNames",nameBuilder.toString());
         intent.putExtra("ids", idBuilder.toString());
         intent.putExtra("chatStyle", "group");
     }
@@ -143,9 +147,10 @@ public class ChatFirebaseUtil {
     public static GroupChatModel getGroupChatModelFromIntent(Intent intent) {
         String groupName = intent.getStringExtra("name");
         String ids = intent.getStringExtra("ids");
+        String names = intent.getStringExtra("groupUserNames");
         List idList = Arrays.asList(ids.split(" "));
-
-        return new GroupChatModel(idList, groupName);
+        List nameList = Arrays.asList(names.split(" "));
+        return new GroupChatModel(idList, nameList,groupName);
     }
 
     public static String getGroupNameFromIntent(Intent intent) {

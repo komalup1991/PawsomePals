@@ -7,9 +7,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,19 +21,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-
-import org.checkerframework.checker.index.qual.LengthOf;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatGroupUserRecyclerAdapter;
-import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class CreateNewGroupChat extends AppCompatActivity {
@@ -45,7 +39,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private RecyclerView usersRecyclerview;
     private ChatGroupUserRecyclerAdapter adapter;
     private FirestoreRecyclerOptions<Users> options;
-
     private List<Users> userList;
     private Users currentUser;
     private Button createNewChat;
@@ -122,12 +115,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
 
         if (userList.size() > 2 && userList.size() <= 5) {
             createDialogAndCreateIntent();
-
-//            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-//            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList, groupName);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            getApplicationContext().startActivity(intent);
-
         } else if (userList.size() == 2) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(1));

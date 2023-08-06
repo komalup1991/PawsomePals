@@ -10,6 +10,7 @@ public class ChatRoomModel {
     private ChatStyle chatStyle;
     private String chatRoomId;
     private List<String> userIds;
+    private List<String> userNames;
     private Timestamp lastMessageTimestamp;
     private String lastMessageSenderId;
     private String lastMessage;
@@ -18,8 +19,9 @@ public class ChatRoomModel {
 
     }
 
-    public ChatRoomModel(String chatRoomId, String chatRoomName,List<String> userIds, Timestamp lastMessageTimestamp, String lastMessageSenderId) {
+    public ChatRoomModel(String chatRoomId, String chatRoomName,List<String> userIds, List<String> userNames,Timestamp lastMessageTimestamp, String lastMessageSenderId) {
         this.chatRoomName = chatRoomName;
+        this.userNames = userNames;
         this.chatRoomId = chatRoomId;
         this.userIds = userIds;
         this.lastMessageTimestamp = lastMessageTimestamp;
@@ -81,5 +83,13 @@ public class ChatRoomModel {
 
     public void setChatRoomName(String chatRoomName) {
         this.chatRoomName = chatRoomName;
+    }
+
+    public List<String> getUserNames() {
+        return userNames;
+    }
+
+    public void setUserNames(List<String> userNames) {
+        this.userNames = userNames;
     }
 }

@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,7 +28,7 @@ import edu.northeastern.pawsomepals.adapters.RecentChatRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 
 public class ChatFragment extends Fragment {
-    private EditText searchInput;
+    private TextView searchInput;
     private ImageButton searchButton;
     private Button createNewGroupButton;
     private RecyclerView chatRecyclerview;
@@ -66,14 +67,13 @@ public class ChatFragment extends Fragment {
                 setupRecyclerView();
             }
         });
-
-//        createNewChatButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(getContext(), CreateNewChatActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        searchInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ChatSearchChatroomActivity.class);
+                startActivity(intent);
+            }
+        });
         createNewGroupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -136,11 +136,6 @@ public class ChatRoomActivity extends AppCompatActivity {
             //check
             ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers,chatRoomName.getText().toString());
             StringBuilder builder = new StringBuilder();
-
-            for(String name:groupUsersNames){
-                builder.append(name + "    ");
-            }
-            ChatFirebaseUtil.passGroupUsersNamesAsIntent(intent,builder.toString());
             startActivity(intent);
         });
 
@@ -175,11 +170,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                         if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
                             otherGroupUsers.add(user);
                             groupUsers.add(user);
-                            groupUsersNames.add(user.getName());
+                            groupUsersNames.add(user.getName().toLowerCase());
                         }
                         if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
                             groupUsers.add(user);
-                            groupUsersNames.add(user.getName());
+                            groupUsersNames.add(user.getName().toLowerCase());
                         }
                     }
                 });
@@ -299,6 +294,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             chatRoomId,
                             otherUser.getName(),
                             Arrays.asList(ChatFirebaseUtil.currentUserId(), otherUser.getUserId()),
+                            Arrays.asList(ChatFirebaseUtil.currentUserName().toLowerCase(),otherUser.getName().toLowerCase()),
                             Timestamp.now(),
                             ""
                     );
@@ -320,6 +316,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             chatRoomId,
                             group.getGroupName(),
                             group.getGroupMembers(),
+                            group.getGroupMemberNames(),
                             Timestamp.now(),
                             ""
                     );

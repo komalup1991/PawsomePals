@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/search_toolbar">
 
-        <TextView
+        <EditText
             android:id="@+id/chat_search_chat"
             android:layout_width="360dp"
             android:layout_height="wrap_content"
@@ -44,45 +44,11 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/new_chat_bar"
-        android:background="@color/white"/>
-
-    <LinearLayout
-        android:id="@+id/new_chat_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_below="@id/search_toolbar"
-        android:background="#00000000"
-        android:orientation="horizontal">
-
-        <androidx.legacy.widget.Space
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/new_group_chat_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="?android:attr/selectableItemBackground"
-            android:text="New Chat"
-            android:textColor="@color/white"
-            android:textColorHint="@color/backgroundColor" />
-
-        <!--        <Button-->
-        <!--            android:id="@+id/new_chat_btn"-->
-        <!--            android:layout_width="wrap_content"-->
-        <!--            android:layout_height="match_parent"-->
-        <!--            android:layout_weight="1"-->
-        <!--            android:backgroundTint="@color/backgroundColor"-->
-        <!--            android:text="New Chat"-->
-        <!--            android:textColor="@color/white"-->
-        <!--            android:textColorHint="@color/backgroundColor" />-->
-    </LinearLayout>
-
+        android:background="@color/white"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chat_search_user_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/new_chat_bar"/>
+        android:layout_below="@id/search_toolbar"/>
 </RelativeLayout>

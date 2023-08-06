@@ -126,6 +126,10 @@ public class Users {
         this.chatSelected = chatSelected;
     }
 
+    public String getSearchName(){
+        return name.toLowerCase();
+    }
+
 
 }
 
