@@ -26,9 +26,9 @@ public class MainActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
 
         final Handler handler = new Handler(Looper.getMainLooper());
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
                 if (auth.getCurrentUser() == null) {
                     startActivity(new Intent(MainActivity.this, LoginActivity.class));
                     finish();
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
 
-//            }
-//        }, 2000);
+            }
+        }, 2000);
     }
 }
