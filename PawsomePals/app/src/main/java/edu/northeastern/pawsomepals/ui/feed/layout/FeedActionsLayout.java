@@ -3,6 +3,10 @@ package edu.northeastern.pawsomepals.ui.feed.layout;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -96,7 +100,7 @@ public class FeedActionsLayout extends LinearLayout {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                sharePost(activity);
             }
         });
 
@@ -133,5 +137,18 @@ public class FeedActionsLayout extends LinearLayout {
 
     private String getLikeCount(long likeCount) {
         return "(" + likeCount + ")";
+    }
+
+    public void sharePost(Activity activity){
+        String deepLinkUrl = "https://pawsomepals/";
+        String shareText = "Check out this pawsome post: " + deepLinkUrl;
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Pawsome Pals: Unleash Your Dog's Social Paws-abilities with Pawsome Pals!");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+
+        Intent chooserIntent = Intent.createChooser(shareIntent, "Share Deep Link using!");
+        activity.startActivity(chooserIntent);
     }
 }
