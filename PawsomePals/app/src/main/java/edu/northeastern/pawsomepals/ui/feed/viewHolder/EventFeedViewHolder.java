@@ -32,7 +32,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
     TextView eventDetailsTextView;
     TextView eventDateTextView;
     TextView eventTimeTextView, eventNameTextView;
-    ImageButton favImageButton;
+    ImageView userTaggedImageView,locationTaggedImageView;
     FeedActionsLayout feedActionsLayout;
 
     public EventFeedViewHolder(@NonNull View itemView) {
@@ -42,12 +42,13 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         timestampTextView = itemView.findViewById(R.id.timestampTextView);
         eventImage = itemView.findViewById(R.id.eventImage);
         userTaggedTextView = itemView.findViewById(R.id.userTaggedTextView);
+        userTaggedImageView= itemView.findViewById(R.id.userTaggedImageView);
+        locationTaggedImageView= itemView.findViewById(R.id.locationTaggedImageView);
         locationTaggedTextView = itemView.findViewById(R.id.locationTaggedTextView);
         eventDetailsTextView = itemView.findViewById(R.id.eventDetailsTextView);
         eventDateTextView = itemView.findViewById(R.id.eventDateTextView);
         eventTimeTextView = itemView.findViewById(R.id.eventTimeTextView);
         eventNameTextView = itemView.findViewById(R.id.eventNameTextView);
-        favImageButton = itemView.findViewById(R.id.favImageButton);
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
     }
 
@@ -71,7 +72,8 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
             userTaggedTextView.setText(userTagged);
         } else {
-            userTaggedTextView.setText("No User Tagged!!! ☹️");
+            userTaggedTextView.setVisibility(View.GONE);
+            userTaggedImageView.setVisibility(View.GONE);
         }
 
         if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
@@ -83,7 +85,9 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
                 }
             });
         } else {
-            locationTaggedTextView.setText("No Location Tagged!!! ☹️");
+            locationTaggedTextView.setVisibility(View.GONE);
+            locationTaggedImageView.setVisibility(View.GONE);
+
         }
         if (eventDetails != null && !eventDetails.isEmpty() && !(eventDetails.trim().equals("null"))) {
             eventDetailsTextView.setText(eventDetails);

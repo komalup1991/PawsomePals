@@ -11,7 +11,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,14 +36,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 
@@ -92,43 +87,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         loadMarkersOnMap();
         if (selectedFeedItem != null) {
             moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
-//            selectedFeedItem = null;
         }
     }
 
     private void loadMarkersOnMap() {
-        List<CollectionReference> collections = new ArrayList<>();
-        collections.add(FirebaseFirestore.getInstance().collection("events"));
-        collections.add(FirebaseFirestore.getInstance().collection("posts"));
-        collections.add(FirebaseFirestore.getInstance().collection("services"));
-        collections.add(FirebaseFirestore.getInstance().collection("photovideo"));
-
-        FirestoreDataLoader firestoreDataLoader = new FirestoreDataLoader(this, collections, "createdAt");
-        firestoreDataLoader.loadDataFromCollections();
+        FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(), this);
     }
 
     @Override
     public void onDataLoaded(List<FeedItem> feedItems) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
+            Marker m;
+
             @Override
             public void run() {
                 if (googleMap != null) {
                     for (FeedItem item : feedItems) {
                         if (item.getLatLng() != null) {
-                            MarkerOptions marker = new MarkerOptions()
-                                    .title(item.getLatLng().toString())
-                                    .icon(bitmapFromVector(
-                                            activity.getApplicationContext(),
-                                            R.drawable.dogpawheart,
-                                            80))
-                                    .snippet(item.getCreatedBy())
-                                    .position(new LatLng(item.getLatLng().getLatitude(), item.getLatLng().getLongitude()));
-                            Marker m = googleMap.addMarker(marker);
+                            m = feedMarker(item);
                             if (selectedFeedItem != null && item.getFeedItemId().equals(selectedFeedItem.getFeedItemId())) {
                                 m.setZIndex(9);
                                 m.showInfoWindow();
                             }
                             m.setTag(item.getFeedItemId());
+
                         }
                     }
                 }
@@ -136,33 +118,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         });
     }
 
+    private Marker feedMarker(FeedItem feedItem) {
+        BitmapDescriptor icon = bitmapFromVector(
+                activity.getApplicationContext(),
+                R.drawable.dogpawheart,
+                80);
+
+        MarkerOptions marker = new MarkerOptions();
+
+        if (feedItem.getType() == 1) {
+            marker.title("Photo").icon(icon).snippet(feedItem.getUsername())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
+                            feedItem.getLatLng().getLongitude()));
+        } else if (feedItem.getType() == 2) {
+            marker.title("Service").icon(icon).snippet(feedItem.getUsername())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
+                            feedItem.getLatLng().getLongitude()));
+        } else if (feedItem.getType() == 3) {
+            marker.title("Event").icon(icon).snippet(feedItem.getUsername())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
+                            feedItem.getLatLng().getLongitude()));
+        } else if (feedItem.getType() == 4) {
+            marker.title("Post").icon(icon).snippet(feedItem.getUsername())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
+                            feedItem.getLatLng().getLongitude()));
+        }
+        Marker m = googleMap.addMarker(marker);
+        return m;
+    }
+
+
     private BitmapDescriptor bitmapFromVector(Context context, int vectorResId, int sizeOfMarker) {
-        // below line is use to generate a drawable.
         Drawable vectorDrawable = ContextCompat.getDrawable(
                 context, vectorResId);
-
-        // below line is use to set bounds to our vector
-        // drawable.
         vectorDrawable.setBounds(
                 0, 0, sizeOfMarker,
                 sizeOfMarker);
-
-        // below line is use to create a bitmap for our
-        // drawable which we have added.
         Bitmap bitmap = Bitmap.createBitmap(
                 sizeOfMarker,
                 sizeOfMarker,
                 Bitmap.Config.ARGB_8888);
-
-        // below line is use to add bitmap in our canvas.
         Canvas canvas = new Canvas(bitmap);
-
-        // below line is use to draw our
-        // vector drawable in canvas.
         vectorDrawable.draw(canvas);
-
-        // after generating our bitmap we are returning our
-        // bitmap.
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 

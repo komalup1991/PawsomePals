@@ -14,11 +14,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -49,7 +46,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout;
+import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -62,7 +59,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 3;
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
-    private String photoVideoPostDocId;
     private TextView userNameTextView, tagPeopleTextView, taggedUserDisplayTextView;
     private EditText captionEditTextView;
     private Dialog progressDialog;
@@ -81,7 +77,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private Context context;
     private LatLng currentLatLng;
     private String locationTagged;
-    private TagLocationLayout tagLocationLayout;
+    private TaggingOptionsLayout taggingOptionsLayout;
+    private String usersTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +91,20 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         userProfilePic = findViewById(R.id.userProfilePic);
         userNameTextView = findViewById(R.id.userNameTextView);
         captionEditTextView = findViewById(R.id.captionEditTextView);
-        tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
-        taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
         photoVideoImageView = findViewById(R.id.photoVideoImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
-        tagLocationLayout = findViewById(R.id.tag_location_layout);
-        tagLocationLayout.bindView(this, new TagLocationLayout.OnLocationFetchListener() {
+        taggingOptionsLayout = findViewById(R.id.tag_location_layout);
+        taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
             @Override
             public void onLocation(LatLng latLng, String locationTagged) {
                 currentLatLng = latLng;
                 CreatePhotoVideoActivity.this.locationTagged = locationTagged;
+            }
+
+            @Override
+            public void onTaggedUsersGet(String usersTagged) {
+                CreatePhotoVideoActivity.this.usersTagged = usersTagged;
+
             }
         });
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
@@ -123,7 +124,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Add Post");
+            actionBar.setTitle("Add Photo");
         }
         FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
             @Override
@@ -158,22 +159,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                 showEditImageDialog();
             }
         });
-
-        tagPeopleTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserSelectionDialog();
-            }
-        });
-
-        taggedUserDisplayTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserSelectionDialog();
-            }
-        });
-
-        fetchAllUsersFromFirestore();
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -323,13 +308,12 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String caption = captionEditTextView.getText().toString();
-        String userTagged = taggedUserDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> photoVideoPosts = new HashMap<>();
         photoVideoPosts.put("createdBy", loggedInUserId);
         photoVideoPosts.put("caption", caption);
-        photoVideoPosts.put("userTagged", userTagged);
+        photoVideoPosts.put("userTagged", usersTagged);
         photoVideoPosts.put("locationTagged", locationTagged);
         photoVideoPosts.put("latLng", currentLatLng);
         photoVideoPosts.put("createdAt", createdAt);
@@ -348,79 +332,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchAllUsersFromFirestore() {
-        db.collection("user")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        allUsers.clear();
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            Users user = document.toObject(Users.class);
-                            if (!user.getUserId().equals(loggedInUserId)) {
-                                allUsers.putIfAbsent(user.getUserId(), user);
-                            }
-                        }
-                    }
-                });
-    }
-
-
-    private void showUserSelectionDialog() {
-        List<String> userNames = new ArrayList<>();
-        List<String> userIds = new ArrayList<>();
-        boolean[] checkedItems = new boolean[allUsers.size()];
-
-        int i = 0;
-        for (Map.Entry<String, Users> entry : allUsers.entrySet()) {
-            Users user = entry.getValue();
-            if (user.getName() != null) {
-                userNames.add(user.getName());
-                userIds.add(user.getUserId());
-            }
-            checkedItems[i++] = selectedUsers.contains(user);
-        }
-
-        String[] userNamesArray = userNames.toArray(new String[userNames.size()]);
-        String[] userIdsArray = userIds.toArray(new String[userNames.size()]);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle("Select Users")
-                .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
-                    Users user = allUsers.get(userIdsArray[which]);
-                    if (isChecked) {
-                        selectedUsers.add(user);
-                    } else {
-                        selectedUsers.remove(user);
-                    }
-                })
-                .setPositiveButton("OK", (dialog, which) -> {
-                    updateSelectedUsersTextView();
-
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private void updateSelectedUsersTextView() {
-        List<String> selectedNames = new ArrayList<>();
-        for (Users user : selectedUsers) {
-            selectedNames.add(user.getName());
-        }
-
-        StringBuilder commaSeparatedNames = new StringBuilder();
-        for (int i = 0; i < selectedNames.size(); i++) {
-
-            commaSeparatedNames.append(selectedNames.get(i));
-            if (i < selectedNames.size() - 1) {
-                commaSeparatedNames.append(", ");
-            }
-        }
-
-        taggedUserDisplayTextView.setVisibility(View.VISIBLE);
-        taggedUserDisplayTextView.setText(commaSeparatedNames.toString());
-
-    }
 
 
     private void showCancelConfirmationDialog() {

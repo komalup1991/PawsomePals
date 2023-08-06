@@ -10,7 +10,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,7 +19,6 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -311,33 +309,15 @@ public class FirebaseUtil {
                 });
     }
 
-    private void getFollowData(String userId) {
+    public static void getFollowData(String userId, DataCallback dataCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        CollectionReference followerRef = db.collection("follow").document(userId).collection("followers");
-        CollectionReference followingRef = db.collection("follow").document(userId).collection("following");
-
-        List<String> followersList = new ArrayList<>();
-        List<String> followingList = new ArrayList<>();
-
-
-        followerRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        DocumentReference followingRef = db.collection("follow").document(userId);
+        followingRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot document : queryDocumentSnapshots) {
-                    followersList.add(document.getId());
-                }
-
-            }
-        });
-
-        followingRef.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (DocumentSnapshot document : queryDocumentSnapshots) {
-                    followingList.add(document.getId());
-                }
-
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                List<String> followingUserIds = (List<String>) documentSnapshot.get("following");
+                dataCallback.onFollowingUserIdListReceived(followingUserIds);
             }
         });
     }
@@ -352,5 +332,7 @@ public class FirebaseUtil {
         void onDismiss();
 
         void onRecipeReceived(Recipe recipe);
+
+        void onFollowingUserIdListReceived(List<String> followingUserIds);
     }
 }

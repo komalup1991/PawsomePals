@@ -1,11 +1,14 @@
 package edu.northeastern.pawsomepals.adapters;
 
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import edu.northeastern.pawsomepals.ui.feed.FeedAllFragment;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.FeedFriendsFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedRecipeFragment;
 
@@ -18,13 +21,30 @@ public class FragmentAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        // Create and return the appropriate fragment based on the position
-        return switch (position) {
-            case 0 -> new FeedAllFragment();
-            case 1 -> new FeedFriendsFragment();
-            case 2 -> new FeedRecipeFragment();
-            default -> new FeedAllFragment(); // Return a default fragment if needed
-        };
+        Bundle bundle;
+        switch (position) {
+            case 0:
+                FeedAllFragment feedAllFragment = new FeedAllFragment();
+                bundle = new Bundle();
+                bundle.putSerializable("feed_view_type", FeedFragmentViewType.ALL);
+                feedAllFragment.setArguments(bundle);
+                return feedAllFragment;
+            case 1:
+                FeedAllFragment feedFriendFragment = new FeedAllFragment();
+                bundle = new Bundle();
+                bundle.putSerializable("feed_view_type", FeedFragmentViewType.FRIEND);
+                feedFriendFragment.setArguments(bundle);
+                return feedFriendFragment;
+            case 2:
+                FeedAllFragment feedRecipeFragment = new FeedAllFragment();
+                bundle = new Bundle();
+                bundle.putSerializable("feed_view_type", FeedFragmentViewType.RECIPE);
+                feedRecipeFragment.setArguments(bundle);
+                return feedRecipeFragment;
+            default:
+                return new FeedAllFragment(); // Return a default fragment if needed
+        }
+
     }
 
     @Override

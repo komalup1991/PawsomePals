@@ -70,7 +70,7 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
 
     class ItemAdapter extends RecyclerView.Adapter<ViewHolder> {
         private Activity activity;
-        private final String[] actions = {"Recipe", "Post", "Photo/Video", "Services", "Events"};
+        private final String[] actions = {"Recipe", "Post", "Photo", "Services", "Events"};
         private final int[] icons = {R.drawable.dogbowl, R.drawable.socialmedia,
                 R.drawable.media, R.drawable.groomingcolor, R.drawable.planner};
         private OnItemClickListener listener;
@@ -113,7 +113,7 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
                         case "Post":
                             intent = new Intent(activity, CreatePostActivity.class);
                             break;
-                        case "Photo/Video":
+                        case "Photo":
                             intent = new Intent(activity, CreatePhotoVideoActivity.class);
                             break;
                         case "Services":

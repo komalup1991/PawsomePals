@@ -65,7 +65,7 @@ public class ProfileRecipeAdapter extends RecyclerView.Adapter<ProfileRecipeAdap
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(context, RecipeDetailActivity.class);
-                        intent.putExtra("recipeId", recipe.getRecipeId());
+                        intent.putExtra("recipe", recipe);
                         context.startActivity(intent);
                     }
                 });

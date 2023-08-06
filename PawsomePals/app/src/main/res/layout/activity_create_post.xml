@@ -109,43 +109,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/captionEditTextView" />
 
-
-
-
-            <TextView
-                android:id="@+id/tagPeopleTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/tag_people"
-                android:textAllCaps="true"
-                android:textColor="@color/darkPink"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.025"
-                app:layout_constraintStart_toStartOf="parent"
-                android:clickable="true"
-                android:focusable="true"
-                app:layout_constraintTop_toBottomOf="@+id/postContentEditTextView" />
-            <TextView
-                android:id="@+id/taggedUserDisplayTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/border"
-                android:ems="10"
-                android:text="@string/tagged_user"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.125"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tagPeopleTextView" />
-
-            <edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout
+            <edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout
                 android:id="@+id/tag_location_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -154,7 +118,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.025"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/taggedUserDisplayTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/postContentEditTextView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

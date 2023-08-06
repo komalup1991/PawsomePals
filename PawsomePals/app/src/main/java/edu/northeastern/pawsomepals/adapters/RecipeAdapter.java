@@ -108,8 +108,6 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.RecipeView
             userProfilePic = itemView.findViewById(R.id.userProfilePic);
             recipeName = itemView.findViewById(R.id.recipeName);
             username = itemView.findViewById(R.id.username);
-
-
         }
 
 

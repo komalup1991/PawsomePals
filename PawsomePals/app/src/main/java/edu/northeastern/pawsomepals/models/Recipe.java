@@ -1,9 +1,10 @@
 package edu.northeastern.pawsomepals.models;
 
+import androidx.annotation.Nullable;
+
 import java.io.Serializable;
 
 public class Recipe extends FeedItem implements Serializable {
-    private String recipeId;
     private String title;
     private String img;
     private String desc;
@@ -21,13 +22,6 @@ public class Recipe extends FeedItem implements Serializable {
     private String instructions;
 
     public Recipe() {
-    }
-    public String getRecipeId() {
-        return recipeId;
-    }
-
-    public void setRecipeId(String recipeId) {
-        this.recipeId = recipeId;
     }
 
     public String getTitle() {
@@ -128,6 +122,23 @@ public class Recipe extends FeedItem implements Serializable {
 
     public void setInstructions(String instructions) {
         this.instructions = instructions;
+    }
+    @Override
+    public int hashCode() {
+        return getFeedItemId().hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Recipe otherRecipe)) {
+            return false;
+        }
+
+        if (otherRecipe.getFeedItemId() == null || this.getFeedItemId() == null) {
+            return false;
+        }
+
+        return this.getFeedItemId().equals(otherRecipe.getFeedItemId());
     }
 
     @Override

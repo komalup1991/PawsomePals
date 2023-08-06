@@ -40,6 +40,7 @@ public class FeedFragment extends Fragment {
         FragmentAdapter fragmentAdapter = new FragmentAdapter(this.getActivity());
         viewPager.setUserInputEnabled(false);
         viewPager.setAdapter(fragmentAdapter);
+        viewPager.setOffscreenPageLimit(1);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {

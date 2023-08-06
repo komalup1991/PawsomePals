@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.models;
 
-public class LatLng {
+import java.io.Serializable;
+
+public class LatLng implements Serializable {
     private double latitude;
     private double longitude;
 

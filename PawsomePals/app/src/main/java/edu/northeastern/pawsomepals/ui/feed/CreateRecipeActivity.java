@@ -338,8 +338,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
         recipeCollection.put("prepTime", recipePrepTime);
         recipeCollection.put("cookTime", recipeCookTime);
         recipeCollection.put("createdAt", createdAt);
+        recipeCollection.put("type",5);
         recipeCollection.put("img", imageUrlFromFirebaseStorage);
-        recipeCollection.put("recipeId", UUID.randomUUID().toString());
+        recipeCollection.put("feedItemId", UUID.randomUUID().toString());
+        recipeCollection.put("username",userNameToSaveInFeed);
+        recipeCollection.put("userProfileImage",userProfileUrlToSaveInFeed);
 
         FirebaseUtil.createCollectionInFirestore(recipeCollection,"recipes" ,new BaseDataCallback() {
             @Override

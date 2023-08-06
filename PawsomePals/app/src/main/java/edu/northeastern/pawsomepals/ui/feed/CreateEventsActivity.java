@@ -25,7 +25,6 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.libraries.places.api.model.Place;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -50,7 +49,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.feed.layout.TagLocationLayout;
+import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -77,7 +76,7 @@ public class CreateEventsActivity extends AppCompatActivity {
     private ImageView selectPhoto, eventImageView;
     private Uri galleryImageUri, cameraImageUri;
 
-    private TagLocationLayout tagLocationLayout;
+    private TaggingOptionsLayout taggingOptionsLayout;
 
     int selectedHour = 0;
     int selectedMinute = 0;
@@ -87,6 +86,7 @@ public class CreateEventsActivity extends AppCompatActivity {
     private Context context;
     private LatLng currentLatLng;
     private String locationTagged;
+    private String usersTagged;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,16 +101,20 @@ public class CreateEventsActivity extends AppCompatActivity {
         userNameTextView = findViewById(R.id.userNameTextView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDetailsEditText = findViewById(R.id.eventDetailsEditText);
-        tagPeopleTextView = findViewById(R.id.tagPeopleTextView);
-        taggedUserDisplayTextView = findViewById(R.id.taggedUserDisplayTextView);
         eventImageView = findViewById(R.id.photoVideoImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
-        tagLocationLayout = findViewById(R.id.tag_location_layout);
-        tagLocationLayout.bindView(this, new TagLocationLayout.OnLocationFetchListener() {
+        taggingOptionsLayout = findViewById(R.id.tag_location_layout);
+        taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
             @Override
             public void onLocation(LatLng latLng, String locationTagged) {
                 currentLatLng = latLng;
                 CreateEventsActivity.this.locationTagged = locationTagged;
+            }
+
+            @Override
+            public void onTaggedUsersGet(String usersTagged) {
+                CreateEventsActivity.this.usersTagged = usersTagged;
+
             }
         });
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
@@ -180,21 +184,6 @@ public class CreateEventsActivity extends AppCompatActivity {
             }
         });
 
-        tagPeopleTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserSelectionDialog();
-            }
-        });
-
-        taggedUserDisplayTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showUserSelectionDialog();
-            }
-        });
-
-        fetchAllUsersFromFirestore();
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,6 +196,11 @@ public class CreateEventsActivity extends AppCompatActivity {
                 if (eventDetailsEditText.getText().toString().isEmpty()) {
                     eventDetailsEditText.setError("This field is required");
                     Toast.makeText(CreateEventsActivity.this, "Event Detail is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (cameraImageUri==null && galleryImageUri==null ) {
+                    eventDetailsEditText.setError("This field is required");
+                    Toast.makeText(CreateEventsActivity.this, "Event Image is mandatory.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -393,7 +387,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         String eventDetails = eventDetailsEditText.getText().toString();
         String eventDate = setEventDateTextView.getText().toString();
         String eventTime = setEventTimeTextView.getText().toString();
-        String userTagged = taggedUserDisplayTextView.getText().toString();
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
         Map<String, Object> events = new HashMap<>();
         events.put("createdBy", loggedInUserId);
@@ -401,7 +394,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("eventTime", eventTime);
         events.put("eventDate", eventDate);
         events.put("eventDetails", eventDetails);
-        events.put("userTagged", userTagged);
+        events.put("userTagged", usersTagged);
         events.put("locationTagged", locationTagged);
         events.put("latLng", currentLatLng);
         events.put("createdAt", createdAt);
@@ -418,80 +411,6 @@ public class CreateEventsActivity extends AppCompatActivity {
                 finish();
             }
         });
-    }
-
-    private void fetchAllUsersFromFirestore() {
-        db.collection("user")
-                .get()
-                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        allUsers.clear();
-                        for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
-                            Users user = document.toObject(Users.class);
-                            if (!user.getUserId().equals(loggedInUserId)) {
-                                allUsers.putIfAbsent(user.getUserId(), user);
-                            }
-                        }
-                    }
-                });
-    }
-
-
-    private void showUserSelectionDialog() {
-        List<String> userNames = new ArrayList<>();
-        List<String> userIds = new ArrayList<>();
-        boolean[] checkedItems = new boolean[allUsers.size()];
-
-        int i = 0;
-        for (Map.Entry<String, Users> entry : allUsers.entrySet()) {
-            Users user = entry.getValue();
-            if (user.getName() != null) {
-                userNames.add(user.getName());
-                userIds.add(user.getUserId());
-            }
-            checkedItems[i++] = selectedUsers.contains(user);
-        }
-
-        String[] userNamesArray = userNames.toArray(new String[userNames.size()]);
-        String[] userIdsArray = userIds.toArray(new String[userNames.size()]);
-
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        builder.setTitle("Select Users")
-                .setMultiChoiceItems(userNamesArray, checkedItems, (dialog, which, isChecked) -> {
-                    Users user = allUsers.get(userIdsArray[which]);
-                    if (isChecked) {
-                        selectedUsers.add(user);
-                    } else {
-                        selectedUsers.remove(user);
-                    }
-                })
-                .setPositiveButton("OK", (dialog, which) -> {
-                    updateSelectedUsersTextView();
-
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
-    }
-
-    private void updateSelectedUsersTextView() {
-        List<String> selectedNames = new ArrayList<>();
-        for (Users user : selectedUsers) {
-            selectedNames.add(user.getName());
-        }
-
-        StringBuilder commaSeparatedNames = new StringBuilder();
-        for (int i = 0; i < selectedNames.size(); i++) {
-
-            commaSeparatedNames.append(selectedNames.get(i));
-            if (i < selectedNames.size() - 1) {
-                commaSeparatedNames.append(", ");
-            }
-        }
-
-        taggedUserDisplayTextView.setVisibility(View.VISIBLE);
-        taggedUserDisplayTextView.setText(commaSeparatedNames.toString());
-
     }
 
 

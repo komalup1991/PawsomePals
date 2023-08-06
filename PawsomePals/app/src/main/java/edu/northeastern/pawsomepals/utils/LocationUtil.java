@@ -96,19 +96,6 @@ public class LocationUtil {
         }).start();
     }
 
-//    private void requestLocationPermissions() {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-//            ActivityCompat.requestPermissions(activity,
-//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION,
-//                            android.Manifest.permission.ACCESS_BACKGROUND_LOCATION},
-//                    REQUEST_CODE_LOCATION_PERMISSIONS);
-//        } else {
-//            ActivityCompat.requestPermissions(activity,
-//                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
-//                    REQUEST_CODE_LOCATION_PERMISSIONS);
-//        }
-//    }
-
     private void requestLocationPermission() {
         if (ActivityCompat.checkSelfPermission(
                 activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {

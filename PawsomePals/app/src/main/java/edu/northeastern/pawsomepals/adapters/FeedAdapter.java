@@ -16,6 +16,7 @@ import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
+import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.EventFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PhotoVideoFeedViewHolder;
@@ -61,6 +62,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 view = layoutInflater.inflate(R.layout.feed_services_item, parent, false);
                 return new ServicesFeedViewHolder(view);
             }
+            case FeedItem.TYPE_RECIPE -> {
+                view = layoutInflater.inflate(R.layout.recipe_all_layout, parent, false);
+                return new RecipeAllAdapter.RecipeAllViewHolder(view);
+            }
             default -> throw new UnsupportedOperationException("Invalid item");
         }
     }
@@ -72,13 +77,15 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case FeedItem.TYPE_RECIPE_HEADER ->
                     ((RecipeRecyclerViewHolder) holder).bindRecylerViewData();
             case FeedItem.TYPE_POST ->
-                    ((PostFeedViewHolder) holder). bindData (((Activity)context), (Post) feedItem);
+                    ((PostFeedViewHolder) holder). bindData (((Activity)context), (Post) feedItem, locationClickListener);
             case FeedItem.TYPE_PHOTO_VIDEO ->
-                    ((PhotoVideoFeedViewHolder) holder).bindData(((Activity)context), (PhotoVideo) feedItem);
+                    ((PhotoVideoFeedViewHolder) holder).bindData(((Activity)context), (PhotoVideo) feedItem, locationClickListener);
             case FeedItem.TYPE_EVENT ->
                     ((EventFeedViewHolder) holder).bindData(((Activity)context), (Event) feedItem, locationClickListener);
             case FeedItem.TYPE_SERVICE ->
-                    ((ServicesFeedViewHolder) holder).bindData(((Activity)context), (Services) feedItem);
+                    ((ServicesFeedViewHolder) holder).bindData(((Activity)context), (Services) feedItem, locationClickListener);
+            case FeedItem.TYPE_RECIPE ->
+                    ((RecipeAllAdapter.RecipeAllViewHolder) holder).bindData(((Activity)context), (Recipe) feedItem, null);
         }
     }
 

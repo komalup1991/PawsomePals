@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
@@ -23,6 +24,7 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
     TextView photoVideoCaptionTextView;
     ImageView photoVideoImageView;
     TextView userTaggedTextView;
+    ImageView userTaggedImageView,locationTaggedImageView;
     TextView locationTaggedTextView;
     FeedActionsLayout feedActionsLayout;
 
@@ -34,19 +36,41 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         photoVideoCaptionTextView = itemView.findViewById(R.id.photoVideoCaptionTextView);
         photoVideoImageView = itemView.findViewById(R.id.photoVideoImageView);
         userTaggedTextView = itemView.findViewById(R.id.userTaggedTextView);
+        userTaggedImageView= itemView.findViewById(R.id.userTaggedImageView);
         locationTaggedTextView = itemView.findViewById(R.id.locationTaggedTextView);
+        locationTaggedImageView = itemView.findViewById(R.id.locationTaggedImageView);
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
     }
 
-    public void bindData(Activity activity, PhotoVideo photoVideo) {
+    public void bindData(Activity activity, PhotoVideo photoVideo, FeedAdapter.LocationClickListener onLocationClickListener) {
         feedActionsLayout.bindView(activity, photoVideo);
         Glide.with(userProfilePic.getContext())
                 .load(photoVideo.getUserProfileImage())
                 .into(userProfilePic);
         usernameTextView.setText(photoVideo.getUsername());
         timestampTextView.setText(TimeUtil.formatTime(photoVideo.getCreatedAt()));
-        userTaggedTextView.setText(photoVideo.getUserTagged());
-        locationTaggedTextView.setText(photoVideo.getLocationTagged());
+        String userTagged = photoVideo.getUserTagged();
+        String locationTagged = photoVideo.getLocationTagged();
+        if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
+            userTaggedTextView.setText(userTagged);
+        } else {
+            userTaggedImageView.setVisibility(View.GONE);
+            userTaggedTextView.setVisibility(View.GONE);
+        }
+
+        if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
+            locationTaggedTextView.setText(locationTagged);
+            locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    onLocationClickListener.onClick(photoVideo);
+                }
+            });
+        } else {
+            locationTaggedImageView.setVisibility(View.GONE);
+            locationTaggedTextView.setVisibility(View.GONE);
+        }
+
         photoVideoCaptionTextView.setText(photoVideo.getCaption());
 
         Glide.with(photoVideoImageView.getContext())

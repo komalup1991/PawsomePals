@@ -15,17 +15,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,15 +33,18 @@ import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
+import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
-import edu.northeastern.pawsomepals.utils.TimeUtil;
+import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
-public class FeedAllFragment extends Fragment implements FirestoreDataLoader.FirestoreDataListener {
+public class FeedAllFragment extends Fragment {
     private RecyclerView feedsRecyclerView;
     private final List<FeedItem> feedItemList = new ArrayList<>();
     private FeedAdapter feedAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private FeedFragmentViewType feedFragmentViewType;
 
     @Nullable
     @Override
@@ -56,6 +57,8 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        feedFragmentViewType = (FeedFragmentViewType) requireArguments().getSerializable("feed_view_type");
 
         feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
@@ -73,23 +76,75 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("feedItem", feedItem);
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container_view, MapFragment.class,bundle, "MapFragment")
+                        .add(R.id.fragment_container_view, MapFragment.class, bundle, "MapFragment")
                         .commit();
             }
         });
         feedsRecyclerView.setAdapter(feedAdapter);
-
         fetchFeeds();
     }
 
     private void refreshFeeds() {
         feedItemList.clear();
-        feedAdapter.notifyDataSetChanged();
         fetchFeeds();
         swipeRefreshLayout.setRefreshing(false);
     }
 
     private void fetchFeeds() {
+        switch (feedFragmentViewType) {
+            case ALL -> {
+                fetchAllFeeds();
+            }
+            case FRIEND -> {
+                fetchFriendsFeeds();
+            }
+            case RECIPE -> {
+                fetchRecipes();
+            }
+        }
+
+    }
+
+    private void fetchRecipes() {
+        CollectionReference recipes = FirebaseFirestore.getInstance().collection("recipes");
+        recipes.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    Recipe e = doc.toObject(Recipe.class);
+                    updateFeedItemList(e);
+                }
+            }
+        });
+        FirestoreDataLoader.loadDataFromCollections(new ArrayList<>() {{
+                                                        add(recipes);
+                                                    }},
+                new FirestoreDataLoader.FirestoreDataListener() {
+                    @Override
+                    public void onDataLoaded(List<FeedItem> feedItems) {
+                        notifyDatasetChange(feedItems);
+                    }
+                });
+    }
+
+    private void fetchFriendsFeeds() {
+        FirebaseUtil.getFollowData(FirebaseAuth.getInstance().getCurrentUser().getUid(), new BaseDataCallback() {
+            @Override
+            public void onFollowingUserIdListReceived(List<String> followingUserIds) {
+                super.onFollowingUserIdListReceived(followingUserIds);
+                FirestoreDataLoader.loadDataFromCollectionsForUserIds(FirestoreDataLoader.getAllCollections(),
+                        followingUserIds, new FirestoreDataLoader.FirestoreDataListener() {
+
+                            @Override
+                            public void onDataLoaded(List<FeedItem> feedItems) {
+                                notifyDatasetChange(feedItems);
+                            }
+                        });
+            }
+        });
+    }
+
+    private void fetchAllFeeds() {
         if (!feedItemList.isEmpty()) {
             return;
         }
@@ -104,11 +159,7 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
                 }
             }
         });
-
-
         collections.add(event);
-
-
         CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
         posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -143,13 +194,36 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
                 }
             }
         });
+
         collections.add(photoVideo);
 
+        FirestoreDataLoader.loadDataFromCollections(collections,
+                new FirestoreDataLoader.FirestoreDataListener() {
+                    @Override
+                    public void onDataLoaded(List<FeedItem> feedItems) {
+                        notifyDatasetChange(feedItems);
+                    }
+                });
+    }
 
-        String orderByField = "createdAt";
+    public void notifyDatasetChange(List<FeedItem> feedItems) {
+        feedItemList.clear();
+        if (feedFragmentViewType != FeedFragmentViewType.RECIPE) {
+            feedItemList.add(new FeedItem() {
+                @Override
+                public int getType() {
+                    return FeedItem.TYPE_RECIPE_HEADER;
+                }
+            });
+        }
+        feedItemList.addAll(feedItems);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                feedAdapter.notifyDataSetChanged();
+            }
+        });
 
-        FirestoreDataLoader firestoreDataLoader = new FirestoreDataLoader(this, collections, orderByField);
-        firestoreDataLoader.loadDataFromCollections();
     }
 
     private void updateFeedItemList(FeedItem item) {
@@ -162,26 +236,13 @@ public class FeedAllFragment extends Fragment implements FirestoreDataLoader.Fir
             feedAdapter.notifyItemChanged(index);
         } else {
             for (FeedItem feedItem : feedItemList) {
-                Log.d("feednow ",feedItem + "");
+                Log.d("feednow ", feedItem + "");
                 if (Objects.equals(feedItem.getFeedItemId(), item.getFeedItemId())) {
                     feedItem.setCommentCount(item.getCommentCount());
                 }
             }
             feedAdapter.notifyDataSetChanged();
         }
-    }
-
-
-    @Override
-    public void onDataLoaded(List<FeedItem> feedItems) {
-        this.feedItemList.clear();
-        this.feedItemList.addAll(feedItems);
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                feedAdapter.notifyDataSetChanged();
-            }
-        });
     }
 }
 
