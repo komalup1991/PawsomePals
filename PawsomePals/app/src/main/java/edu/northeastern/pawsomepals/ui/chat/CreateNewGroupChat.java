@@ -1,11 +1,15 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -45,6 +49,8 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private List<Users> userList;
     private Users currentUser;
     private Button createNewChat;
+    private String groupName;
+    private EditText editTextField;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,17 +87,18 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 createGroupChat();
             }
         });
-    }
-
-    private void setupUsersRecyclerView(String searchTerm) {
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 currentUser = task.getResult().toObject(Users.class);
-                userList.add(currentUser);
+                if (!userList.contains(currentUser)) {
+                    userList.add(currentUser);
+                }
             }
         });
+    }
 
+    private void setupUsersRecyclerView(String searchTerm) {
         Query query = ChatFirebaseUtil.allUserCollectionReference()
                 .whereGreaterThanOrEqualTo("searchName", searchTerm.toLowerCase());
 
@@ -101,15 +108,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
         usersRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         usersRecyclerview.setAdapter(adapter);
         adapter.startListening();
-
-//        Query query = ChatFirebaseUtil.allUserCollectionReference().orderBy("name");
-//
-//        options = new FirestoreRecyclerOptions.Builder<Users>()
-//                .setQuery(query, Users.class).build();
-//        adapter = new ChatGroupUserRecyclerAdapter(options, getApplicationContext());
-//        usersRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-//        usersRecyclerview.setAdapter(adapter);
-//        adapter.startListening();
     }
 
     private void createGroupChat() {
@@ -118,19 +116,46 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 userList.add(model);
             }
         }
+        for (Users user : userList) {
+            Log.i("create", user.getName() + "info");
+        }
 
-        if (userList.size() > 2 && userList.size() <= 10) {
-            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getApplicationContext().startActivity(intent);
+        if (userList.size() > 2 && userList.size() <= 5) {
+            createDialogAndCreateIntent();
+
+//            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+//            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList, groupName);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            getApplicationContext().startActivity(intent);
+
         } else if (userList.size() == 2) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-            ChatFirebaseUtil.passUserModelAsIntent(intent,userList.get(1));
+            ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(1));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
         } else {
-            Toast.makeText(this, "Group members must be more than 1 and less than 10", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Group members must be more than 1 and less than 5", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void createDialogAndCreateIntent() {
+        editTextField = new EditText(this.getApplicationContext());
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Create A Group Name")
+                .setView(editTextField)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        groupName = editTextField.getText().toString();
+                        Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                        ChatFirebaseUtil.passGroupChatModelAsIntent(intent, userList, groupName);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        getApplicationContext().startActivity(intent);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
     }
 }

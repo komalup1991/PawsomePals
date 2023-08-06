@@ -1,8 +1,14 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -10,16 +16,22 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ktx.Firebase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class ChatFirebaseUtil {
     public static String currentUserId() {
@@ -41,17 +53,22 @@ public class ChatFirebaseUtil {
         intent.putExtra("chatStyle", "oneOnOne");
     }
 
-    public static void passGroupChatModelAsIntent(Intent intent, List<Users> users) {
-        StringBuilder nameBuilder = new StringBuilder();
+    public static void passGroupNameAsIntent(Intent intent, String newGroupName) {
+        intent.putExtra("groupName", newGroupName);
+    }
+    public static void passGroupUsersNamesAsIntent(Intent intent, String groupUsersNames) {
+        intent.putExtra("groupUserNames",groupUsersNames);
+    }
+
+    public static void passGroupChatModelAsIntent(Intent intent, List<Users> users, String groupName) {
         StringBuilder idBuilder = new StringBuilder();
 
         for (Users user : users) {
             if (user != null) {
-                nameBuilder.append(user.getName() + " ");
                 idBuilder.append(user.getUserId() + " ");
             }
         }
-        intent.putExtra("name", nameBuilder.toString());
+        intent.putExtra("name", groupName);
         intent.putExtra("ids", idBuilder.toString());
         intent.putExtra("chatStyle", "group");
     }
@@ -67,6 +84,10 @@ public class ChatFirebaseUtil {
     public static CollectionReference allRecipeCollectionReference() {
         Log.i("coll", FirebaseFirestore.getInstance().collection("recipes").getClass().toString());
         return FirebaseFirestore.getInstance().collection("recipes");
+    }
+
+    public static StorageReference allChatRoomImagesCollectionReference() {
+        return FirebaseStorage.getInstance().getReference().child("chat_message_images");
     }
 
     public static DocumentReference getChatroomReference(String chatroomId) {
@@ -127,6 +148,14 @@ public class ChatFirebaseUtil {
         return new GroupChatModel(idList, groupName);
     }
 
+    public static String getGroupNameFromIntent(Intent intent) {
+        return intent.getStringExtra("groupName");
+    }
+
+    public static String getGroupUsersNamesAsIntent(Intent intent) {
+        return intent.getStringExtra("groupUserNames");
+    }
+
 
     public static CollectionReference allChatRoomCollectionReference() {
         return FirebaseFirestore.getInstance().collection("chatroom");
@@ -150,5 +179,45 @@ public class ChatFirebaseUtil {
 
     public static String timestampToString(Timestamp timestamp) {
         return new SimpleDateFormat("MMM d HH:mm:ss").format(timestamp.toDate());
+    }
+
+    public static void uploadImageToStorage(Uri imageUri, FirebaseUtil.DataCallback dataCallback) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+
+        Uri uploadImageUri = null;
+        if (imageUri != null) {
+            uploadImageUri = imageUri;
+        }
+
+        if (uploadImageUri != null) {
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String imageName = "chat" + "_image_" + timestamp + ".jpg";
+            StorageReference imageRef = storageRef.child("chat_message_images/" + imageName);
+            UploadTask uploadTask = imageRef.putFile(uploadImageUri);
+            uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return imageRef.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        if (downloadUri != null) {
+                            dataCallback.onImageUriReceived(downloadUri.toString());
+                        }
+                    } else {
+                        dataCallback.onError(task.getException());
+                    }
+                }
+            });
+        } else {
+            dataCallback.onDismiss();
+        }
     }
 }
