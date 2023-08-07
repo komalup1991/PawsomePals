@@ -1,11 +1,13 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 
@@ -22,6 +24,7 @@ public class RecipeDetailActivity extends AppCompatActivity {
             recipeInstructionTextView, recipeServingSizeTextView, recipeCookTimeTextView, recipePrepTimeTextView;
     EditText recipeNotes;
     ImageView recipeImageView;
+
 
 
     @Override
@@ -43,15 +46,56 @@ public class RecipeDetailActivity extends AppCompatActivity {
         recipePrepTimeTextView = findViewById(R.id.recipePrepTimeTextView);
         recipeNotes = findViewById(R.id.recipeNotes);
         recipeImageView = findViewById(R.id.recipeImageView);
+        CardView cardView2 = findViewById(R.id.cardView2);
+        CardView cardView3 = findViewById(R.id.cardView3);
+        CardView cardView4 = findViewById(R.id.cardView4);
+        CardView cardView5 = findViewById(R.id.cardView5);
+        CardView cardView6 = findViewById(R.id.cardView6);
+        CardView cardView7 = findViewById(R.id.cardView7);
 
 
         recipeNameTextView.setText(recipe.getTitle());
-        recipeDescriptionTextView.setText(recipe.getDesc());
-        recipeIngredientsTextView.setText(recipe.getIngredients());
-        recipeInstructionTextView.setText(recipe.getInstructions());
-        recipeServingSizeTextView.setText(recipe.getServing());
-        recipeCookTimeTextView.setText(recipe.getCookTime());
-        recipePrepTimeTextView.setText(recipe.getPrepTime());
+        String description = recipe.getDesc();
+        if (description != null && !description.isEmpty()) {
+            recipeDescriptionTextView.setText(description);
+        } else {
+            cardView2.setVisibility(View.GONE);
+        }
+
+        String ingredients = recipe.getIngredients();
+        if (ingredients != null && !ingredients.isEmpty()) {
+            recipeIngredientsTextView.setText(ingredients);
+        } else {
+            cardView3.setVisibility(View.GONE);
+        }
+
+        String instruction = recipe.getInstructions();
+        if (instruction != null && !instruction.isEmpty()) {
+            recipeInstructionTextView.setText(instruction);
+        } else {
+            cardView4.setVisibility(View.GONE);
+        }
+
+        String servingSize = recipe.getServing();
+        if (servingSize != null && !servingSize.isEmpty()) {
+            recipeServingSizeTextView.setText(servingSize);
+        } else {
+            cardView5.setVisibility(View.GONE);
+        }
+
+        String cookTime = recipe.getCookTime();
+        if (cookTime != null && !cookTime.isEmpty()) {
+            recipeCookTimeTextView.setText(cookTime);
+        } else {
+            cardView6.setVisibility(View.GONE);
+        }
+
+        String prepTime = recipe.getPrepTime();
+        if (prepTime != null && !prepTime.isEmpty()) {
+            recipePrepTimeTextView.setText(prepTime);
+        } else {
+            cardView7.setVisibility(View.GONE);
+        }
         Glide.with(RecipeDetailActivity.this)
                 .load(recipe.getImg())
                 .into(recipeImageView);
@@ -68,8 +112,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
                 usernameTextView.setText(user.getName());
             }
         });
-
-
     }
 
 

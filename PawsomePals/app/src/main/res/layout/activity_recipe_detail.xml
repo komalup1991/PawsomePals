@@ -95,6 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 app:cardBackgroundColor="@android:color/white"
+
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -104,6 +105,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:padding="16dp"
                     android:orientation="vertical">
 
 
@@ -111,7 +113,6 @@
                 android:id="@+id/recipeDescriptionTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Description"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -124,7 +125,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:padding="8dp"
+
                         android:text="Indulge in the rich, moist, and chocolatey goodness of this amazing chocolate cake recipe."
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -147,6 +148,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="16dp"
                 android:orientation="vertical">
 
 
@@ -154,7 +156,6 @@
                 android:id="@+id/recipeIngredientsTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Ingredients"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -191,13 +192,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="16dp"
                 android:orientation="vertical">
 
             <TextView
                 android:id="@+id/recipeInstructionTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Instructions"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -232,13 +233,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="16dp"
                 android:orientation="vertical">
 
             <TextView
                 android:id="@+id/recipeServingSizeTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Serving Size"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -273,6 +274,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:padding="16dp"
                 android:orientation="vertical">
 
 
@@ -280,7 +282,6 @@
                 android:id="@+id/recipeCookTimeTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Cook Time"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -316,6 +317,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="16dp"
         android:orientation="vertical">
 
 
@@ -323,7 +325,6 @@
                 android:id="@+id/recipePrepTimeTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:text="Prep Time"
                 android:textSize="18sp"
                 android:textStyle="bold"

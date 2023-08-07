@@ -307,9 +307,19 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeDescription = descriptionEditTextView.getText().toString();
         String recipeIngredients = ingredientsEditTextView.getText().toString();
         String recipeInstructions = instructionsEditTextView.getText().toString();
+
         String recipeServing = setServingSizeTextView.getText().toString();
+        if (recipeServing.equals(getString(R.string.set_servings))) {
+            recipeServing="";
+        }
         String recipePrepTime = setPrepTextView.getText().toString();
+        if (recipePrepTime.equals(getString(R.string.set_time))) {
+            recipePrepTime="";
+        }
         String recipeCookTime = setCookTextView.getText().toString();
+        if (recipeCookTime.equals(getString(R.string.set_time))) {
+            recipeCookTime="";
+        }
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> recipeCollection = new HashMap<>();
