@@ -27,6 +27,7 @@ import edu.northeastern.pawsomepals.ui.chat.ChatImgUtil;
 public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageModel, RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_TEXT_MESSAGE = 0;
     private static final int VIEW_TYPE_IMAGE_MESSAGE = 1;
+    private static final int VIEW_TYPE_LOCATION_MESSAGE = 2;
 
 
     private Context context;
@@ -38,7 +39,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
      *
      * @param options
      */
-    public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatMessageModel> options,Context context) {
+    public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatMessageModel> options, Context context) {
         super(options);
         this.context = context;
     }
@@ -50,10 +51,13 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
 
         if (message.isPicture()) {
             return VIEW_TYPE_IMAGE_MESSAGE;
+        } else if (message.isPlace()) {
+            return VIEW_TYPE_LOCATION_MESSAGE;
         } else {
             return VIEW_TYPE_TEXT_MESSAGE;
         }
     }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -66,11 +70,13 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.chat_image_item, parent, false);
             return new ImageViewHolder(view);
+        } else if (viewType == VIEW_TYPE_LOCATION_MESSAGE) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.chat_location_item, parent, false);
+            return new LocationViewHolder(view);
         }
         // return null or throw an exception
         return null;
-//        View view = LayoutInflater.from(context).inflate(R.layout.chat_message_item,parent,false);
-//        return new ChatModelViewHolder(view);
     }
 
     @Override
@@ -78,7 +84,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
         if (holder.getItemViewType() == VIEW_TYPE_TEXT_MESSAGE) {
             ChatModelViewHolder textViewHolder = (ChatModelViewHolder) holder;
             // Set data to text view holder
-            if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())){
+            if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())) {
                 textViewHolder.otherUserNameTextView.setVisibility(View.GONE);
                 textViewHolder.leftChatLayout.setVisibility(View.GONE);
                 textViewHolder.rightChatLayout.setVisibility(View.VISIBLE);
@@ -92,7 +98,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
         } else if (holder.getItemViewType() == VIEW_TYPE_IMAGE_MESSAGE) {
             ImageViewHolder imageViewHolder = (ImageViewHolder) holder;
             // Set data to image view holder
-            if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())){
+            if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())) {
                 imageViewHolder.otherUserNameTextView.setVisibility(View.GONE);
                 imageViewHolder.leftCardView.setVisibility(View.GONE);
                 imageViewHolder.rightCardView.setVisibility(View.VISIBLE);
@@ -106,12 +112,29 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 imageViewHolder.otherUserNameTextView.setText(model.getSenderName());
                 imageViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
             }
+        } else if (holder.getItemViewType() == VIEW_TYPE_LOCATION_MESSAGE) {
+            LocationViewHolder locationViewHolder = (LocationViewHolder) holder;
+            // Set data to image view holder
+            if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())) {
+                locationViewHolder.otherUserNameTextView.setVisibility(View.GONE);
+                locationViewHolder.leftCardView.setVisibility(View.GONE);
+                locationViewHolder.rightCardView.setVisibility(View.VISIBLE);
+                locationViewHolder.ownLocationNameTextview.setText(model.getLocation().getLocationName());
+                locationViewHolder.ownLocationAddressTextview.setText(model.getLocation().getLocationAddress());
+            } else {
+                locationViewHolder.rightCardView.setVisibility(View.GONE);
+                locationViewHolder.leftCardView.setVisibility(View.VISIBLE);
+                locationViewHolder.otherUserNameTextView.setText(model.getSenderName());
+                locationViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
+                locationViewHolder.otherLocationNameTextview.setText(model.getLocation().getLocationName());
+                locationViewHolder.otherLocationAddressTextview.setText(model.getLocation().getLocationAddress());
+            }
         }
     }
 
-    class ChatModelViewHolder extends RecyclerView.ViewHolder{
+    class ChatModelViewHolder extends RecyclerView.ViewHolder {
         LinearLayout leftChatLayout, rightChatLayout;
-        TextView otherUserNameTextView,leftChatTextView, rightChatTextView;
+        TextView otherUserNameTextView, leftChatTextView, rightChatTextView;
 
 
         public ChatModelViewHolder(@NonNull View itemView) {
@@ -123,7 +146,8 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             rightChatLayout = itemView.findViewById(R.id.right_chat_layout);
         }
     }
-    class ImageViewHolder extends RecyclerView.ViewHolder{
+
+    class ImageViewHolder extends RecyclerView.ViewHolder {
         CardView leftCardView, rightCardView;
         ImageView leftImageView, rightImageView;
         TextView otherUserNameTextView;
@@ -138,4 +162,24 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
         }
     }
 
+    class LocationViewHolder extends RecyclerView.ViewHolder {
+        CardView leftCardView, rightCardView;
+        ImageView leftImageView, rightImageView;
+        TextView otherUserNameTextView;
+        TextView otherLocationNameTextview,otherLocationAddressTextview;
+        TextView ownLocationNameTextview,ownLocationAddressTextview;
+
+        public LocationViewHolder(@NonNull View itemView) {
+            super(itemView);
+            otherUserNameTextView = itemView.findViewById(R.id.other_user_name);
+            leftImageView = itemView.findViewById(R.id.img_friend);
+            rightImageView = itemView.findViewById(R.id.img_own);
+            leftCardView = itemView.findViewById(R.id.card_view_friend);
+            rightCardView = itemView.findViewById(R.id.card_view_own);
+            otherLocationNameTextview = itemView.findViewById(R.id.other_location_name);
+            otherLocationAddressTextview = itemView.findViewById(R.id.other_location_address);
+            ownLocationNameTextview = itemView.findViewById(R.id.own_location_name);
+            ownLocationAddressTextview = itemView.findViewById(R.id.own_location_address);
+        }
+    }
 }
