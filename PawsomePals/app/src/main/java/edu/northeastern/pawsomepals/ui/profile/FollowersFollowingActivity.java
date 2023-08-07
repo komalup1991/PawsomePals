@@ -122,6 +122,7 @@ public class FollowersFollowingActivity extends AppCompatActivity {
             public void onUserClick(int position) {
                 Users selectedUser = userProfiles.get(position);
                 String selectedUserId = selectedUser.getUserId();
+                Log.d("yoo",selectedUser.getUserId());
                 navigateToProfileFragment(selectedUserId);
             }
         });
@@ -144,23 +145,17 @@ public class FollowersFollowingActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onBackPressed() {
-        finish();
-    }
-
     private void navigateToProfileFragment(String userIDValue) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("profileId", userIDValue);
+        setResult(RESULT_OK, resultIntent);
+
         SharedPreferences sharedPreferences = this.getSharedPreferences("ProfileId", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("profileId", userIDValue);
         editor.apply();
 
-        //Navigate to Profile Fragment
-        ProfileFragment profileFragment = new ProfileFragment();
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container_view, profileFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        finish();
     }
 
     private void filterList(String newText) {
@@ -280,6 +275,5 @@ public class FollowersFollowingActivity extends AppCompatActivity {
                     } else {
                         Log.e("Fetch User Profiles", "Error fetching user profiles");
                     }
-                });
-    }
+                });}
 }

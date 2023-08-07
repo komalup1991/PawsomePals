@@ -3,6 +3,8 @@ package edu.northeastern.pawsomepals.ui.profile;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import static edu.northeastern.pawsomepals.ui.login.HomeActivity.PROFILE_ACTIVITY_REQUEST_CODE;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -83,20 +85,34 @@ public class ProfileFragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private Boolean isUserProfile = false;
+
     private LinearLayout followingLayout;
     private LinearLayout followersLayout;
     private LinearLayout postsLayout;
+
+    private String profileIdArg;
+    private int OPEN_PROFILE_FRAGMENT = 9;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        if (getArguments() != null) {
+            profileIdArg = getArguments().getString("profileId");
+        }
+
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
 
         currentUser = firebaseAuth.getCurrentUser();
+
+        if (profileIdArg != null) {
+            profileId = profileIdArg;
+        }
+
         if (currentUser != null) {
             userId = currentUser.getUid();
         }
@@ -120,7 +136,7 @@ public class ProfileFragment extends Fragment {
         viewPager = view.findViewById(R.id.viewPager);
 
         // Check if the profileId is the same as the current user's userId
-        if (profileId.equals(userId)) {
+        if (userId.equals(profileId)) {
             editOrFollowButton.setText("Edit Profile");
             isUserProfile = true;
         } else {
@@ -193,7 +209,7 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
                 intent.putExtra("profileId", profileId);
                 intent.putExtra("clickedValue", "following");
-                getContext().startActivity(intent);
+                getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
             }
         });
 
