@@ -6,6 +6,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +19,7 @@ import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatUserRecyclerAdapter;
@@ -48,6 +51,23 @@ public class CreateNewChatActivity extends AppCompatActivity {
         searchInput.requestFocus();
 
         backButton.setOnClickListener(v -> onBackPressed());
+
+        searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                setupSearchRecyclerView(searchInput.getText().toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
 
         searchButton.setOnClickListener(v -> {
             String searchTerm = searchInput.getText().toString();
@@ -83,7 +103,7 @@ public class CreateNewChatActivity extends AppCompatActivity {
 
     private void setupSearchRecyclerView(String searchTerm) {
         Query query = ChatFirebaseUtil.allUserCollectionReference()
-                .whereGreaterThanOrEqualTo("name", searchTerm);
+                .whereGreaterThanOrEqualTo("searchName", searchTerm.toLowerCase());
 
         FirestoreRecyclerOptions<Users> options = new FirestoreRecyclerOptions.Builder<Users>()
                 .setQuery(query, Users.class).build();

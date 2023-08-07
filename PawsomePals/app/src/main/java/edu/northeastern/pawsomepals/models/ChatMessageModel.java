@@ -3,17 +3,22 @@ package edu.northeastern.pawsomepals.models;
 import com.google.firebase.Timestamp;
 
 public class ChatMessageModel {
+    private String senderName;
     private String message;
     private String senderId;
     private Timestamp timestamp;
+    private boolean picture;
+    private String image;
 
     public ChatMessageModel(){
     }
 
-    public ChatMessageModel(String message, String senderId, Timestamp Timestamp){
+    public ChatMessageModel(String message, String senderId, Timestamp Timestamp,String senderName,String image){
         this.message = message;
         this.senderId = senderId;
         this.timestamp = Timestamp;
+        this.senderName = senderName;
+        this.image = image;
     }
 
     public String getMessage() {
@@ -38,5 +43,28 @@ public class ChatMessageModel {
 
     public void setTimestamp(Timestamp Timestamp) {
         this.timestamp = Timestamp;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public boolean isPicture() {
+        return picture;
+    }
+
+    public void setPicture(boolean picture) {
+        this.picture = picture;
+    }
+
+    public void setPictureLink(String url) {
+        this.image = url;
+    }
+    public String getImage(){
+        return image;
     }
 }

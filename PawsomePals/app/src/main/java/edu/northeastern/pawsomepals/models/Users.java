@@ -1,5 +1,10 @@
 package edu.northeastern.pawsomepals.models;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class Users {
 
     private String userId;
@@ -13,6 +18,15 @@ public class Users {
     private String fcmToken;
     private boolean chatSelected = false;
 
+     private List<Favorite> favorites;
+
+    public List<Favorite> getFavoriteList() {
+        return favorites;
+    }
+
+    public void setFavoriteList(List<Favorite> favorites) {
+        this.favorites = favorites;
+    }
 
     public Users() {
     }
@@ -111,5 +125,11 @@ public class Users {
     public void setChatSelected(boolean chatSelected) {
         this.chatSelected = chatSelected;
     }
+
+    public String getSearchName(){
+        return name.toLowerCase();
+    }
+
+
 }
 

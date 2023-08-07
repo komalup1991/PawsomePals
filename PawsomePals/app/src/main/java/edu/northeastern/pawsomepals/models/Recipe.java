@@ -1,7 +1,10 @@
 package edu.northeastern.pawsomepals.models;
 
-public class Recipe {
-    private String recipeId;
+import androidx.annotation.Nullable;
+
+import java.io.Serializable;
+
+public class Recipe extends FeedItem implements Serializable {
     private String title;
     private String img;
     private String desc;
@@ -14,27 +17,11 @@ public class Recipe {
     private String userProfileImage;
     private String createdAt;
 
+
+
+    private String instructions;
+
     public Recipe() {
-    }
-
-    public Recipe(String recipeId, String title, String img, String desc, String createdBy, String ingredients, String serving, String prepTime, String cookTime) {
-        this.recipeId = recipeId;
-        this.title = title;
-        this.img = img;
-        this.desc = desc;
-        this.createdBy = createdBy;
-        this.ingredients = ingredients;
-        this.serving = serving;
-        this.prepTime = prepTime;
-        this.cookTime = cookTime;
-    }
-
-    public String getRecipeId() {
-        return recipeId;
-    }
-
-    public void setRecipeId(String recipeId) {
-        this.recipeId = recipeId;
     }
 
     public String getTitle() {
@@ -63,6 +50,11 @@ public class Recipe {
 
     public String getCreatedBy() {
         return createdBy;
+    }
+
+    @Override
+    public int getType() {
+        return FeedItem.TYPE_RECIPE;
     }
 
     public void setCreatedBy(String createdBy) {
@@ -123,6 +115,30 @@ public class Recipe {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+    public String getInstructions() {
+        return instructions;
+    }
+
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
+    }
+    @Override
+    public int hashCode() {
+        return getFeedItemId().hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof Recipe otherRecipe)) {
+            return false;
+        }
+
+        if (otherRecipe.getFeedItemId() == null || this.getFeedItemId() == null) {
+            return false;
+        }
+
+        return this.getFeedItemId().equals(otherRecipe.getFeedItemId());
     }
 
     @Override

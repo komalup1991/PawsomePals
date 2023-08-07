@@ -4,6 +4,14 @@
     android:layout_height="wrap_content"
     android:padding="8dp">
 
+    <TextView
+        android:id="@+id/other_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Other Name"
+        android:textColor="#989494"
+        android:textSize="16sp" />
+
     <LinearLayout
         android:id="@+id/left_chat_layout"
         android:layout_width="wrap_content"
@@ -11,7 +19,9 @@
         android:layout_marginEnd="80dp"
         android:background="@drawable/edit_text_round_corner"
         android:backgroundTint="@color/orange"
-        android:padding="8dp">
+        android:padding="8dp"
+        android:layout_toRightOf="@id/other_user_name"
+        android:layout_marginStart="4dp" >
 
         <TextView
             android:id="@+id/left_chat_textview"

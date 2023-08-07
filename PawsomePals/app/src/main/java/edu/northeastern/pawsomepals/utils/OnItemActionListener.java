@@ -6,7 +6,7 @@ import edu.northeastern.pawsomepals.models.Recipe;
 public interface OnItemActionListener {
     void onRecipeClick(Recipe recipe);
 
-    void onUserClick(Recipe recipe);
+    void onUserClick(String userId);
 
-    void onLikeClick(FeedItem feedItem);
+    void onLocationClick(FeedItem feedItem);
 }

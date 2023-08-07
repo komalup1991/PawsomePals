@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,10 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.northeastern.pawsomepals.R;
@@ -30,9 +28,9 @@ import edu.northeastern.pawsomepals.adapters.RecentChatRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 
 public class ChatFragment extends Fragment {
-    private EditText searchInput;
+    private TextView searchInput;
     private ImageButton searchButton;
-    private Button createNewChatButton, createNewGroupButton;
+    private Button createNewGroupButton;
     private RecyclerView chatRecyclerview;
     private RecentChatRecyclerAdapter adapter;
 
@@ -51,7 +49,7 @@ public class ChatFragment extends Fragment {
 
         searchInput = view.findViewById(R.id.chat_search_chat);
         searchButton = view.findViewById(R.id.chat_search_chat_btn);
-        createNewChatButton = view.findViewById(R.id.new_chat_btn);
+//        createNewChatButton = view.findViewById(R.id.new_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewGroupButton = view.findViewById(R.id.new_group_chat_btn);
 
@@ -69,11 +67,10 @@ public class ChatFragment extends Fragment {
                 setupRecyclerView();
             }
         });
-
-        createNewChatButton.setOnClickListener(new View.OnClickListener() {
+        searchInput.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getContext(), CreateNewChatActivity.class);
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ChatSearchChatroomActivity.class);
                 startActivity(intent);
             }
         });

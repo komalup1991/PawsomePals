@@ -22,14 +22,15 @@
         android:backgroundTint="@color/white"
         android:orientation="horizontal"
         android:padding="2dp">
-
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/chat_profile_pic"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
-            android:padding="4dp"
-            tools:srcCompat="@tools:sample/avatars" />
+            android:scaleType="centerCrop"
+            app:civ_border_width="2dp"
+            app:civ_border_color="#FFFFFF"
+            android:src="@drawable/group_chat_icon"
+            android:layout_gravity="center_vertical" />
 
         <LinearLayout
             android:id="@+id/linearLayout2"
@@ -44,8 +45,8 @@
 
                 <TextView
                     android:id="@+id/chat_name_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="250dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:text="chat room name"
@@ -77,7 +78,6 @@
 
         </LinearLayout>
     </LinearLayout>
-
 
     <View
         android:id="@+id/view"

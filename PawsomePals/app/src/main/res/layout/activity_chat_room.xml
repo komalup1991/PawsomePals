@@ -32,8 +32,8 @@
         android:id="@+id/chatroom_more_button"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:background="@null"
         android:layout_alignParentRight="true"
+        android:background="@null"
         android:clickable="true"
         android:focusable="true"
         android:padding="8dp"
@@ -44,8 +44,8 @@
         android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="65dp"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="65dp"
         android:layout_marginTop="10dp"
         android:text="User Name"
         android:textColor="@color/white"
@@ -55,22 +55,23 @@
         android:id="@+id/message_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/chatRoomToolBar"
-        android:layout_above="@+id/bottomLayout"/>
+        android:layout_above="@+id/bottomLayout"
+        android:layout_below="@id/chatRoomToolBar" />
 
     <LinearLayout
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="10dp"
         android:background="@color/backgroundColor"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:padding="10dp">
 
         <EditText
             android:id="@+id/message_input"
-            android:layout_width="314dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:layout_weight="3"
             android:ems="10"
             android:hint="Write message here"
             android:inputType="text"
@@ -79,8 +80,9 @@
 
         <ImageButton
             android:id="@+id/function_btn"
-            android:layout_width="50dp"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
+            android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/chat_add_icon" />
 
@@ -88,10 +90,31 @@
             android:id="@+id/message_send_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@null"
             android:src="@drawable/chat_send_icon" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/chat_image_preview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/image_preview_textView"
+        android:visibility="invisible"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/image_preview_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/message_recycler_view"
+        android:layout_marginStart="15dp"
+        android:background="@color/beige"
+        android:text="Image Preview"
+        android:textColor="#A5A1A1"
+        android:visibility="invisible" />
+
 
     <!--        <ImageButton-->
     <!--            android:id="@+id/message_edit_button"-->

@@ -3,17 +3,16 @@ package edu.northeastern.pawsomepals.ui.feed;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -70,7 +69,7 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
 
     class ItemAdapter extends RecyclerView.Adapter<ViewHolder> {
         private Activity activity;
-        private final String[] actions = {"Recipe", "Post", "Photo/Video", "Services", "Events"};
+        private final String[] actions = {"Recipe", "Post", "Photo", "Services", "Events"};
         private final int[] icons = {R.drawable.dogbowl, R.drawable.socialmedia,
                 R.drawable.media, R.drawable.groomingcolor, R.drawable.planner};
         private OnItemClickListener listener;
@@ -113,7 +112,7 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
                         case "Post":
                             intent = new Intent(activity, CreatePostActivity.class);
                             break;
-                        case "Photo/Video":
+                        case "Photo":
                             intent = new Intent(activity, CreatePhotoVideoActivity.class);
                             break;
                         case "Services":

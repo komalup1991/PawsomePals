@@ -1,12 +1,13 @@
 package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
-import android.text.TextUtils;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -14,38 +15,38 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
+import edu.northeastern.pawsomepals.ui.profile.DogProfileActivity;
+import edu.northeastern.pawsomepals.ui.profile.EditDogUserActivity;
 
-public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.DogProfileViewHolder> {
+public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.DogProfileViewHolder> {
     private List<Dogs> dogProfiles;
     private Context context;
     private FirebaseFirestore firebaseFirestore;
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_DOG_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
-    public DogProfileAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile, FirebaseFirestore firebaseFirestore) {
+    public ProfileDogAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile) {
         this.dogProfiles = dogProfiles;
         this.context = context;
         this.isUserProfile = isUserProfile;
-        this.firebaseFirestore = firebaseFirestore;
+        this.firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    public List<Dogs> getDogProfiles() {
+        return dogProfiles;
     }
 
     @NonNull
     @Override
     public DogProfileViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.dogs_items_row, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.profile_dogs_items_row, parent, false);
         return new DogProfileViewHolder(view);
     }
     private void deleteDogProfileFromFirebase(int position) {
@@ -59,8 +60,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
                     // Dog profile deleted successfully
                     Toast.makeText(context, "Dog profile deleted successfully.", Toast.LENGTH_SHORT).show();
                     // You can also remove the dog profile from the local list to update the RecyclerView
-                    dogProfiles.remove(position);
-                    notifyItemRemoved(position);
+
                 })
                 .addOnFailureListener(e -> {
                     // Failed to delete dog profile
@@ -81,17 +81,32 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
 
                 if (isUserProfile) {
                     holder.editButton.setOnClickListener(v -> {
-                        // Handle edit dog profile action
-                        // Implement the action to edit the dog's profile here
+                        Intent intent = new Intent(context, EditDogUserActivity.class);
+                        intent.putExtra("dogId", dogProfile.getDogId());
+                        context.startActivity(intent);
+
                     });
 
                     holder.deleteButton.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
+
                             deleteDogProfileFromFirebase(position);
+                            dogProfiles.remove(position);
+                            notifyItemRemoved(position);
                         }
                     });
                 }
+
+
+                holder.layoutDogInfo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, DogProfileActivity.class);
+                        intent.putExtra("dogId", dogProfile.getDogId());
+                        context.startActivity(intent);
+                    }
+                });
 
             } catch (ParseException e) {
                 throw new RuntimeException(e);
@@ -118,12 +133,18 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
         }
     }
 
+    public void setDogProfiles(List<Dogs> dogProfiles) {
+        this.dogProfiles = dogProfiles;
+
+    }
+
     public class DogProfileViewHolder extends RecyclerView.ViewHolder {
         private ImageView imageDog;
         private TextView nameTextView;
         private TextView breedTextView;
         private ImageButton editButton;
         private ImageButton deleteButton;
+        private LinearLayout layoutDogInfo;
 
         public DogProfileViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -133,6 +154,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
 
             editButton = itemView.findViewById(R.id.btnEdit);
             deleteButton = itemView.findViewById(R.id.btnDelete);
+            layoutDogInfo = itemView.findViewById(R.id.layoutDogInfo);
         }
 
         public void bind(Dogs dogProfile) throws ParseException {
@@ -166,6 +188,7 @@ public class DogProfileAdapter extends RecyclerView.Adapter<DogProfileAdapter.Do
                 editButton.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
             }
+
 
         }
 

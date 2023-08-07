@@ -106,27 +106,28 @@ public class PawsomePalWebService {
                 JSONObject breedObject = breedsArray.getJSONObject(i);
 
                 JSONObject weightObject = breedObject.getJSONObject("weight");
-                String imperialWeight = weightObject.getString("imperial");
-                String metricWeight = weightObject.getString("metric");
+                String imperialWeight = weightObject.has("imperial") ? weightObject.getString("imperial") : "";
+                String metricWeight = weightObject.has("metric") ? weightObject.getString("metric") : "";
 
                 JSONObject heightObject = breedObject.getJSONObject("height");
-                String imperialHeight = weightObject.getString("imperial");
-                String metricHeight = weightObject.getString("metric");
+                String imperialHeight = heightObject.has("imperial") ? heightObject.getString("imperial") : "";
+                String metricHeight = heightObject.has("metric") ? heightObject.getString("metric") : "";
 
-                String id = breedObject.getString("id");
-                String name = breedObject.getString("name");
-                String bred_for = breedObject.getString("bred_for");
-                String breed_group = breedObject.getString("breed_group");
-                String life_span = breedObject.getString("life_span");
-                String temperament = breedObject.getString("temperament");
-                String origin = breedObject.getString("origin");
-                String reference_image_id = breedObject.getString("reference_image_id");
+                String id = breedObject.has("id") ? breedObject.getString("id") : "";
+                String name = breedObject.has("name") ? breedObject.getString("name") : "";
+                String bred_for = breedObject.has("bred_for") ? breedObject.getString("bred_for") : "";
+                String breed_group = breedObject.has("breed_group") ? breedObject.getString("breed_group") : "";
+                String life_span = breedObject.has("life_span") ? breedObject.getString("life_span") : "";
+                String temperament = breedObject.has("temperament") ? breedObject.getString("temperament") : "";
+                String origin = breedObject.has("origin") ? breedObject.getString("origin") : "";
+                String reference_image_id = breedObject.has("reference_image_id") ? breedObject.getString("reference_image_id") : "";
 
                 JSONObject imageObject = breedObject.getJSONObject("image");
-                String imageId = weightObject.getString("id");
-                String imageWidth = weightObject.getString("width");
-                String imageHeight = weightObject.getString("height");
-                String imageUrl = weightObject.getString("url");
+                String imageId = imageObject.has("imageId") ? imageObject.getString("imageId") : "";
+                String imageWidth = imageObject.has("imageWidth") ? imageObject.getString("imageWidth") : "";
+                String imageHeight = imageObject.has("imageHeight") ? imageObject.getString("imageHeight") : "";
+                String imageUrl = imageObject.has("imageUrl") ? imageObject.getString("imageUrl") : "";
+
 
                 BreedWeightDetails weight = new BreedWeightDetails(imperialWeight, metricWeight);
 

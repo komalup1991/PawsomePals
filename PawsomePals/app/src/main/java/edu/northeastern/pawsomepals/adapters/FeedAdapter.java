@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -16,20 +17,26 @@ import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
+import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.EventFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PhotoVideoFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PostFeedViewHolder;
-import edu.northeastern.pawsomepals.ui.feed.viewHolder.RecipeRecyclerViewHolder;
+import edu.northeastern.pawsomepals.ui.feed.viewHolder.RecipeFeedViewHolder;
+import edu.northeastern.pawsomepals.ui.feed.viewHolder.RecipeFeedsHeaderViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.ServicesFeedViewHolder;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<FeedItem> feedItems;
     private Context context;
 
-    public FeedAdapter(List<FeedItem> feedItems, Context context) {
+    private OnItemActionListener onItemActionListener;
+
+    public FeedAdapter(List<FeedItem> feedItems, Context context, OnItemActionListener onItemActionListener) {
         this.feedItems = feedItems;
         this.context = context;
+        this.onItemActionListener = onItemActionListener;
     }
 
     @NonNull
@@ -40,7 +47,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         switch (viewType) {
             case FeedItem.TYPE_RECIPE_HEADER -> {
                 view = layoutInflater.inflate(R.layout.recipe_recycler_view_layout, parent, false);
-                return new RecipeRecyclerViewHolder(view);
+                return new RecipeFeedsHeaderViewHolder(view, onItemActionListener);
             }
             case FeedItem.TYPE_POST -> {
                 view = layoutInflater.inflate(R.layout.feed_post_item, parent, false);
@@ -58,6 +65,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 view = layoutInflater.inflate(R.layout.feed_services_item, parent, false);
                 return new ServicesFeedViewHolder(view);
             }
+            case FeedItem.TYPE_RECIPE -> {
+                view = layoutInflater.inflate(R.layout.recipe_all_layout, parent, false);
+                return new RecipeFeedViewHolder(view);
+            }
             default -> throw new UnsupportedOperationException("Invalid item");
         }
     }
@@ -67,19 +78,19 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         FeedItem feedItem = this.feedItems.get(position);
         switch (feedItem.getType()) {
             case FeedItem.TYPE_RECIPE_HEADER ->
-                    ((RecipeRecyclerViewHolder) holder).bindRecylerViewData();
+                    ((RecipeFeedsHeaderViewHolder) holder).bindRecylerViewData();
             case FeedItem.TYPE_POST ->
-                    ((PostFeedViewHolder) holder). bindData (((Activity)context), (Post) feedItem);
+                    ((PostFeedViewHolder) holder).bindData(((Activity) context), (Post) feedItem, onItemActionListener);
             case FeedItem.TYPE_PHOTO_VIDEO ->
-                    ((PhotoVideoFeedViewHolder) holder).bindData(((Activity)context), (PhotoVideo) feedItem);
+                    ((PhotoVideoFeedViewHolder) holder).bindData(((Activity) context), (PhotoVideo) feedItem, onItemActionListener);
             case FeedItem.TYPE_EVENT ->
-                    ((EventFeedViewHolder) holder).bindData(((Activity)context), (Event) feedItem);
+                    ((EventFeedViewHolder) holder).bindData(((Activity) context), (Event) feedItem, onItemActionListener);
             case FeedItem.TYPE_SERVICE ->
-                    ((ServicesFeedViewHolder) holder).bindData(((Activity)context), (Services) feedItem);
+                    ((ServicesFeedViewHolder) holder).bindData(((Activity) context), (Services) feedItem, onItemActionListener);
+            case FeedItem.TYPE_RECIPE ->
+                    ((RecipeFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Recipe) feedItem, onItemActionListener);
         }
     }
-
-
 
     @Override
     public int getItemViewType(int position) {
@@ -90,6 +101,4 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public int getItemCount() {
         return this.feedItems.size();
     }
-
-
 }

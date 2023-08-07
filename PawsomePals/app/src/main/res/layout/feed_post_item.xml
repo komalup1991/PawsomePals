@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="8dp"
     android:background="@drawable/border"
     android:backgroundTint="@color/pastelGreen">
@@ -15,9 +14,9 @@
         android:id="@+id/user_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:background="@drawable/custom_border_top_round"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -61,98 +60,86 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/postCaptionTextView"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/custom_border_sticker"
-        app:layout_constraintTop_toTopOf="@+id/content_layout"
-        app:layout_constraintEnd_toStartOf="@+id/timestampTextView"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-         />
+        <TextView
+            android:id="@+id/postCaptionTextView"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/custom_border_sticker"
+            app:layout_constraintEnd_toStartOf="@+id/timestampTextView"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/content_layout" />
 
 
-    <TextView
-        android:id="@+id/postContentTextView"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/custom_border_sticker"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/postCaptionTextView" />
+        <TextView
+            android:id="@+id/postContentTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/custom_border_sticker"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/postCaptionTextView" />
 
-    <ImageView
-        android:id="@+id/userTaggedImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        android:contentDescription="User Tagged"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/user"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/postContentTextView" />
+        <ImageView
+            android:id="@+id/userTaggedImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="User Tagged"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/user"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/postContentTextView" />
 
-    <TextView
-        android:id="@+id/userTaggedTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="User Tagged"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/userTaggedImageView"
-        app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
-        app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
+        <TextView
+            android:id="@+id/userTaggedTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="User Tagged"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/userTaggedImageView"
+            app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
+            app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
 
-    <ImageView
-        android:id="@+id/locationTaggedImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        android:contentDescription="Location Tagged"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/pin"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
+        <ImageView
+            android:id="@+id/locationTaggedImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="Location Tagged"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/pin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
 
-    <TextView
-        android:id="@+id/locationTaggedTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Location Tagged"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/locationTaggedImageView"
-        app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
-        app:layout_constraintTop_toTopOf="@id/locationTaggedImageView"  />
+        <TextView
+            android:id="@+id/locationTaggedTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Location Tagged"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/locationTaggedImageView"
+            app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
+            app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <include
-        layout="@layout/feed_actions_layout"
-        android:layout_width="wrap_content"
+
+    <edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout
+        android:id="@+id/feed_action"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/content_layout" />
-
-    <ImageButton
-        android:id="@+id/favImageButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/pawprintempty"
-        android:background="@drawable/custom_border_sticker"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/feed_action"
-        app:layout_constraintTop_toTopOf="@+id/feed_action" />
 </androidx.constraintlayout.widget.ConstraintLayout>

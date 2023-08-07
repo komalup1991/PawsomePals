@@ -6,15 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -32,26 +26,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -72,13 +57,12 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private ImageView selectPhoto;
     private EditText recipeNameEditText;
     private EditText descriptionEditTextView;
-    private EditText ingredientsEditTextView;
+    private EditText ingredientsEditTextView,instructionsEditTextView;
     private String currentPhotoPath;
     private FirebaseFirestore db;
     private StorageReference storageRef;
     private Uri galleryImageUri, cameraImageUri;
     private TextView setServingSizeTextView, setPrepTextView, setCookTextView, valueTextView;
-    private String recipeDocId;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
     private boolean isQuantityPickerDialogVisible = false;
@@ -89,13 +73,14 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private int selectedPrepMinutes;
     private int selectedCookHours;
     private int selectedCookMinutes;
-    private Dialog progressDialog;
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
     String loggedInUserId;
-    private Context context;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
+    private Dialog progressDialog;
+    private Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +112,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
         descriptionEditTextView = findViewById(R.id.descriptionEditTextView);
         ingredientsEditTextView = findViewById(R.id.ingredientsEditTextView);
+        instructionsEditTextView = findViewById(R.id.instructionsEditTextView);
         setServingSizeTextView = findViewById(R.id.setServingSizeTextView);
         setPrepTextView = findViewById(R.id.setPrepTextView);
         setCookTextView = findViewById(R.id.setCookTextView);
@@ -196,6 +182,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
                 showTimePickerDialog("Cook Time", "How long does it take to cook this recipe?", setCookTextView);
             }
         });
+
+
+
 
 
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -317,6 +306,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeTitle = recipeNameEditText.getText().toString();
         String recipeDescription = descriptionEditTextView.getText().toString();
         String recipeIngredients = ingredientsEditTextView.getText().toString();
+        String recipeInstructions = instructionsEditTextView.getText().toString();
         String recipeServing = setServingSizeTextView.getText().toString();
         String recipePrepTime = setPrepTextView.getText().toString();
         String recipeCookTime = setCookTextView.getText().toString();
@@ -327,11 +317,16 @@ public class CreateRecipeActivity extends AppCompatActivity {
         recipeCollection.put("title", recipeTitle);
         recipeCollection.put("desc", recipeDescription);
         recipeCollection.put("ingredients", recipeIngredients);
+        recipeCollection.put("instructions", recipeInstructions);
         recipeCollection.put("serving", recipeServing);
         recipeCollection.put("prepTime", recipePrepTime);
         recipeCollection.put("cookTime", recipeCookTime);
         recipeCollection.put("createdAt", createdAt);
+        recipeCollection.put("type",5);
         recipeCollection.put("img", imageUrlFromFirebaseStorage);
+        recipeCollection.put("feedItemId", UUID.randomUUID().toString());
+        recipeCollection.put("username",userNameToSaveInFeed);
+        recipeCollection.put("userProfileImage",userProfileUrlToSaveInFeed);
 
         FirebaseUtil.createCollectionInFirestore(recipeCollection,"recipes" ,new BaseDataCallback() {
             @Override

@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.models;
 
-public class Dogs {
+import java.io.Serializable;
+
+public class Dogs implements Serializable {
     private String dogId;
     private String userId;
     private String name;
@@ -11,7 +13,7 @@ public class Dogs {
     private String gender;
     private String dob;
     private String size;
-
+    private Boolean isDeleted;
     public Dogs() {
     }
 
@@ -26,6 +28,7 @@ public class Dogs {
         this.gender = gender;
         this.dob = dob;
         this.size = size;
+        this.isDeleted = false;
     }
 
     public String getDogId() {
@@ -108,5 +111,13 @@ public class Dogs {
 
     public String getMixedBreed() {
         return mixedBreed;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }

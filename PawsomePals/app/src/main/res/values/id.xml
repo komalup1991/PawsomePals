@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_people_search_tv" type="id"/>
+    <item name="tag_location_search_tv" type="id"/>
+</resources>
