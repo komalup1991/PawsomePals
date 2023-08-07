@@ -530,18 +530,6 @@ public class ProfileFragment extends Fragment {
         firebaseFirestore.collection("user")
                 .whereEqualTo("userId", userIdValue)
                 .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    postsCountValue = queryDocumentSnapshots.size();
-                    // Update the UI with the new posts count
-                    postsCount.setText(String.valueOf(postsCountValue));
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Get Posts Count", "Error getting documents.", e);
-                });
-
-        firebaseFirestore.collection("user")
-                .whereEqualTo("userId", userIdValue)
-                .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         for (QueryDocumentSnapshot userDocument : task.getResult()) {
