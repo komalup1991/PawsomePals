@@ -91,8 +91,6 @@ public class ProfileFragment extends Fragment {
     private LinearLayout postsLayout;
 
     private String profileIdArg;
-    private int OPEN_PROFILE_FRAGMENT = 9;
-
 
     @Nullable
     @Override

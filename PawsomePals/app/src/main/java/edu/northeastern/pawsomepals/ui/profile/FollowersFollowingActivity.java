@@ -122,7 +122,6 @@ public class FollowersFollowingActivity extends AppCompatActivity {
             public void onUserClick(int position) {
                 Users selectedUser = userProfiles.get(position);
                 String selectedUserId = selectedUser.getUserId();
-                Log.d("yoo",selectedUser.getUserId());
                 navigateToProfileFragment(selectedUserId);
             }
         });

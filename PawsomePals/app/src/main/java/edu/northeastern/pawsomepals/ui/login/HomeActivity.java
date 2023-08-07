@@ -1,5 +1,3 @@
-
-
 package edu.northeastern.pawsomepals.ui.login;
 
 import androidx.annotation.NonNull;
@@ -174,7 +172,7 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
     @Override
     public void onBackPressed() {
         if (currentSelectedItemIndex != R.id.feed) {
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag(getFragmentTagBasedOnId(R.id.feed));
+            Fragment fragment = getFragmentBasedOnId(R.id.feed);
             replaceFragment(fragment, currentSelectedItemIndex);
             bottomNavigationView.setSelectedItemId(R.id.feed);
             currentSelectedItemIndex = R.id.feed;
@@ -205,13 +203,9 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
                 getSupportFragmentManager().beginTransaction()
                         .setReorderingAllowed(true)
                         .replace(R.id.fragment_container_view, ProfileFragment.class, data.getExtras(),
-                                "profile_fragment")
+                                "profile_fragment_other")
                         .commit();
             }
-        }
-        if (requestCode == 9) {
-
-
         }
     }
 }
