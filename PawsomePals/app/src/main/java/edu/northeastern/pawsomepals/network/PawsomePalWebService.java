@@ -123,10 +123,10 @@ public class PawsomePalWebService {
                 String reference_image_id = breedObject.has("reference_image_id") ? breedObject.getString("reference_image_id") : "";
 
                 JSONObject imageObject = breedObject.getJSONObject("image");
-                String imageId = imageObject.has("imageId") ? imageObject.getString("imageId") : "";
-                String imageWidth = imageObject.has("imageWidth") ? imageObject.getString("imageWidth") : "";
-                String imageHeight = imageObject.has("imageHeight") ? imageObject.getString("imageHeight") : "";
-                String imageUrl = imageObject.has("imageUrl") ? imageObject.getString("imageUrl") : "";
+                String imageId = imageObject.has("id") ? imageObject.getString("id") : "";
+                String imageWidth = imageObject.has("width") ? imageObject.getString("width") : "";
+                String imageHeight = imageObject.has("height") ? imageObject.getString("height") : "";
+                String imageUrl = imageObject.has("url") ? imageObject.getString("url") : "";
 
 
                 BreedWeightDetails weight = new BreedWeightDetails(imperialWeight, metricWeight);
