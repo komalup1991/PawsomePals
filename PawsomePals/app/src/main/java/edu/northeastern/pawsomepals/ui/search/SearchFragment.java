@@ -19,6 +19,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -43,7 +46,6 @@ import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
 
-import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchDogAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchRecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchUserAdapter;
@@ -53,9 +55,7 @@ import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
-import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
-import edu.northeastern.pawsomepals.ui.profile.NewDogProfileActivity;
-import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
+
 
 public class SearchFragment extends Fragment {
 
@@ -230,20 +230,18 @@ public class SearchFragment extends Fragment {
             int random = getRandomNumber(0,breeds.size()-1);
             Log.d("breeds",breeds.get(0).toString());
             BreedDetails randomBreed = breeds.get(random);
+            ImageView breedImage = getView().findViewById(R.id.breed_image);
+            TextView breedName = getView().findViewById(R.id.breed_name);
 
-//            progressBar.setVisibility(View.GONE);
-//
-//            breedAdapter.clear();
-//            mixedBreedAdapter.clear();
-//
-//            breedAdapter.insert("Dog's Breed", 0);
-//            mixedBreedAdapter.insert("Dog's Mixed Breed", 0);
-//
-//            breedAdapter.addAll(breeds);
-//            mixedBreedAdapter.addAll(breeds);
-//
-//            breedAdapter.notifyDataSetChanged();
-//            mixedBreedAdapter.notifyDataSetChanged();
+            String imageUrl = randomBreed.getImage().getUrl();
+            Log.d("image",imageUrl);
+
+            breedName.setText(randomBreed.getName());
+            Glide.with(requireContext())
+                    .load(randomBreed.getImage().getUrl())
+                    .into(breedImage);
+
+
         }
 
         @Override

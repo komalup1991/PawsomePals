@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -46,43 +47,53 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/golden_retriever"
-        android:layout_width="344dp"
-        android:layout_height="262dp"
-        android:layout_below="@id/new_chat_bar"
-        android:layout_marginStart="16dp"
+        android:layout_width="170dp"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="12dp"
         android:layout_marginLeft="16dp"
-        android:layout_marginTop="46dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        android:elevation="4dp">
+        android:background="@color/darkPink"
+        android:elevation="4dp"
+        app:cardCornerRadius="15dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <ImageView
+
+            <TextView
+                android:id="@+id/breed_title"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/darkPink"
+                android:text="Pet of the Day!"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/breed_image"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@color/darkPink"
+                android:scaleType="fitCenter"
                 android:src="@drawable/servicedog" />
 
             <TextView
+                android:id="@+id/breed_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="Golden Retriever"
-                android:textSize="18sp"
+                android:text="Name"
+                android:background="@color/darkPink"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="The Golden Retriever is a friendly, intelligent, and devoted dog breed." />
+            />
 
-            <!-- Add more information about the Golden Retriever if needed -->
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
