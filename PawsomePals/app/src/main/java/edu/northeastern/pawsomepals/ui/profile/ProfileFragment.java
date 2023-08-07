@@ -3,6 +3,8 @@ package edu.northeastern.pawsomepals.ui.profile;
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 
+import static edu.northeastern.pawsomepals.ui.login.HomeActivity.PROFILE_ACTIVITY_REQUEST_CODE;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,16 +86,31 @@ public class ProfileFragment extends Fragment {
     private ViewPager2 viewPager;
     private Boolean isUserProfile = false;
 
+    private LinearLayout followingLayout;
+    private LinearLayout followersLayout;
+    private LinearLayout postsLayout;
+
+    private String profileIdArg;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        if (getArguments() != null) {
+            profileIdArg = getArguments().getString("profileId");
+        }
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
 
         currentUser = firebaseAuth.getCurrentUser();
+
+        if (profileIdArg != null) {
+            profileId = profileIdArg;
+        }
+
         if (currentUser != null) {
             userId = currentUser.getUid();
         }
@@ -108,13 +126,15 @@ public class ProfileFragment extends Fragment {
         followingCount = view.findViewById(R.id.followingCount);
         editOrFollowButton = view.findViewById(R.id.editOrFollowButton);
         progressBar = view.findViewById(R.id.progressBar);
-
+        followingLayout = view.findViewById(R.id.followingLayout);
+        followersLayout = view.findViewById(R.id.followersLayout);
+        postsLayout = view.findViewById(R.id.postsLayout);
         fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
 
         // Check if the profileId is the same as the current user's userId
-        if (profileId.equals(userId)) {
+        if (userId.equals(profileId)) {
             editOrFollowButton.setText("Edit Profile");
             isUserProfile = true;
         } else {
@@ -181,13 +201,23 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        followingCount.setOnClickListener(new View.OnClickListener() {
+        followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
                 intent.putExtra("profileId", profileId);
                 intent.putExtra("clickedValue", "following");
-                getContext().startActivity(intent);
+                getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
+            }
+        });
+
+        followersLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
+                intent.putExtra("profileId", profileId);
+                intent.putExtra("clickedValue", "followers");
+                getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
             }
         });
 
@@ -374,9 +404,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
-
-
     private void unfollowProfile() {
         // Check if the document for the current user exists in the "follow" collection
         firebaseFirestore.collection("follow")
@@ -448,8 +475,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
-
     private void getFollowingCount(String userIdValue) {
         firebaseFirestore.collection("follow")
                 .document(userIdValue)
@@ -501,7 +526,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
     private void getPostsCount(String userIdValue) {
         firebaseFirestore.collection("posts")
                 .whereEqualTo("createdBy", userIdValue)
@@ -517,18 +541,6 @@ public class ProfileFragment extends Fragment {
     }
 
     private void getUserInfo(String userIdValue) {
-        firebaseFirestore.collection("user")
-                .whereEqualTo("userId", userIdValue)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    postsCountValue = queryDocumentSnapshots.size();
-                    // Update the UI with the new posts count
-                    postsCount.setText(String.valueOf(postsCountValue));
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Get Posts Count", "Error getting documents.", e);
-                });
-
         firebaseFirestore.collection("user")
                 .whereEqualTo("userId", userIdValue)
                 .get()

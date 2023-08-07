@@ -6,4 +6,252 @@
     android:layout_height="match_parent"
     tools:context=".ui.profile.EditDogUserActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        style="@style/AppToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </androidx.appcompat.widget.Toolbar>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imageProfile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/dog"
+                app:civ_border_color="#FFFFFF"
+                app:civ_border_width="2dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageAddIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/circle_background"
+                android:src="@drawable/baseline_add_24"
+                app:layout_constraintBottom_toBottomOf="@id/imageProfile"
+                app:layout_constraintEnd_toEndOf="@id/imageProfile"
+                app:tint="@color/white" />
+
+            <EditText
+                android:id="@+id/editTextName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/input_bg"
+                android:drawableLeft="@drawable/dog_paw"
+                android:drawablePadding="10dp"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="text"
+                android:paddingLeft="20dp"
+                android:paddingTop="13dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="13dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/imageProfile" />
+
+
+            <RadioGroup
+                android:id="@+id/radioGroupGender"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="left"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/editTextName">
+
+
+                <RadioButton
+                    android:id="@+id/radioButtonMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/white"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Male"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:buttonTint="@color/white"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Female"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/textViewDOB"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/input_bg"
+                android:drawableLeft="@drawable/baseline_calendar_month_24"
+                android:drawablePadding="10dp"
+                android:ems="10"
+                android:hint="Date Of Birth/Adoption"
+                android:inputType="date"
+                android:paddingLeft="20dp"
+                android:paddingTop="13dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="13dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                app:layout_constraintEnd_toEndOf="@id/radioGroupGender"
+                app:layout_constraintStart_toStartOf="@id/radioGroupGender"
+                app:layout_constraintTop_toBottomOf="@id/radioGroupGender" />
+
+            <RadioGroup
+                android:id="@+id/radioGroupSize"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="left"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/textViewDOB">
+
+                <RadioButton
+                    android:id="@+id/radioButtonSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@color/white"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Small"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonMedium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:buttonTint="@color/white"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Medium"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:buttonTint="@color/white"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="Large"
+                    android:textColor="@color/white"
+                    android:textColorHint="@color/white" />
+
+            </RadioGroup>
+
+            <CheckBox
+                android:id="@+id/checkBoxMixedBreed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/input_bg"
+                android:buttonTint="@color/white"
+                android:paddingRight="10dp"
+                android:text="Mixed Breed"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                app:layout_constraintStart_toStartOf="@+id/radioGroupSize"
+                app:layout_constraintTop_toBottomOf="@+id/radioGroupSize" />
+
+            <Spinner
+                android:id="@+id/spinnerDogBreed"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/input_bg"
+                android:popupBackground="@color/accentColor"
+                android:spinnerMode="dropdown"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/checkBoxMixedBreed" />
+
+            <Spinner
+                android:id="@+id/spinnerMixedBreed"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/input_bg"
+                android:dropDownSelector="@drawable/custom_spinner_selector"
+                android:popupBackground="@color/accentColor"
+                android:spinnerMode="dropdown"
+                android:textColor="@color/white"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/spinnerDogBreed" />
+
+
+            <Button
+                android:id="@+id/btnUpdate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="26dp"
+                android:background="@drawable/input_bg"
+                android:text="Update"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/editTextName"
+                app:layout_constraintStart_toStartOf="@id/editTextName"
+                app:layout_constraintTop_toBottomOf="@id/spinnerMixedBreed" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -39,13 +40,71 @@
             android:src="@drawable/chat_search_icon"
             android:visibility="visible" />
 
+
+
     </LinearLayout>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/golden_retriever"
+        android:layout_width="170dp"
+        android:layout_height="150dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@color/darkPink"
+        android:elevation="4dp"
+        app:cardCornerRadius="15dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/breed_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:background="@color/darkPink"
+                android:text="Pet of the Day!"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/breed_image"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@color/darkPink"
+                android:scaleType="fitCenter"
+                android:src="@drawable/servicedog" />
+
+            <TextView
+                android:id="@+id/breed_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Name"
+                android:background="@color/darkPink"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            />
+
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/new_chat_bar"/>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,20 +117,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Dogs" />
+            android:text="Dogs"
+            android:background="@drawable/button_selector"/>
         <Button
             android:id="@+id/user_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Users" />
+            android:text="Users"
+            android:background="@drawable/button_selector"/>
         <Button
             android:id="@+id/recipe_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Recipes" />
+            android:text="Recipes"
+            android:background="@drawable/button_selector"/>
+
 
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/history_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:text="Search History" />
+
+
 
 </RelativeLayout>
