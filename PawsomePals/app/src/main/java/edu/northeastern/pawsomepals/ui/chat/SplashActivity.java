@@ -11,7 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
@@ -27,6 +29,7 @@ public class SplashActivity extends AppCompatActivity {
         if (ChatFirebaseUtil.isLoggedIn() && getIntent().getExtras() != null){
             //from notification
             String userId = getIntent().getExtras().getString("userId");
+            userId= FirebaseAuth.getInstance().getCurrentUser().getUid();
             ChatFirebaseUtil.allUserCollectionReference().document(userId).get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()){

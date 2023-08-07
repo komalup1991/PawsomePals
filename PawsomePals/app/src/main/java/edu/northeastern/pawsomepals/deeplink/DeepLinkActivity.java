@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import edu.northeastern.pawsomepals.ui.login.HomeActivity;
+
 public class DeepLinkActivity extends AppCompatActivity {
 
     @Override
@@ -15,12 +17,21 @@ public class DeepLinkActivity extends AppCompatActivity {
         Uri deepLinkUri = getIntent().getData();
 
         if (deepLinkUri != null) {
+            String feedId = deepLinkUri.getQueryParameter("feedId");
+            if (feedId == null) {
             PackageManager packageManager = getPackageManager();
             Intent intent = packageManager.getLaunchIntentForPackage(getApplication().getPackageName());
-            startActivity(intent);
-            finish();
+                if (intent != null) {
+                    startActivity(intent);
+                }
+            } else {
+                Intent intent = new Intent(this, HomeActivity.class);
+                intent.putExtra("feedId", feedId);
+                startActivity(intent);
+            }
+        }
+        finish();
 
-            String deepLinkPath = deepLinkUri.getPath();
+           // String deepLinkPath = deepLinkUri.getPath();
         }
     }
-}

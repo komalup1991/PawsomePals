@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
+import androidx.annotation.Nullable;
+
 import java.io.Serializable;
 
 public abstract class FeedItem implements Serializable {
@@ -135,5 +137,23 @@ public abstract class FeedItem implements Serializable {
 
     public void setDisplayTime(String displayTime) {
         this.displayTime = displayTime;
+    }
+
+    @Override
+    public int hashCode() {
+        return getFeedItemId().hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof FeedItem otherFeedItem)) {
+            return false;
+        }
+
+        if (otherFeedItem.getFeedItemId() == null || this.getFeedItemId() == null) {
+            return false;
+        }
+
+        return this.getFeedItemId().equals(otherFeedItem.getFeedItemId());
     }
 }
