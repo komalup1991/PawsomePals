@@ -217,7 +217,7 @@ public class ProfileFragment extends Fragment {
                 Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
                 intent.putExtra("profileId", profileId);
                 intent.putExtra("clickedValue", "followers");
-                getContext().startActivity(intent);
+                getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
             }
         });
 
