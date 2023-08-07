@@ -1,7 +1,9 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -10,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -77,14 +80,22 @@ public class FollowersFollowingActivity extends AppCompatActivity {
             userId = currentUser.getUid();
         }
 
-        SharedPreferences sharedPreferences = getSharedPreferences("ProfileId", MODE_PRIVATE);
-        profileId = sharedPreferences.getString("profileId", "none");
-
         // Initialize UI elements
         recyclerViewUsers = findViewById(R.id.recyclerView);
         textNoUserProfiles = findViewById(R.id.textViewEmptyList);
         searchView = findViewById(R.id.searchView);
         progressBar = findViewById(R.id.progressBar);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            if(displayFollowersOrFollowingUsers.equals("following")) {
+            actionBar.setTitle("Following Users");} else {
+                actionBar.setTitle("Followers");
+            }
+        }
 
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -115,10 +126,27 @@ public class FollowersFollowingActivity extends AppCompatActivity {
             }
         });
 
-        fetchFollowingUserProfiles(profileId);
-
+        if(displayFollowersOrFollowingUsers.equals("following")) {
+            fetchFollowingUserProfiles(profileId);
+        }else {
+            fetchFollowersUserProfiles(profileId);
+        }
         progressBar.setVisibility(View.GONE);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     private void navigateToProfileFragment(String userIDValue) {
@@ -203,4 +231,55 @@ public class FollowersFollowingActivity extends AppCompatActivity {
                 });
     }
 
+    private void fetchFollowersUserProfiles(String userIdValue) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("follow")
+                .document(userIdValue)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            List<String> followingList = (List<String>) document.get("followers");
+                            if (followingList != null && !followingList.isEmpty()) {
+                                // Step 2: Fetch documents from the "user" collection based on the list of user IDs
+                                db.collection("user")
+                                        .whereIn("userId", followingList)
+                                        .get()
+                                        .addOnCompleteListener(userTask -> {
+                                            if (userTask.isSuccessful()) {
+                                                userProfiles = new ArrayList<>();
+                                                for (QueryDocumentSnapshot userDoc : userTask.getResult()) {
+                                                    // Replace "UserModel" with your actual model class for users
+                                                    Users user = userDoc.toObject(Users.class);
+
+                                                    userProfiles.add(user);
+                                                }
+                                                profileFollowingFollowerAdapter.setUserProfiles(userProfiles);
+
+                                                profileFollowingFollowerAdapter.notifyDataSetChanged();
+                                            } else {
+                                                Log.e("Fetch User Profiles", "Error fetching user profiles");
+                                            }
+                                        });
+                            } else {
+                                if (followingList != null && !followingList.isEmpty() && !(followingList.size() == 0)) {
+                                    recyclerViewUsers.setVisibility(View.VISIBLE);
+                                    textNoUserProfiles.setVisibility(View.GONE);
+                                } else {
+                                    recyclerViewUsers.setVisibility(View.GONE);
+                                    textNoUserProfiles.setText("No user is following you");
+                                    textNoUserProfiles.setVisibility(View.VISIBLE);
+                                }
+                                profileFollowingFollowerAdapter.notifyDataSetChanged();
+                            }
+                        } else {
+                            Log.e("Fetch User Profiles", "Error fetching user profiles");
+                        }
+                    } else {
+                        Log.e("Fetch User Profiles", "Error fetching user profiles");
+                    }
+                });
+    }
 }

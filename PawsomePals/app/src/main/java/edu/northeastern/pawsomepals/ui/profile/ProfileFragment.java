@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,6 +83,9 @@ public class ProfileFragment extends Fragment {
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
     private Boolean isUserProfile = false;
+    private LinearLayout followingLayout;
+    private LinearLayout followersLayout;
+    private LinearLayout postsLayout;
 
     @Nullable
     @Override
@@ -108,7 +112,9 @@ public class ProfileFragment extends Fragment {
         followingCount = view.findViewById(R.id.followingCount);
         editOrFollowButton = view.findViewById(R.id.editOrFollowButton);
         progressBar = view.findViewById(R.id.progressBar);
-
+        followingLayout = view.findViewById(R.id.followingLayout);
+        followersLayout = view.findViewById(R.id.followersLayout);
+        postsLayout = view.findViewById(R.id.postsLayout);
         fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
@@ -181,12 +187,22 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        followingCount.setOnClickListener(new View.OnClickListener() {
+        followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
                 intent.putExtra("profileId", profileId);
                 intent.putExtra("clickedValue", "following");
+                getContext().startActivity(intent);
+            }
+        });
+
+        followersLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
+                intent.putExtra("profileId", profileId);
+                intent.putExtra("clickedValue", "followers");
                 getContext().startActivity(intent);
             }
         });
@@ -374,9 +390,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
-
-
     private void unfollowProfile() {
         // Check if the document for the current user exists in the "follow" collection
         firebaseFirestore.collection("follow")
@@ -448,8 +461,6 @@ public class ProfileFragment extends Fragment {
     }
 
 
-
-
     private void getFollowingCount(String userIdValue) {
         firebaseFirestore.collection("follow")
                 .document(userIdValue)
@@ -499,7 +510,6 @@ public class ProfileFragment extends Fragment {
                     }
                 });
     }
-
 
 
     private void getPostsCount(String userIdValue) {
