@@ -39,13 +39,61 @@
             android:src="@drawable/chat_search_icon"
             android:visibility="visible" />
 
+
+
     </LinearLayout>
+
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/golden_retriever"
+        android:layout_width="344dp"
+        android:layout_height="262dp"
+        android:layout_below="@id/new_chat_bar"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginBottom="16dp"
+        android:elevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/servicedog" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="Golden Retriever"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="The Golden Retriever is a friendly, intelligent, and devoted dog breed." />
+
+            <!-- Add more information about the Golden Retriever if needed -->
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/new_chat_bar"/>
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -58,20 +106,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Dogs" />
+            android:text="Dogs"
+            android:background="@drawable/button_selector"/>
         <Button
             android:id="@+id/user_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Users" />
+            android:text="Users"
+            android:background="@drawable/button_selector"/>
         <Button
             android:id="@+id/recipe_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Recipes" />
+            android:text="Recipes"
+            android:background="@drawable/button_selector"/>
+
 
     </LinearLayout>
+
+
+    <Button
+        android:id="@+id/history_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:text="Search History" />
+
+
 
 </RelativeLayout>

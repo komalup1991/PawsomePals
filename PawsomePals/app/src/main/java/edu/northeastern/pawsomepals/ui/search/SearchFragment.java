@@ -1,13 +1,16 @@
 package edu.northeastern.pawsomepals.ui.search;
 
+
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -16,6 +19,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,7 +37,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
 
@@ -41,10 +47,14 @@ import edu.northeastern.pawsomepals.adapters.RecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchDogAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchRecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchUserAdapter;
+import edu.northeastern.pawsomepals.models.BreedDetails;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
+import edu.northeastern.pawsomepals.network.PawsomePalWebService;
 import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
+import edu.northeastern.pawsomepals.ui.profile.NewDogProfileActivity;
 import edu.northeastern.pawsomepals.ui.profile.UserProfileActivity;
 
 public class SearchFragment extends Fragment {
@@ -76,6 +86,8 @@ public class SearchFragment extends Fragment {
 
     private SearchDogAdapter.OnItemActionListener onItemActionListenerDog;
 
+    private PawsomePalWebService pawsomePalWebService;
+
 
     @Nullable
     @Override
@@ -104,8 +116,11 @@ public class SearchFragment extends Fragment {
         Button dogBtn = view.findViewById(R.id.dog_btn);
         Button userBtn = view.findViewById(R.id.user_btn);
         Button recipeBtn = view.findViewById(R.id.recipe_btn);
+        Button historyBtn = view.findViewById(R.id.history_button);
 
         AutoCompleteTextView autoCompleteTextView = view.findViewById(R.id.search);
+        autoCompleteTextView.requestFocus();
+
         autoCompleteAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_dropdown_item_1line,
@@ -113,11 +128,12 @@ public class SearchFragment extends Fragment {
         );
         autoCompleteTextView.setAdapter(autoCompleteAdapter);
 
+
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedQuery = autoCompleteAdapter.getItem(position);
-                searchInput.setText(selectedQuery); // Set the selected suggestion in the EditText
+                searchInput.setText(selectedQuery);
                 performSearch(selectedSearchType);
             }
         });
@@ -150,6 +166,7 @@ public class SearchFragment extends Fragment {
                 }
 
                 performSearch(selectedSearchType);
+                saveSearchHistory(searchInput.getText().toString());
             }
         });
 
@@ -159,6 +176,10 @@ public class SearchFragment extends Fragment {
                 selectedSearchType = "dogs";
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
+                dogBtn.setSelected(true);
+                userBtn.setSelected(false);
+                recipeBtn.setSelected(false);
+
             }
         });
 
@@ -167,6 +188,7 @@ public class SearchFragment extends Fragment {
             public void onClick(View view) {
                 selectedSearchType = "users";
                 searchRecyclerView.setAdapter(searchUserAdapter);
+
 
             }
         });
@@ -180,14 +202,76 @@ public class SearchFragment extends Fragment {
             }
         });
 
+        historyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                List<String> searchHistory = getSearchHistory();
+                if (!searchHistory.isEmpty()) {
+                    showSearchHistoryDialog(searchHistory);
+                } else {
+                    Toast.makeText(requireContext(), "No search history available", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        pawsomePalWebService = new PawsomePalWebService(uiThreadCallback);
+
+        pawsomePalWebService.getBreedsDetails();
+
+
     }
+
+
+    PawsomePalWebService.UiThreadCallback uiThreadCallback = new BaseUiThreadCallback() {
+
+        public void onGetAllBreedsDetails(List<BreedDetails> breeds) {
+            int random = getRandomNumber(0,breeds.size()-1);
+            Log.d("breeds",breeds.get(0).toString());
+            BreedDetails randomBreed = breeds.get(random);
+
+//            progressBar.setVisibility(View.GONE);
+//
+//            breedAdapter.clear();
+//            mixedBreedAdapter.clear();
+//
+//            breedAdapter.insert("Dog's Breed", 0);
+//            mixedBreedAdapter.insert("Dog's Mixed Breed", 0);
+//
+//            breedAdapter.addAll(breeds);
+//            mixedBreedAdapter.addAll(breeds);
+//
+//            breedAdapter.notifyDataSetChanged();
+//            mixedBreedAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onError() {
+            //progressBar.setVisibility(View.GONE);
+            //Toast.makeText(NewDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onEmptyResult() {
+//            progressBar.setVisibility(View.GONE);
+//            Toast.makeText(NewDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
+        }
+
+    };
+
+//    pawsomePalWebService = new PawsomePalWebService(uiThreadCallback);
+//        pawsomePalWebService.getBreedsNames();
+//        progressBar.setVisibility(View.VISIBLE);
+
     private void performSearch(String searchType) {
         String inputSearch = searchInput.getText().toString().trim();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query;
 
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").whereGreaterThanOrEqualTo("name", inputSearch);
+            query = db.collection("dogs").
+                    whereGreaterThanOrEqualTo("name", inputSearch);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -198,7 +282,7 @@ public class SearchFragment extends Fragment {
                             Dogs dog1 = documentSnapshot.toObject(Dogs.class);
                             searchDogList.add(dog1);
                         }
-                        Log.d("list",searchDogList.get(0).toString());
+                        //Log.d("list",searchDogList.get(0).toString());
                         searchDogAdapter.setDogs(searchDogList);
                         searchDogAdapter.notifyDataSetChanged();
                     }
@@ -321,7 +405,41 @@ public class SearchFragment extends Fragment {
         });
     }
 
+    private void saveSearchHistory(String searchTerm) {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("SearchHistory", Context.MODE_PRIVATE);
+        Set<String> historySet = sharedPreferences.getStringSet("history", new HashSet<>());
+        historySet.add(searchTerm);
 
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putStringSet("history", historySet);
+        editor.apply();
+    }
 
+    private List<String> getSearchHistory() {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("SearchHistory", Context.MODE_PRIVATE);
+        Set<String> historySet = sharedPreferences.getStringSet("history", new HashSet<>());
+        return new ArrayList<>(historySet);
+    }
+
+    private void showSearchHistoryDialog(List<String> searchHistory) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Search History");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, searchHistory);
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int position) {
+                String selectedQuery = searchHistory.get(position);
+                searchInput.setText(selectedQuery);
+                performSearch(selectedSearchType);
+            }
+        });
+        builder.setPositiveButton("OK", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public int getRandomNumber(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
+    }
 
 }
