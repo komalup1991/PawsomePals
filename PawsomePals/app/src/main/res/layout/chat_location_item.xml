@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:padding="8dp">
+    <TextView
+        android:id="@+id/other_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Other Name"
+        android:textColor="#989494"
+        android:textSize="16sp" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_friend"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/orange"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        android:layout_toRightOf="@id/other_user_name"
+        android:layout_marginStart="4dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_toRightOf="@id/other_user_name">
+            <TextView
+                android:id="@+id/other_location_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location name"
+                android:textColor="#989494"
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/other_location_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location address"
+                android:textColor="#989494"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/img_friend"
+                android:layout_width="300dp"
+                android:layout_height="250dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/chat_location_img"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view_own"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/yellow"
+        android:layout_alignParentRight="true"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="8dp"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+            <TextView
+                android:id="@+id/own_location_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location name"
+                android:textColor="#989494"
+                android:textSize="18sp" />
+            <TextView
+                android:id="@+id/own_location_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Location address"
+                android:textColor="#989494"
+                android:textSize="16sp" />
+
+            <ImageView
+                android:id="@+id/img_own"
+                android:layout_width="300dp"
+                android:layout_height="250dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/chat_location_img"
+                android:layout_alignParentRight="true" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

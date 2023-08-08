@@ -2,6 +2,8 @@ package edu.northeastern.pawsomepals.ui.chat;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
@@ -48,6 +51,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -67,6 +73,7 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatMessageRecyclerAdapter;
+import edu.northeastern.pawsomepals.models.ChatLocationModel;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.ChatStyle;
@@ -88,13 +95,15 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private static final int PERMISSIONS_REQUEST_CAMERA = 3;
     private static final int PERMISSIONS_REQUEST_STORAGE = 4;
+    private Dialog functionDialog;
+
     private EditText messageInput;
     private ImageButton sendMessageBtn;
     private ImageButton functionBtn;
     private ImageButton backBtn;
     private ImageButton infoBtn;
     private ImageView img_preview;
-    private TextView imgPreviewTextView;
+    private TextView imgPreviewTextView,locationPreviewTextView;
     private TextView chatRoomName;
     private RecyclerView chatRoomRecyclerView;
     private List<Users> otherGroupUsers;
@@ -107,8 +116,10 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ChatMessageRecyclerAdapter adapter;
 
     private GroupChatModel group;
+    private ChatLocationModel location;
     private Uri fileUri;
     private StorageReference storageReference;
+    private ActivityResultLauncher<Intent> startAutocomplete = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,14 +127,20 @@ public class ChatRoomActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_room);
 
         initialView();
+        functionDialog = new Dialog(this);
         otherGroupUsers = new ArrayList<>();
         groupUsers = new ArrayList<>();
         groupUsersNames = new ArrayList<>();
+        location = null;
         sendMessageBtn.setOnClickListener(view -> {
             String message = messageInput.getText().toString().trim();
             if (message.isEmpty() && img_preview == null) return;
             if (img_preview != null && fileUri != null) {
                 sendImageToUser();
+            } else if (!locationPreviewTextView.getText().equals("")){
+                locationPreviewTextView.setText("");
+                locationPreviewTextView.setVisibility(View.INVISIBLE);
+                sendLocationFileToUser();
             } else {
                 sendMessageToUser(message);
             }
@@ -184,6 +201,57 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
 
         setupChatRecyclerView();
+        setupLocationRequire();
+    }
+
+    private void sendLocationFileToUser() {
+        if (location != null){
+            chatRoomModel.setLastMessageTimestamp(Timestamp.now());
+            chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
+            chatRoomModel.setLastMessage("<Location>");
+            ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
+
+            uploadLocation(location);
+            locationPreviewTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void uploadLocation(ChatLocationModel location) {
+        ChatMessageModel chatMessageModel;
+        if (location != null) {
+            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),null,location);
+            chatMessageModel.setPicture(false);
+            chatMessageModel.setPlace(true);
+            ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            messageInput.setText("");
+                            sendNotification("You receive a <location>");
+                        }
+                    });
+        }
+    }
+
+    private void setupLocationRequire() {
+        if (startAutocomplete == null) {
+            startAutocomplete = this.registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(),
+                    result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            Intent intent = result.getData();
+                            if (intent != null) {
+                                Place place = Autocomplete.getPlaceFromIntent(intent);
+                                String displayText = place.getName() + "\n" + place.getAddress();
+                                place.getLatLng();
+                                locationPreviewTextView.setText(displayText);
+                                locationPreviewTextView.setVisibility(View.VISIBLE);
+                                location = new ChatLocationModel(place.getName(),place.getAddress(),place.getLatLng().latitude,place.getLatLng().longitude);
+                            }
+                        } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                            // The user canceled the operation.
+                        }
+                    });
+        }
     }
 
     private void initialView() {
@@ -196,41 +264,54 @@ public class ChatRoomActivity extends AppCompatActivity {
         backBtn = findViewById(R.id.message_back_button);
         img_preview = findViewById(R.id.chat_image_preview);
         imgPreviewTextView = findViewById(R.id.image_preview_textView);
+        locationPreviewTextView = findViewById(R.id.location_preview_textView);
     }
 
     private void showDialog() {
-        final Dialog dialog = new Dialog(this);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.chat_bottom_sheet_layout);
+        functionDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        functionDialog.setContentView(R.layout.chat_bottom_sheet_layout);
 
-        LinearLayout cameraLayout = dialog.findViewById(R.id.layoutCamera);
-        LinearLayout galleryLayout = dialog.findViewById(R.id.layoutGallery);
-        LinearLayout locationLayout = dialog.findViewById(R.id.layoutLocation);
+        LinearLayout cameraLayout = functionDialog.findViewById(R.id.layoutCamera);
+        LinearLayout galleryLayout = functionDialog.findViewById(R.id.layoutGallery);
+        LinearLayout locationLayout = functionDialog.findViewById(R.id.layoutLocation);
 
         cameraLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 handleImageCaptureFromCamera();
+                functionDialog.dismiss();
             }
         });
         galleryLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 handleImagePickFromGallery();
+                functionDialog.dismiss();
             }
         });
         locationLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                handleLocationPickFromApi();
+                functionDialog.dismiss();
             }
         });
-        dialog.show();
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-        dialog.getWindow().setGravity(Gravity.BOTTOM);
+        functionDialog.show();
+        functionDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        functionDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        functionDialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        functionDialog.getWindow().setGravity(Gravity.BOTTOM);
 
+    }
+
+    private void handleLocationPickFromApi() {
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.ADDRESS, Place.Field.LAT_LNG);
+
+        // Start the autocomplete intent.
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields)
+                .build(this);
+        startAutocomplete.launch(intent);
     }
 
 
@@ -263,9 +344,11 @@ public class ChatRoomActivity extends AppCompatActivity {
         chatRoomModel.setLastMessage(message);
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-        if (fileUri == null) {
-            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),null);
+        if (fileUri == null && location == null) {
+            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),null,null);
             chatMessageModel.setPicture(false);
+            chatMessageModel.setPlace(false);
+
             ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -491,7 +574,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            } else {
+            } else if (!locationPreviewTextView.equals("")){}else {
                 Toast.makeText(this, "Please choose image", Toast.LENGTH_SHORT).show();
             }
         }
@@ -541,8 +624,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                 img_preview.setVisibility(View.INVISIBLE);
                 img_preview = null;
 
-                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),url);
+                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),url,null);
                 chatMessageModel.setPicture(true);
+                chatMessageModel.setPlace(false);
                 ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
                         .addOnCompleteListener(addTask -> {
                             if (addTask.isSuccessful()) {

@@ -115,6 +115,16 @@
         android:textColor="#A5A1A1"
         android:visibility="invisible" />
 
+    <TextView
+        android:id="@+id/location_preview_textView"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/message_recycler_view"
+        android:layout_centerHorizontal="true"
+        android:textColor="#A5A1A1"
+        android:text="" />
+
 
     <!--        <ImageButton-->
     <!--            android:id="@+id/message_edit_button"-->
