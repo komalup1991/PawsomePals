@@ -26,6 +26,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
@@ -133,7 +135,41 @@ public class FeedAllFragment extends Fragment {
             case RECIPE -> {
                 fetchRecipes();
             }
+            case POST -> {
+                fetchPosts();
+            }
+            case FAVOURITE -> {
+            }
         }
+    }
+
+    private void fetchPosts() {
+        List<String> userIds = new ArrayList<>();
+
+        String profileId = getArguments().getString("profileId");
+        userIds.add(profileId);
+
+        CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
+        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    Post e = doc.toObject(Post.class);
+                    updateFeedItemList(e);
+                }
+            }
+        });
+        FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
+                                                                  add(posts);
+                                                              }},
+                userIds, new FirestoreDataLoader.FirestoreDataListener() {
+
+                    @Override
+                    public void onDataLoaded(List<FeedItem> feedItems) {
+                        notifyDatasetChange(feedItems);
+                    }
+                });
+
     }
 
     private void fetchRecipes() {
@@ -239,7 +275,7 @@ public class FeedAllFragment extends Fragment {
 
     public void notifyDatasetChange(List<FeedItem> feedItems) {
         feedItemList.clear();
-        if (feedFragmentViewType != FeedFragmentViewType.RECIPE) {
+        if (feedFragmentViewType != FeedFragmentViewType.RECIPE && feedFragmentViewType != FeedFragmentViewType.POST) {
             feedItemList.add(new FeedItem() {
                 @Override
                 public int getType() {
@@ -277,11 +313,12 @@ public class FeedAllFragment extends Fragment {
             feedAdapter.notifyDataSetChanged();
         }
     }
+
     private void scrollToFeedItem(String feedId) {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                for(int i = 0; i<feedItemList.size();i++) {
+                for (int i = 0; i < feedItemList.size(); i++) {
                     FeedItem feedItem = feedItemList.get(i);
                     if (feedId.equals(feedItem.getFeedItemId())) {
                         // Scroll to the specific feed item

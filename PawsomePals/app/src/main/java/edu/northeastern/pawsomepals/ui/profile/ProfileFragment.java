@@ -31,6 +31,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -55,6 +56,8 @@ import java.util.Map;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 
 public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
@@ -97,9 +100,17 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
+        profileId = sharedPreferences.getString("profileId", "none");
+
         if (getArguments() != null) {
             profileIdArg = getArguments().getString("profileId");
         }
+
+        if (profileIdArg != null) {
+            profileId = profileIdArg;
+        }
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -107,16 +118,11 @@ public class ProfileFragment extends Fragment {
 
         currentUser = firebaseAuth.getCurrentUser();
 
-        if (profileIdArg != null) {
-            profileId = profileIdArg;
-        }
 
         if (currentUser != null) {
             userId = currentUser.getUid();
         }
 
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
-        profileId = sharedPreferences.getString("profileId", "none");
 
         // Initialize UI elements
         profileImage = view.findViewById(R.id.profileImage);
@@ -219,6 +225,24 @@ public class ProfileFragment extends Fragment {
                 intent.putExtra("clickedValue", "followers");
                 getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
             }
+        });
+
+        postsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFeedFragment feedFragment = new ProfileFeedFragment();
+                Bundle args = new Bundle();
+
+                args.putString("profileId", profileId);
+                args.putString("tabText", "Posts");
+                args.putSerializable("feed_view_type", FeedFragmentViewType.POST);
+                feedFragment.setArguments(args);
+
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container_view, feedFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+           }
         });
 
         if (isUserProfile) {
