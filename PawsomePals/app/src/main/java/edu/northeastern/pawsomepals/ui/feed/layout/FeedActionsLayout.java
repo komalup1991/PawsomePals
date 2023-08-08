@@ -8,6 +8,7 @@ import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;
@@ -100,7 +101,7 @@ public class FeedActionsLayout extends LinearLayout {
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sharePost(activity);
+                sharePost(activity,feedItem);
             }
         });
 
@@ -139,8 +140,9 @@ public class FeedActionsLayout extends LinearLayout {
         return "(" + likeCount + ")";
     }
 
-    public void sharePost(Activity activity){
-        String deepLinkUrl = "https://pawsomepals/";
+    public void sharePost(Activity activity, FeedItem feedItem) {
+        String feedId = feedItem.getFeedItemId();
+        String deepLinkUrl = "https://pawsomepals/?feedId=" + feedId;
         String shareText = "Check out this pawsome post: " + deepLinkUrl;
 
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -151,4 +153,5 @@ public class FeedActionsLayout extends LinearLayout {
         Intent chooserIntent = Intent.createChooser(shareIntent, "Share Deep Link using!");
         activity.startActivity(chooserIntent);
     }
+
 }

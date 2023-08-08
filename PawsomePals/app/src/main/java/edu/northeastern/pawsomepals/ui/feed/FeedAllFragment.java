@@ -52,6 +52,7 @@ public class FeedAllFragment extends Fragment {
     private FeedAdapter feedAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FeedFragmentViewType feedFragmentViewType;
+    private String feedIdFromDeepLink;
 
     @Nullable
     @Override
@@ -70,6 +71,8 @@ public class FeedAllFragment extends Fragment {
         feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         feedsRecyclerView.setLayoutManager(verticalLayoutManager);
+
+        feedIdFromDeepLink = getActivity().getIntent().getStringExtra("feedId");
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -131,7 +134,6 @@ public class FeedAllFragment extends Fragment {
                 fetchRecipes();
             }
         }
-
     }
 
     private void fetchRecipes() {
@@ -250,9 +252,11 @@ public class FeedAllFragment extends Fragment {
             @Override
             public void run() {
                 feedAdapter.notifyDataSetChanged();
+                if (feedIdFromDeepLink != null) {
+                    scrollToFeedItem(feedIdFromDeepLink);
+                }
             }
         });
-
     }
 
     private void updateFeedItemList(FeedItem item) {
@@ -272,6 +276,22 @@ public class FeedAllFragment extends Fragment {
             }
             feedAdapter.notifyDataSetChanged();
         }
+    }
+    private void scrollToFeedItem(String feedId) {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for(int i = 0; i<feedItemList.size();i++) {
+                    FeedItem feedItem = feedItemList.get(i);
+                    if (feedId.equals(feedItem.getFeedItemId())) {
+                        // Scroll to the specific feed item
+                        int position = i;
+                        feedsRecyclerView.scrollToPosition(position);
+                        break;
+                    }
+                }
+            }
+        }, 500);
     }
 }
 
