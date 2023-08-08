@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -38,11 +39,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -80,6 +83,7 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -105,12 +109,16 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageView img_preview;
     private TextView imgPreviewTextView,locationPreviewTextView;
     private TextView chatRoomName;
+    private Toolbar chatRoomToolbar;
+
     private RecyclerView chatRoomRecyclerView;
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
     private List<String> groupUsersNames;
+    private LinearLayout bottomLayout;
 
     private Users currentUser, otherUser;
+    private FrameLayout profileShowBackground;
     private String chatRoomId;
     private ChatRoomModel chatRoomModel;
     private ChatMessageRecyclerAdapter adapter;
@@ -148,13 +156,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         backBtn.setOnClickListener(v -> onBackPressed());
 
-        infoBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
-            //check
-            ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers,chatRoomName.getText().toString());
-            StringBuilder builder = new StringBuilder();
-            startActivity(intent);
-        });
+
 
         functionBtn.setOnClickListener(view -> showDialog()
         );
@@ -162,10 +164,14 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> currentUser = task.getResult().toObject(Users.class));
 
         if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("oneOnOne")) {
-            infoBtn.setVisibility(View.INVISIBLE);
             otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
-
+            infoBtn.setOnClickListener(v -> {
+                profileShowBackground.setVisibility(View.VISIBLE);
+                chatRoomToolbar.setVisibility(View.INVISIBLE);
+                bottomLayout.setVisibility(View.INVISIBLE);
+                navigateToProfileFragment(otherUser.getUserId());
+            });
             if(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null){
                 chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
             }else{
@@ -175,6 +181,13 @@ public class ChatRoomActivity extends AppCompatActivity {
             getOrCreateChatRoomModel();
 
         } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")) {
+            infoBtn.setOnClickListener(v -> {
+                Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
+                //check
+                ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers,chatRoomName.getText().toString());
+                StringBuilder builder = new StringBuilder();
+                startActivity(intent);
+            });
             group = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getGroupRoomId(group.getGroupMembers());
             chatRoomName.setText(group.getGroupName());
@@ -231,7 +244,24 @@ public class ChatRoomActivity extends AppCompatActivity {
                     });
         }
     }
+    private void navigateToProfileFragment(String userIDValue) {
+        int bgColor = Color.argb(100,253,182,182);
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("profileId", userIDValue);
+        setResult(RESULT_OK, resultIntent);
 
+        SharedPreferences sharedPreferences = this.getSharedPreferences("ProfileId", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("profileId", userIDValue);
+        editor.apply();
+
+        //Navigate to Profile Fragment
+        ProfileFragment profileFragment = new ProfileFragment();
+        FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.chatRoomContainer, profileFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
     private void setupLocationRequire() {
         if (startAutocomplete == null) {
             startAutocomplete = this.registerForActivityResult(
@@ -265,6 +295,9 @@ public class ChatRoomActivity extends AppCompatActivity {
         img_preview = findViewById(R.id.chat_image_preview);
         imgPreviewTextView = findViewById(R.id.image_preview_textView);
         locationPreviewTextView = findViewById(R.id.location_preview_textView);
+        profileShowBackground = findViewById(R.id.profile_show_background);
+        bottomLayout = findViewById(R.id.bottomLayout);
+        chatRoomToolbar = findViewById(R.id.chatRoomToolBar);
     }
 
     private void showDialog() {
@@ -359,10 +392,6 @@ public class ChatRoomActivity extends AppCompatActivity {
         } else {
 
         }
-
-    }
-
-    private void submitChatToFileBase(ChatMessageModel chatMessageModel, boolean picture) {
 
     }
 
@@ -699,16 +728,11 @@ public class ChatRoomActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null){
-            chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
-            Log.i("info",chatRoomName.getText().toString()+"start");
-        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
     }
 
     @Override

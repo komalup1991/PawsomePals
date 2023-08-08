@@ -33,8 +33,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:background="@null"
-            android:backgroundTint="#D12424"
+            android:background="@color/backgroundColor"
+            android:backgroundTint="#FDB6B6"
             android:padding="4dp"
             android:src="@drawable/chat_search_icon"
             android:visibility="visible" />
