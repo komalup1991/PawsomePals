@@ -167,9 +167,6 @@ public class ChatRoomActivity extends AppCompatActivity {
             otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
             infoBtn.setOnClickListener(v -> {
-                profileShowBackground.setVisibility(View.VISIBLE);
-                chatRoomToolbar.setVisibility(View.INVISIBLE);
-                bottomLayout.setVisibility(View.INVISIBLE);
                 navigateToProfileFragment(otherUser.getUserId());
             });
             if(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null){
@@ -245,22 +242,32 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
     }
     private void navigateToProfileFragment(String userIDValue) {
-        int bgColor = Color.argb(100,253,182,182);
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("profileId", userIDValue);
-        setResult(RESULT_OK, resultIntent);
+//        int bgColor = Color.argb(100,253,182,182);
+//        Intent resultIntent = new Intent();
+//        resultIntent.putExtra("profileId", userIDValue);
+//        setResult(RESULT_OK, resultIntent);
+//
+//        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("profileId", userIDValue);
+//        editor.apply();
+//
+//        //Navigate to Profile Fragment
+//        ProfileFragment profileFragment = new ProfileFragment();
+//        FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.chatRoomContainer, profileFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences("ProfileId", MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("profileId", userIDValue);
         editor.apply();
 
-        //Navigate to Profile Fragment
         ProfileFragment profileFragment = new ProfileFragment();
-        FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.chatRoomContainer, profileFragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container_view,profileFragment)
+                .commit();
     }
     private void setupLocationRequire() {
         if (startAutocomplete == null) {
