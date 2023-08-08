@@ -14,6 +14,7 @@ public class ProfileFeedAdapter extends FragmentStateAdapter {
     private static final int NUM_TABS = 1;
     private String profileId;
     private FeedFragmentViewType viewType;
+
     public ProfileFeedAdapter(@NonNull FragmentActivity fragmentActivity, String profileId, FeedFragmentViewType viewType) {
         super(fragmentActivity);
 
@@ -25,16 +26,23 @@ public class ProfileFeedAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         Bundle bundle;
-        switch (position) {
-            case 0:
-                FeedAllFragment feedAllFragment = new FeedAllFragment();
-                bundle = new Bundle();
-                bundle.putSerializable("feed_view_type", viewType);
-                bundle.putString("profileId", profileId);
-                feedAllFragment.setArguments(bundle);
-                return feedAllFragment;
-            default:
-                return new FeedAllFragment();
+
+        if (position == 0 && viewType == FeedFragmentViewType.POST) {
+            FeedAllFragment feedAllFragment = new FeedAllFragment();
+            bundle = new Bundle();
+            bundle.putSerializable("feed_view_type", viewType);
+            bundle.putString("profileId", profileId);
+            feedAllFragment.setArguments(bundle);
+            return feedAllFragment;
+        } else if (position == 0 && viewType == FeedFragmentViewType.FAVOURITE) {
+            FeedAllFragment feedAllFragment = new FeedAllFragment();
+            bundle = new Bundle();
+            bundle.putSerializable("feed_view_type", viewType);
+            bundle.putString("profileId", profileId);
+            feedAllFragment.setArguments(bundle);
+            return feedAllFragment;
+        } else {
+            return new FeedAllFragment();
         }
 
     }

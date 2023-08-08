@@ -5,15 +5,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
 import edu.northeastern.pawsomepals.ui.profile.DogsFragment;
-import edu.northeastern.pawsomepals.ui.profile.FavoritesFragment;
 import edu.northeastern.pawsomepals.ui.profile.PhotosFragment;
 import edu.northeastern.pawsomepals.ui.profile.RecipesFragment;
 
 public class ProfileFragmentAdapter extends FragmentStateAdapter {
-    private static final int NUM_TABS = 4;
+    private static final int NUM_TABS = 3;
 
     private String profileId;
     private Boolean isUserProfile;
@@ -33,7 +30,6 @@ public class ProfileFragmentAdapter extends FragmentStateAdapter {
             case 0 -> DogsFragment.newInstance(profileId, isUserProfile);
             case 1 -> RecipesFragment.newInstance(profileId);
             case 2 -> PhotosFragment.newInstance(profileId);
-            case 3 -> new FavoritesFragment();
             default -> DogsFragment.newInstance(profileId, isUserProfile);
         };
     }

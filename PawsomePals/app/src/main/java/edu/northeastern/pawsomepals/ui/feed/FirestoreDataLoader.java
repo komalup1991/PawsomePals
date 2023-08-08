@@ -54,6 +54,7 @@ public class FirestoreDataLoader {
         loadDataFromCollections(feedIds, new ArrayList<>(), collections, firestoreDataListener);
     }
 
+
     /**
      * Usage:-
      * This will fetch only post from two users and with specific postId.
@@ -188,12 +189,35 @@ public class FirestoreDataLoader {
         return feedItemList;
     }
 
-    private static Set<String> fetchUserFavFeedIds() {
+    public static Set<String> fetchUserFavFeedIds() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Task<QuerySnapshot> taskFavorites = db.collection("user").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("favorites")
                 .get();
         Set<String> favoriteFeedIds = new HashSet<>();
+        try {
+            Tasks.await(taskFavorites);
+            if (taskFavorites.isSuccessful()) {
+                QuerySnapshot querySnapshot = taskFavorites.getResult();
+                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                    favoriteFeedIds.add(document.toObject(Favorite.class).getFeedItemId());
+                }
+
+            }
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return favoriteFeedIds;
+    }
+
+    private static List<String> fetchUserFavFeedIds(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Task<QuerySnapshot> taskFavorites = db.collection("user").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .collection("favorites")
+                .get();
+        List<String> favoriteFeedIds = new ArrayList<>();
         try {
             Tasks.await(taskFavorites);
             if (taskFavorites.isSuccessful()) {

@@ -32,6 +32,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.FeedAdapter;
@@ -139,6 +140,7 @@ public class FeedAllFragment extends Fragment {
                 fetchPosts();
             }
             case FAVOURITE -> {
+                fetchFavourites();
             }
         }
     }
@@ -171,6 +173,81 @@ public class FeedAllFragment extends Fragment {
                 });
 
     }
+
+    public void fetchFavourites() {
+        if (!feedItemList.isEmpty()) {
+            return;
+        }
+        List<CollectionReference> collections = new ArrayList<>();
+        CollectionReference event = FirebaseFirestore.getInstance().collection("events");
+        event.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    Event e = doc.toObject(Event.class);
+                    updateFeedItemList(e);
+                }
+            }
+        });
+        collections.add(event);
+        CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
+        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    Post p = doc.toObject(Post.class);
+                    updateFeedItemList(p);
+                }
+            }
+        });
+        collections.add(posts);
+
+        CollectionReference services = FirebaseFirestore.getInstance().collection("services");
+        services.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    Services s = doc.toObject(Services.class);
+                    updateFeedItemList(s);
+                }
+            }
+        });
+        collections.add(services);
+
+        CollectionReference photoVideo = FirebaseFirestore.getInstance().collection("photovideo");
+        photoVideo.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentSnapshot doc : value.getDocuments()) {
+                    PhotoVideo pv = doc.toObject(PhotoVideo.class);
+                    updateFeedItemList(pv);
+                }
+            }
+        });
+
+        collections.add(photoVideo);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<String> feedIds = new ArrayList<>(FirestoreDataLoader.fetchUserFavFeedIds());
+
+                FirestoreDataLoader.loadDataFromCollectionsForFeedIds(collections, feedIds,
+                        new FirestoreDataLoader.FirestoreDataListener() {
+                            @Override
+                            public void onDataLoaded(List<FeedItem> feedItems) {
+                                notifyDatasetChange(feedItems);
+                            }
+                        });
+
+            }
+        }).start();
+
+
+
+
+    }
+
 
     private void fetchRecipes() {
         CollectionReference recipes = FirebaseFirestore.getInstance().collection("recipes");
@@ -275,7 +352,7 @@ public class FeedAllFragment extends Fragment {
 
     public void notifyDatasetChange(List<FeedItem> feedItems) {
         feedItemList.clear();
-        if (feedFragmentViewType != FeedFragmentViewType.RECIPE && feedFragmentViewType != FeedFragmentViewType.POST) {
+        if (feedFragmentViewType != FeedFragmentViewType.RECIPE && feedFragmentViewType != FeedFragmentViewType.POST && feedFragmentViewType != FeedFragmentViewType.FAVOURITE) {
             feedItemList.add(new FeedItem() {
                 @Override
                 public int getType() {
