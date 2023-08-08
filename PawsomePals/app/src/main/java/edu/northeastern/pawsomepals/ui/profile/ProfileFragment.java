@@ -19,9 +19,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +33,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -55,6 +58,8 @@ import java.util.Map;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 
 public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
@@ -89,7 +94,7 @@ public class ProfileFragment extends Fragment {
     private LinearLayout followingLayout;
     private LinearLayout followersLayout;
     private LinearLayout postsLayout;
-
+private ImageButton favImageButton;
     private String profileIdArg;
 
     @Nullable
@@ -97,9 +102,17 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
+        profileId = sharedPreferences.getString("profileId", "none");
+
         if (getArguments() != null) {
             profileIdArg = getArguments().getString("profileId");
         }
+
+        if (profileIdArg != null) {
+            profileId = profileIdArg;
+        }
+
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -107,16 +120,11 @@ public class ProfileFragment extends Fragment {
 
         currentUser = firebaseAuth.getCurrentUser();
 
-        if (profileIdArg != null) {
-            profileId = profileIdArg;
-        }
 
         if (currentUser != null) {
             userId = currentUser.getUid();
         }
 
-        SharedPreferences sharedPreferences = getContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
-        profileId = sharedPreferences.getString("profileId", "none");
 
         // Initialize UI elements
         profileImage = view.findViewById(R.id.profileImage);
@@ -132,14 +140,17 @@ public class ProfileFragment extends Fragment {
         fabAddDogProfile = view.findViewById(R.id.fabAddDogProfile);
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
+        favImageButton = view.findViewById(R.id.favImageButton);
 
         // Check if the profileId is the same as the current user's userId
         if (userId.equals(profileId)) {
             editOrFollowButton.setText("Edit Profile");
             isUserProfile = true;
+            favImageButton.setVisibility(View.VISIBLE);
         } else {
             setupFollowButton();
             fabAddDogProfile.hide();
+            favImageButton.setVisibility(View.GONE);
         }
 
         ProfileFragmentAdapter fragmentAdapter = new ProfileFragmentAdapter(this.getActivity(), profileId, isUserProfile);
@@ -151,7 +162,6 @@ public class ProfileFragment extends Fragment {
                 case 0 -> tab.setText("Dogs");
                 case 1 -> tab.setText("Recipes");
                 case 2 -> tab.setText("Photos");
-                case 3 -> tab.setText("Favourites");
             }
         }).attach();
 
@@ -221,15 +231,41 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        if (isUserProfile) {
-            profileImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    openImageChooserDialog();
-                }
-            });
-        }
+        postsLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFeedFragment feedFragment = new ProfileFeedFragment();
+                Bundle args = new Bundle();
 
+                args.putString("profileId", profileId);
+                args.putString("tabText", "Posts");
+                args.putSerializable("feed_view_type", FeedFragmentViewType.POST);
+                feedFragment.setArguments(args);
+
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container_view, feedFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+           }
+        });
+
+        favImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ProfileFeedFragment feedFragment = new ProfileFeedFragment();
+                Bundle args = new Bundle();
+
+                args.putString("profileId", profileId);
+                args.putString("tabText", "Favourites");
+                args.putSerializable("feed_view_type", FeedFragmentViewType.FAVOURITE);
+                feedFragment.setArguments(args);
+
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container_view, feedFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
 
         // Call the method to display name and image of the user
         getUserInfo(profileId);
@@ -572,151 +608,6 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
-    private void openImageChooserDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Choose Profile Picture");
-        builder.setItems(new String[]{"Take Photo", "Choose from Gallery"}, (dialog, which) -> {
-            if (which == 0) {
-                handleImageCaptureFromCamera();
-            } else if (which == 1) {
-                handleImagePickFromGallery();
-            }
-        });
-        builder.show();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAMERA:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Camera permissions granted, proceed with image capture
-                    handleImageCaptureFromCamera();
-                } else {
-                    // Camera permissions denied, show a message or handle accordingly
-                    Toast.makeText(getActivity(), "Camera permissions denied.", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case PERMISSIONS_REQUEST_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Storage permissions granted, proceed with image pick
-                    handleImagePickFromGallery();
-                } else {
-                    // Storage permissions denied, show a message or handle accordingly
-                    Toast.makeText(getActivity(), "Storage permissions denied.", Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-    }
-
-    private void handleImagePickFromGallery() {
-        // Check if storage permissions are granted
-        if (checkStoragePermission()) {
-            Intent pickPhotoIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(pickPhotoIntent, REQUEST_IMAGE_GALLERY);
-        } else {
-            // Request storage permissions if not granted
-            requestStoragePermission();
-        }
-    }
-
-    private void handleImageCaptureFromCamera() {
-        // Check if camera permissions are granted
-        if (checkCameraPermission()) {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        } else {
-            // Request camera permissions if not granted
-            requestCameraPermission();
-        }
-    }
-
-
-    private boolean checkCameraPermission() {
-        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestCameraPermission() {
-        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAMERA);
-    }
-
-    private boolean checkStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-        }
-    }
-
-    private void requestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                // Handle image capture from the camera
-                if (data != null && data.getExtras() != null) {
-                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                    profileImage.setImageBitmap(bitmap);
-
-                    // Convert the Bitmap to a URI and set it to the photoUri
-                    photoUri = getImageUriFromBitmap(bitmap);
-                    // Update the profileImage field in Firestore
-                    updateProfileImageInFirestore(photoUri);
-                } else {
-                    // Handle the case when data is null or the image capture failed
-                    Toast.makeText(getActivity(), "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
-                }
-            } else if (requestCode == REQUEST_IMAGE_GALLERY) {
-                // Handle image pick from the gallery
-                Uri selectedImageUri = data.getData();
-                if (selectedImageUri != null) {
-                    photoUri = selectedImageUri;
-                    profileImage.setImageURI(photoUri);
-                    // Update the profileImage field in Firestore
-                    updateProfileImageInFirestore(photoUri);
-                }
-            }
-        }
-    }
-
-    private Uri getImageUriFromBitmap(Bitmap bitmap) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(requireContext().getContentResolver(), bitmap, "TempImage", null);
-        return Uri.parse(path);
-    }
-
-    private void updateProfileImageInFirestore(Uri photoUri) {
-        if (currentUser != null) {
-            // Get the Firestore reference for the user document
-            DocumentReference userRef = firebaseFirestore.collection("user").document(userId);
-
-            // Create a map to update the profileImage field
-            Map<String, Object> updateData = new HashMap<>();
-            updateData.put("profileImage", photoUri.toString());
-
-            // Update the document with the new profileImage value
-            userRef.update(updateData)
-                    .addOnSuccessListener(aVoid -> {
-                        // Update successful, do something if needed
-                    })
-                    .addOnFailureListener(e -> {
-                        // Update failed, handle the error
-                        Log.e("Update Profile Image", "Error updating profileImage field", e);
-                    });
-        }
-    }
 
     private void setupFollowButton() {
         // Check if the document for the current user exists in the "follow" collection

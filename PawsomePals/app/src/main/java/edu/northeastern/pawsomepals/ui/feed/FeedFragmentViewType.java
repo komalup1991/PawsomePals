@@ -5,5 +5,7 @@ import java.io.Serializable;
 public enum FeedFragmentViewType implements Serializable {
     ALL,
     FRIEND,
-    RECIPE
+    RECIPE,
+    POST,
+    FAVOURITE
 }

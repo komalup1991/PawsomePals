@@ -22,7 +22,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
     CircleImageView userProfilePic;
     TextView usernameTextView, recipeNameTextView, recipeDescriptionTextView, recipeIngredientsTextView,
             recipeInstructionTextView, recipeServingSizeTextView, recipeCookTimeTextView, recipePrepTimeTextView;
-    EditText recipeNotes;
     ImageView recipeImageView;
 
 
@@ -44,7 +43,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
         recipeServingSizeTextView = findViewById(R.id.recipeServingSizeTextView);
         recipeCookTimeTextView = findViewById(R.id.recipeCookTimeTextView);
         recipePrepTimeTextView = findViewById(R.id.recipePrepTimeTextView);
-        recipeNotes = findViewById(R.id.recipeNotes);
         recipeImageView = findViewById(R.id.recipeImageView);
         CardView cardView2 = findViewById(R.id.cardView2);
         CardView cardView3 = findViewById(R.id.cardView3);

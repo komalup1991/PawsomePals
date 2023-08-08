@@ -16,11 +16,8 @@ public class Recipe extends FeedItem implements Serializable {
     private String username;
     private String userProfileImage;
     private String createdAt;
-
-
-
+    private String notes;
     private String instructions;
-
     public Recipe() {
     }
 
@@ -116,6 +113,7 @@ public class Recipe extends FeedItem implements Serializable {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
+
     public String getInstructions() {
         return instructions;
     }
@@ -123,6 +121,11 @@ public class Recipe extends FeedItem implements Serializable {
     public void setInstructions(String instructions) {
         this.instructions = instructions;
     }
+
+    public String getNotes() {
+        return notes;
+    }
+
     @Override
     public int hashCode() {
         return getFeedItemId().hashCode();
@@ -143,18 +146,6 @@ public class Recipe extends FeedItem implements Serializable {
 
     @Override
     public String toString() {
-        return "Recipe{" +
-                "title='" + title + '\'' +
-                ", img='" + img + '\'' +
-                ", desc='" + desc + '\'' +
-                ", createdBy='" + createdBy + '\'' +
-                ", ingredients='" + ingredients + '\'' +
-                ", serving='" + serving + '\'' +
-                ", prepTime='" + prepTime + '\'' +
-                ", cookTime='" + cookTime + '\'' +
-                ", username='" + username + '\'' +
-                ", userProfileImage='" + userProfileImage + '\'' +
-                ", createdAt='" + createdAt + '\'' +
-                '}';
+        return "Recipe{" + "title='" + title + '\'' + ", img='" + img + '\'' + ", desc='" + desc + '\'' + ", createdBy='" + createdBy + '\'' + ", ingredients='" + ingredients + '\'' + ", serving='" + serving + '\'' + ", prepTime='" + prepTime + '\'' + ", cookTime='" + cookTime + '\'' + ", username='" + username + '\'' + ", userProfileImage='" + userProfileImage + '\'' + ", createdAt='" + createdAt + '\'' + '}';
     }
 }

@@ -43,6 +43,11 @@
 
     <style name="AppToolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/toolbar_color</item>
+        <item name="android:colorControlNormal">@color/white</item>
+    </style>
+
+    <style name="AppToolbarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:colorControlNormal">@color/white</item>
     </style>
 
     <style name="MyNumberPickerTheme" parent="android:Theme.Material">

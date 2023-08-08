@@ -16,9 +16,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -30,6 +32,8 @@ import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class FirestoreDataLoader {
 
@@ -39,6 +43,16 @@ public class FirestoreDataLoader {
         collections.add(FirebaseFirestore.getInstance().collection("posts"));
         collections.add(FirebaseFirestore.getInstance().collection("services"));
         collections.add(FirebaseFirestore.getInstance().collection("photovideo"));
+        return collections;
+    }
+
+    public static List<CollectionReference> getAllCollectionsWithRecipes() {
+        List<CollectionReference> collections = new ArrayList<>();
+        collections.add(FirebaseFirestore.getInstance().collection("events"));
+        collections.add(FirebaseFirestore.getInstance().collection("posts"));
+        collections.add(FirebaseFirestore.getInstance().collection("services"));
+        collections.add(FirebaseFirestore.getInstance().collection("photovideo"));
+        collections.add(FirebaseFirestore.getInstance().collection("recipes"));
         return collections;
     }
 
@@ -53,6 +67,7 @@ public class FirestoreDataLoader {
     public static void loadDataFromCollectionsForFeedIds(List<CollectionReference> collections, List<String> feedIds, FirestoreDataListener firestoreDataListener) {
         loadDataFromCollections(feedIds, new ArrayList<>(), collections, firestoreDataListener);
     }
+
 
     /**
      * Usage:-
@@ -139,7 +154,8 @@ public class FirestoreDataLoader {
 
     private static List<FeedItem> process(List<QuerySnapshot> querySnapshots, Set<String> favoriteFeedIds, Set<String> likeFeedIds) {
         List<FeedItem> feedItemList = new ArrayList<>();
-
+        Map<String, Users> users = new HashMap<>();
+        Set<String> userIds = new HashSet<>();
         for (QuerySnapshot querySnapshot : querySnapshots) {
             for (QueryDocumentSnapshot document : querySnapshot) {
                 int type = Math.toIntExact((Long) document.getData().get("type"));
@@ -165,16 +181,23 @@ public class FirestoreDataLoader {
                     if (feedItem.getFeedItemId() != null && likeFeedIds.contains(feedItem.getFeedItemId())) {
                         feedItem.setLiked(true);
                     }
-//                    try {
-//                        feedItem.setDisplayTime(TimeUtil.formatTime(feedItem.getCreatedAt()));
-//                    } catch (ParseException e) {
-//                        throw new RuntimeException(e);
-//                    }
+
+                    userIds.add(feedItem.getCreatedBy());
                     feedItemList.add(feedItem);
                 }
             }
         }
 
+        List<String> userList = new ArrayList<>();
+        userList.addAll(userIds);
+        users = FirebaseUtil.fetchUserInfoFromFirestoreBlocking(userList);
+        for (FeedItem feedItem : feedItemList) {
+            Users u = users.get(feedItem.getCreatedBy());
+            if (u != null) {
+                feedItem.setUsername(u.getName());
+                feedItem.setUserProfileImage(u.getProfileImage());
+            }
+        }
 
         Collections.sort(feedItemList, new Comparator<FeedItem>() {
             @Override
@@ -188,12 +211,35 @@ public class FirestoreDataLoader {
         return feedItemList;
     }
 
-    private static Set<String> fetchUserFavFeedIds() {
+    public static Set<String> fetchUserFavFeedIds() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Task<QuerySnapshot> taskFavorites = db.collection("user").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .collection("favorites")
                 .get();
         Set<String> favoriteFeedIds = new HashSet<>();
+        try {
+            Tasks.await(taskFavorites);
+            if (taskFavorites.isSuccessful()) {
+                QuerySnapshot querySnapshot = taskFavorites.getResult();
+                for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                    favoriteFeedIds.add(document.toObject(Favorite.class).getFeedItemId());
+                }
+
+            }
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return favoriteFeedIds;
+    }
+
+    private static List<String> fetchUserFavFeedIds(String userId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Task<QuerySnapshot> taskFavorites = db.collection("user").document(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .collection("favorites")
+                .get();
+        List<String> favoriteFeedIds = new ArrayList<>();
         try {
             Tasks.await(taskFavorites);
             if (taskFavorites.isSuccessful()) {
