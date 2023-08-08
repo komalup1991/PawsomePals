@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -22,6 +26,7 @@ import edu.northeastern.pawsomepals.databinding.FragmentFeedCreateListDialogList
 
 public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
 
+    private static final int FEED_CREATION_REQUEST = 1;
     private FragmentFeedCreateListDialogListDialogBinding binding;
     private ItemAdapter itemAdapter;
 
@@ -124,16 +129,19 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
                         default:
                             return;
                     }
-                    activity.startActivity(intent);
+                    activity.startActivityForResult(intent, FEED_CREATION_REQUEST);
                     FeedCreateListDialogFragment.this.dismiss();
 
                 }
             });
         }
 
+
         @Override
         public int getItemCount() {
             return actions.length;
         }
+
+
     }
 }

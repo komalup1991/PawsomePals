@@ -18,6 +18,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="8dp"
+            android:visibility="gone"
             android:text="Pull To Refresh"
             android:textSize="12sp" />
 

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -42,6 +43,12 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
 
     private void fetchRecipesFromFirestore() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseUtil.getFollowData(FirebaseAuth.getInstance().getCurrentUser().getUid(), new BaseDataCallback() {
+            @Override
+            public void onFollowingUserIdListReceived(List<String> followingUserIds) {
+                super.onFollowingUserIdListReceived(followingUserIds);
+            }
+        });
         db.collection("recipes").addSnapshotListener((querySnapshot, error) -> {
             if (error != null) {
                 Log.e("FeedAllFragment", "Error getting recipes.", error);
