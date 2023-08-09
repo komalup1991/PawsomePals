@@ -47,12 +47,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
-import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.common.internal.service.Common;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.widget.Autocomplete;
@@ -67,9 +64,7 @@ import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONObject;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -242,32 +237,32 @@ public class ChatRoomActivity extends AppCompatActivity {
         }
     }
     private void navigateToProfileFragment(String userIDValue) {
-//        int bgColor = Color.argb(100,253,182,182);
-//        Intent resultIntent = new Intent();
-//        resultIntent.putExtra("profileId", userIDValue);
-//        setResult(RESULT_OK, resultIntent);
-//
-//        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString("profileId", userIDValue);
-//        editor.apply();
-//
-//        //Navigate to Profile Fragment
-//        ProfileFragment profileFragment = new ProfileFragment();
-//        FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
-//        transaction.replace(R.id.chatRoomContainer, profileFragment);
-//        transaction.addToBackStack(null);
-//        transaction.commit();
+        int bgColor = Color.argb(100,253,182,182);
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("profileId", userIDValue);
+        setResult(RESULT_OK, resultIntent);
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("profileId", userIDValue);
         editor.apply();
 
+        //Navigate to Profile Fragment
         ProfileFragment profileFragment = new ProfileFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container_view,profileFragment)
-                .commit();
+        FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.chatRoomContainer, profileFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+//
+//        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("profileId", userIDValue);
+//        editor.apply();
+//
+//        ProfileFragment profileFragment = new ProfileFragment();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.fragment_container_view,profileFragment)
+//                .commit();
     }
     private void setupLocationRequire() {
         if (startAutocomplete == null) {
