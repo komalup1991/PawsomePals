@@ -8,12 +8,14 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ktx.Firebase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -29,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -37,8 +40,6 @@ public class ChatFirebaseUtil {
     public static String currentUserId() {
         return FirebaseAuth.getInstance().getUid();
     }
-    public static String currentUserName(){return FirebaseAuth.getInstance().getCurrentUser().getDisplayName();}
-
     public static boolean isLoggedIn() {
         if (currentUserId() != null) {
             return true;
@@ -51,9 +52,15 @@ public class ChatFirebaseUtil {
         intent.putExtra("userId", model.getUserId());
         intent.putExtra("email", model.getEmail());
         intent.putExtra("fcmToken", model.getFcmToken());
-        intent.putExtra("chatStyle", "oneOnOne");
+//        intent.putExtra("chatStyle", "ONEONONE");
+    }
+    public static void passChatStyleFromIntent(Intent intent, ChatStyle style){
+        intent.putExtra("chatStyle",style.toString());
     }
 
+    public static void passCurrentUserNameAsIntent(Intent intent, String name){
+        intent.putExtra("currentUserName",name);
+    }
     public static void passGroupNameAsIntent(Intent intent, String newGroupName) {
         intent.putExtra("groupName", newGroupName);
     }
@@ -68,18 +75,30 @@ public class ChatFirebaseUtil {
         for (Users user : users) {
             if (user != null) {
                 idBuilder.append(user.getUserId() + " ");
-                nameBuilder.append(user.getName() +" ");
+                nameBuilder.append(user.getName().toLowerCase() +" ");
             }
         }
         intent.putExtra("name", groupName);
         intent.putExtra("groupUserNames",nameBuilder.toString());
         intent.putExtra("ids", idBuilder.toString());
-        intent.putExtra("chatStyle", "group");
+        intent.putExtra("chatStyle", ChatStyle.GROUP);
     }
 
     public static DocumentReference currentUserDetails() {
         return FirebaseFirestore.getInstance().collection("user").document(currentUserId());
     }
+
+//    public static String currentUserName(){
+//        final String name;
+//        FirebaseFirestore.getInstance().collection("user").document(currentUserId()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+//            @Override
+//            public void onSuccess(DocumentSnapshot snapshot) {
+//
+//                name = snapshot.get("name").toString();
+//            }
+//        });
+//        return name;
+//    }
 
     public static CollectionReference allUserCollectionReference() {
         return FirebaseFirestore.getInstance().collection("user");
@@ -130,7 +149,9 @@ public class ChatFirebaseUtil {
         }
         return "group_" + groupChatId;
     }
-
+    public static String getCurrentUserNameFromIntent(Intent intent){
+        return intent.getStringExtra("currentUserName");
+    }
     public static Users getUserModelFromIntent(Intent intent) {
         String userName = intent.getStringExtra("name");
         String userId = intent.getStringExtra("userId");

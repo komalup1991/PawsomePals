@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,36 +22,39 @@ import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 import edu.northeastern.pawsomepals.ui.login.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
+    String userId;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (ChatFirebaseUtil.isLoggedIn() && getIntent().getExtras() != null){
+        if (ChatFirebaseUtil.isLoggedIn() && getIntent().getExtras() != null) {
             //from notification
-            String userId = getIntent().getExtras().getString("userId");
-            userId= FirebaseAuth.getInstance().getCurrentUser().getUid();
-            ChatFirebaseUtil.allUserCollectionReference().document(userId).get()
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()){
-                            Users model = task.getResult().toObject(Users.class);
+            if (getIntent().getExtras().getString("userId") != null) {
+               userId  = getIntent().getExtras().getString("userId");
+            } else {
+                userId = FirebaseAuth.getInstance().getCurrentUser().getUid();}
+                ChatFirebaseUtil.allUserCollectionReference().document(userId).get()
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Users model = task.getResult().toObject(Users.class);
 
-                            Intent mainIntent = new Intent(getApplicationContext(), HomeActivity.class);
-                            mainIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                            startActivity(mainIntent);
+                                Intent mainIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                                startActivity(mainIntent);
 
-                            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                            ChatFirebaseUtil.passUserModelAsIntent(intent,model);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-        } else {
-            new Handler().postDelayed(() -> {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                finish();
-            },10);
+                                Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                                ChatFirebaseUtil.passUserModelAsIntent(intent, model);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+            } else{
+                new Handler().postDelayed(() -> {
+                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    finish();
+                }, 100);
+            }
         }
     }
-}

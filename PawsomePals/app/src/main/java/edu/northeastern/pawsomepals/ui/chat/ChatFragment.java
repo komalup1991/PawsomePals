@@ -38,6 +38,7 @@ public class ChatFragment extends Fragment {
     private Button createNewGroupButton;
     private RecyclerView chatRecyclerview;
     private RecentChatRecyclerAdapter adapter;
+
     public interface ProfilePicClickListener {
         void onItemClicked(String userId);
     }
@@ -110,6 +111,7 @@ public class ChatFragment extends Fragment {
         Query query = ChatFirebaseUtil.allChatRoomCollectionReference()
                 .whereArrayContains("userIds", ChatFirebaseUtil.currentUserId())
                 .orderBy("lastMessageTimestamp", Query.Direction.DESCENDING);
+
 
         FirestoreRecyclerOptions<ChatRoomModel> options =
                 new FirestoreRecyclerOptions.Builder<ChatRoomModel>()

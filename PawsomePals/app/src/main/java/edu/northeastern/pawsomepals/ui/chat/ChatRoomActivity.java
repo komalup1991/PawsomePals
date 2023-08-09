@@ -102,7 +102,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageButton backBtn;
     private ImageButton infoBtn;
     private ImageView img_preview;
-    private TextView imgPreviewTextView,locationPreviewTextView;
+    private TextView imgPreviewTextView, locationPreviewTextView;
     private TextView chatRoomName;
     private Toolbar chatRoomToolbar;
 
@@ -140,7 +140,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             if (message.isEmpty() && img_preview == null) return;
             if (img_preview != null && fileUri != null) {
                 sendImageToUser();
-            } else if (!locationPreviewTextView.getText().equals("")){
+            } else if (!locationPreviewTextView.getText().equals("")) {
                 locationPreviewTextView.setText("");
                 locationPreviewTextView.setVisibility(View.INVISIBLE);
                 sendLocationFileToUser();
@@ -152,31 +152,42 @@ public class ChatRoomActivity extends AppCompatActivity {
         backBtn.setOnClickListener(v -> onBackPressed());
 
 
-
         functionBtn.setOnClickListener(view -> showDialog()
         );
 
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> currentUser = task.getResult().toObject(Users.class));
-
-        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("oneOnOne")) {
+        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()) == null){
             otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
             infoBtn.setOnClickListener(v -> {
                 navigateToProfileFragment(otherUser.getUserId());
             });
-            if(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null){
+            if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null) {
                 chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
-            }else{
+            } else {
+                chatRoomName.setText(otherUser.getName());
+            }
+
+            getOrCreateChatRoomModel();
+        }else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.ONEONONE.toString())){
+            otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
+            chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
+            infoBtn.setOnClickListener(v -> {
+                navigateToProfileFragment(otherUser.getUserId());
+            });
+            if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null) {
+                chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
+            } else {
                 chatRoomName.setText(otherUser.getName());
             }
 
             getOrCreateChatRoomModel();
 
-        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals("group")) {
+        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.GROUP)) {
             infoBtn.setOnClickListener(v -> {
                 Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
                 //check
-                ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers,chatRoomName.getText().toString());
+                ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers, chatRoomName.getText().toString());
                 StringBuilder builder = new StringBuilder();
                 startActivity(intent);
             });
@@ -210,7 +221,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void sendLocationFileToUser() {
-        if (location != null){
+        if (location != null) {
             chatRoomModel.setLastMessageTimestamp(Timestamp.now());
             chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
             chatRoomModel.setLastMessage("<Location>");
@@ -224,7 +235,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void uploadLocation(ChatLocationModel location) {
         ChatMessageModel chatMessageModel;
         if (location != null) {
-            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),null,location);
+            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), null, location);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(true);
             ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
@@ -236,8 +247,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                     });
         }
     }
+
     private void navigateToProfileFragment(String userIDValue) {
-        int bgColor = Color.argb(100,253,182,182);
+        int bgColor = Color.argb(100, 253, 182, 182);
         Intent resultIntent = new Intent();
         resultIntent.putExtra("profileId", userIDValue);
         setResult(RESULT_OK, resultIntent);
@@ -264,6 +276,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 //                .replace(R.id.fragment_container_view,profileFragment)
 //                .commit();
     }
+
     private void setupLocationRequire() {
         if (startAutocomplete == null) {
             startAutocomplete = this.registerForActivityResult(
@@ -277,7 +290,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 place.getLatLng();
                                 locationPreviewTextView.setText(displayText);
                                 locationPreviewTextView.setVisibility(View.VISIBLE);
-                                location = new ChatLocationModel(place.getName(),place.getAddress(),place.getLatLng().latitude,place.getLatLng().longitude);
+                                location = new ChatLocationModel(place.getName(), place.getAddress(), place.getLatLng().latitude, place.getLatLng().longitude);
                             }
                         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
                             // The user canceled the operation.
@@ -380,7 +393,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
         if (fileUri == null && location == null) {
-            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),null,null);
+            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), null, null);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(false);
 
@@ -403,15 +416,29 @@ public class ChatRoomActivity extends AppCompatActivity {
                 chatRoomModel = task.getResult().toObject(ChatRoomModel.class);
 
                 if (chatRoomModel == null) {
-                    //first time chat
-                    chatRoomModel = new ChatRoomModel(
-                            chatRoomId,
-                            otherUser.getName(),
-                            Arrays.asList(ChatFirebaseUtil.currentUserId(), otherUser.getUserId()),
-                            Arrays.asList(ChatFirebaseUtil.currentUserName().toLowerCase(),otherUser.getName().toLowerCase()),
-                            Timestamp.now(),
-                            ""
-                    );
+                    if (ChatFirebaseUtil.getCurrentUserNameFromIntent(getIntent()) == null) {
+                        chatRoomModel = new ChatRoomModel(
+                                chatRoomId,
+                                otherUser.getName(),
+                                Arrays.asList(ChatFirebaseUtil.currentUserId(), otherUser.getUserId()),
+                                Arrays.asList("", otherUser.getName().toLowerCase()),
+                                Timestamp.now(),
+                                ""
+                        );
+                    } else {
+                        //first time chat
+                        chatRoomModel = new ChatRoomModel(
+                                chatRoomId,
+                                otherUser.getName(),
+                                Arrays.asList(ChatFirebaseUtil.currentUserId(), otherUser.getUserId()),
+                                Arrays.asList(ChatFirebaseUtil.getCurrentUserNameFromIntent(getIntent()).toLowerCase(), otherUser.getName().toLowerCase()),
+                                Timestamp.now(),
+                                ""
+                        );
+                    }
+                    for (String name : chatRoomModel.getUserNames()) {
+                        Log.i("create", name + "create");
+                    }
                     chatRoomModel.setChatStyle(ChatStyle.ONEONONE);
                     ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
                 }
@@ -454,18 +481,18 @@ public class ChatRoomActivity extends AppCompatActivity {
                     Users currentUser = task.getResult().toObject(Users.class);
 
                     try {
+
+                        JSONObject jasonObject = new JSONObject();
+                        JSONObject notificationObj = new JSONObject();
+                        notificationObj.put("title", currentUser.getName());
+                        notificationObj.put("body", message);
+
+                        JSONObject dataObj = new JSONObject();
+                        dataObj.put("userId", currentUser.getUserId());
+
+                        jasonObject.put("notification", notificationObj);
+                        jasonObject.put("data", dataObj);
                         for (Users user : otherGroupUsers) {
-                            JSONObject jasonObject = new JSONObject();
-                            JSONObject notificationObj = new JSONObject();
-                            notificationObj.put("title", currentUser.getName());
-                            notificationObj.put("body", message);
-
-                            JSONObject dataObj = new JSONObject();
-                            dataObj.put("userId", currentUser.getUserId());
-
-                            jasonObject.put("notification", notificationObj);
-                            jasonObject.put("data", dataObj);
-
                             if (user != null) {
                                 jasonObject.put("to", user.getFcmToken());
                             }
@@ -605,14 +632,15 @@ public class ChatRoomActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            } else if (!locationPreviewTextView.equals("")){}else {
+            } else if (!locationPreviewTextView.equals("")) {
+            } else {
                 Toast.makeText(this, "Please choose image", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void sendImageToUser() {
-        if (fileUri != null){
+        if (fileUri != null) {
             chatRoomModel.setLastMessageTimestamp(Timestamp.now());
             chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
             chatRoomModel.setLastMessage("<Image>");
@@ -655,7 +683,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 img_preview.setVisibility(View.INVISIBLE);
                 img_preview = null;
 
-                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(),url,null);
+                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), url, null);
                 chatMessageModel.setPicture(true);
                 chatMessageModel.setPlace(false);
                 ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)

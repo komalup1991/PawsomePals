@@ -138,6 +138,7 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                                             //navigate to chat activity;
                                             Intent intent = new Intent(context, ChatRoomActivity.class);
                                             ChatFirebaseUtil.passUserModelAsIntent(intent, otherUser);
+                                            ChatFirebaseUtil.passChatStyleFromIntent(intent, ChatStyle.ONEONONE);
                                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                             context.startActivity(intent);
                                         }
