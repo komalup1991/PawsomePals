@@ -1,13 +1,14 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
-import androidx.appcompat.app.ActionBar;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -16,7 +17,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -28,23 +28,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-
-import androidx.appcompat.widget.Toolbar;
-
-import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Users;
-
-import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -58,7 +43,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class EditUserProfileActivity extends AppCompatActivity {
+import edu.northeastern.pawsomepals.R;
+
+public class NewUserProfileActivity extends AppCompatActivity {
+
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
 
@@ -72,7 +60,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private EditText editTextName;
     private TextView textViewDOB;
     private RadioGroup radioGroupGender;
-    private Button btnUpdate;
+    private Button btnSave;
     private Uri photoUri;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
@@ -85,7 +73,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_user_profile);
+        setContentView(R.layout.activity_new_user_profile);
 
         // Initialize Firebase components
         firebaseAuth = FirebaseAuth.getInstance();
@@ -103,19 +91,10 @@ public class EditUserProfileActivity extends AppCompatActivity {
         editTextName = findViewById(R.id.editTextName);
         radioGroupGender = findViewById(R.id.radioGroupGender);
         textViewDOB = findViewById(R.id.textViewDOB);
-        btnUpdate = findViewById(R.id.btnUpdate);
+        btnSave = findViewById(R.id.btnSave);
         progressBar = findViewById(R.id.progressBar);
 
         progressBar.setVisibility(View.GONE);
-
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle("Edit Profile");
-        }
 
         radioGroupGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -138,82 +117,12 @@ public class EditUserProfileActivity extends AppCompatActivity {
                 showDatePicker();
             }
         });
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateDataToFirebaseStorage();
+                saveDataToFirebaseStorage();
             }
         });
-
-        userInfo();
-    }
-
-    private void userInfo() {
-        firebaseFirestore.collection("user")
-                .document(userId)
-                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                // Convert the data to your Dog model class
-                                Users user = document.toObject(Users.class);
-                                String profileImagePath = user.getProfileImage();
-                                if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
-                                    // Load the profile image using Glide
-                                    Glide.with(EditUserProfileActivity.this)
-                                            .load(profileImagePath)
-                                            .into(imageProfile);
-                                } else {
-                                    // If the profile image path is empty or null, you can use a placeholder image
-                                    Glide.with(EditUserProfileActivity.this)
-                                            .load(R.drawable.default_profile_image)
-                                            .into(imageProfile);
-                                }
-                                editTextName.setText(user.getName());
-                                textViewDOB.setText(user.getDob());
-
-                                int radioButtonId = (user.getGender() != null && user.getGender().equals("Male")) ? R.id.radioButtonMale : R.id.radioButtonFemale;
-                                radioGroupGender.check(radioButtonId);
-
-                                progressBar.setVisibility(View.GONE);
-                            } else {
-                                // Document does not exist
-                            }
-                        } else {
-                            // Handle errors
-                        }
-                    }
-                });
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onBackPressed() {
-        showConfirmationDialog();
-    }
-
-    private void showConfirmationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are you sure you want to discard changes?");
-        builder.setPositiveButton("Discard", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     @Override
@@ -276,112 +185,86 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
-        } else {
-            return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
+        else
+        {return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
-        } else {
+        }
+        else{
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
         }
     }
 
 
-    private void updateDataToFirebaseStorage() {
+    private void saveDataToFirebaseStorage() {
         String name = editTextName.getText().toString().trim();
         String gender = getSelectedGender();
         String dob = textViewDOB.getText().toString().trim();
 
         // Check if all the required fields are filled
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(gender) || TextUtils.isEmpty(dob)) {
-            Toast.makeText(this, "Please fill all the fields.", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(gender) || TextUtils.isEmpty(dob) ||
+                photoUri == null) {
+            Toast.makeText(this, "Please fill all the fields and add a profile picture.", Toast.LENGTH_SHORT).show();
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
 
-        if (photoUri != null) {
-            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String imageName = "user_image_" + timestamp + ".jpg";
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageName = "user_image_" + timestamp + ".jpg";
 
-            StorageReference photoRef = profileImageRef.child("user_images/" + imageName);
-            UploadTask uploadTask = photoRef.putFile(photoUri);
+        StorageReference photoRef = profileImageRef.child("user_images/" + imageName);
+        UploadTask uploadTask = photoRef.putFile(photoUri);
 
-            uploadTask.continueWithTask(task -> {
-                if (!task.isSuccessful()) {
-                    throw task.getException();
-                }
-                return photoRef.getDownloadUrl();
-            }).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    // Get the download URL of the uploaded profile picture
-                    Uri downloadUri = task.getResult();
+        uploadTask.continueWithTask(task -> {
+            if (!task.isSuccessful()) {
+                throw task.getException();
+            }
+            return photoRef.getDownloadUrl();
+        }).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Get the download URL of the uploaded profile picture
+                Uri downloadUri = task.getResult();
 
-                    // Create a map to store the user data
-                    Map<String, Object> userData = new HashMap<>();
-                    userData.put("name", name);
-                    userData.put("dob", dob);
-                    userData.put("gender", gender);
-                    userData.put("profileImage", downloadUri.toString());
-                    userData.put("searchName", name.toLowerCase());
+                // Create a map to store the user data
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("name", name);
+                userData.put("dob", dob);
+                userData.put("gender", gender);
+                userData.put("profileImage", downloadUri.toString());
+                userData.put("searchName",name.toLowerCase());
 
-                    // Save the user data to Firebase Firestore
-                    firebaseFirestore.collection("user")
-                            .document(firebaseAuth.getUid())
-                            .update(userData)
-                            .addOnSuccessListener(aVoid -> {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
-
-                                navigateToProfileFragment();
-                            })
-                            .addOnFailureListener(e -> {
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
-                            });
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {// Create a map to store the user data
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("name", name);
-            userData.put("dob", dob);
-            userData.put("gender", gender);
-            userData.put("searchName", name.toLowerCase());
-
-            // Save the user data to Firebase Firestore
-            firebaseFirestore.collection("user")
-                    .document(firebaseAuth.getUid())
-                    .update(userData)
-                    .addOnSuccessListener(aVoid -> {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
-
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
-                    });
-        }
+                // Save the user data to Firebase Firestore
+                firebaseFirestore.collection("user")
+                        .document(firebaseAuth.getUid())
+                        .update(userData)
+                        .addOnSuccessListener(aVoid -> {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                            navigateToEditDogProfileActivity();
+                            finish();
+                        })
+                        .addOnFailureListener(e -> {
+                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
+                        });
+            } else {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void navigateToProfileFragment() {
-        Intent resultIntent = new Intent();
-        resultIntent.putExtra("profileId", userId);
-        setResult(RESULT_OK, resultIntent);
 
-        SharedPreferences sharedPreferences = this.getSharedPreferences("ProfileId", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("profileId", userId);
-        editor.apply();
-
-        finish();
+    private void navigateToEditDogProfileActivity() {
+        Intent intent = new Intent(NewUserProfileActivity.this, NewDogProfileActivity.class);
+        intent.putExtra("redirectTo", "Home");
+        startActivity(intent);
     }
+
 
     private void openImageChooserDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -395,6 +278,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
         });
         builder.show();
     }
+
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
@@ -536,6 +420,5 @@ public class EditUserProfileActivity extends AppCompatActivity {
         String path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "TempImage", null);
         return Uri.parse(path);
     }
-
 
 }

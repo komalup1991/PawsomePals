@@ -29,8 +29,8 @@
             <!-- Profile image -->
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/profileImage"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:scaleType="centerCrop"
@@ -46,23 +46,24 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="0dp"
                 android:text="John Doe"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="@+id/profileImage"
-                app:layout_constraintTop_toBottomOf="@+id/profileImage" />
+                app:layout_constraintStart_toEndOf="@id/profileImage"
+                app:layout_constraintTop_toTopOf="@id/profileImage" />
 
             <!-- Grouping LinearLayout for posts, followers, and following sections -->
             <LinearLayout
                 android:id="@+id/postsFollowersFollowingLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="16dp"
                 android:orientation="horizontal"
                 app:layout_constraintStart_toEndOf="@id/profileImage"
-                app:layout_constraintTop_toTopOf="@id/profileImage">
+
+                app:layout_constraintTop_toBottomOf="@id/profileName">
 
                 <!-- Posts count -->
                 <LinearLayout
@@ -96,7 +97,7 @@
                     android:id="@+id/followersLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="35dp"
+                    android:layout_marginStart="15dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -123,7 +124,7 @@
                     android:id="@+id/followingLayout"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="35dp"
+                    android:layout_marginStart="15dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -166,11 +167,12 @@
                 android:id="@+id/favImageButton"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/custom_border_sticker"
                 android:scaleType="fitCenter"
                 android:src="@drawable/pawprintfull"
+
                 app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="8dp"
                 app:layout_constraintTop_toTopOf="@id/editOrFollowButton" />
             />
 
