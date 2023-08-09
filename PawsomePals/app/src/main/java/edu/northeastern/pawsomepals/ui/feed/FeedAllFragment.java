@@ -62,6 +62,7 @@ import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 public class FeedAllFragment extends Fragment implements ActivityResultCallback<ActivityResult> {
     private RecyclerView feedsRecyclerView;
     private final List<FeedItem> feedItemList = new ArrayList<>();
+    private final List<Users> userList = new ArrayList<>();
     private FeedAdapter feedAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FeedFragmentViewType feedFragmentViewType;
@@ -101,6 +102,15 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
             }
         });
 
+        List<String> usersIds = new ArrayList<>();
+        if (feedFragmentViewType == FeedFragmentViewType.FRIEND) {
+            FirebaseUtil.getFollowData(FirebaseAuth.getInstance().getCurrentUser().getUid(), new BaseDataCallback() {
+                @Override
+                public void onFollowingUserIdListReceived(List<String> followingUserIds) {
+                    feedAdapter.setUserIds(followingUserIds);
+                }
+            });
+        }
         feedAdapter = new FeedAdapter(feedItemList, requireContext(), new OnItemActionListener() {
             @Override
             public void onRecipeClick(Recipe recipe) {
@@ -173,17 +183,18 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         userIds.add(profileId);
 
         CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
-        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentChange doc : value.getDocumentChanges()) {
-                    Post e = doc.getDocument().toObject(Post.class);
-                    if (feedFragmentViewType == FeedFragmentViewType.RECIPE) {
-                        updateFeedItemList(e);
-                    }
-                }
-            }
-        });
+        //TODO check this listener
+//        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+//                for (DocumentChange doc : value.getDocumentChanges()) {
+//                    Post e = doc.getDocument().toObject(Post.class);
+//                    if (feedFragmentViewType == FeedFragmentViewType.RECIPE) {
+//                        updateFeedItemList(e);
+//                    }
+//                }
+//            }
+//        });
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
                                                                   add(posts);
                                                               }},

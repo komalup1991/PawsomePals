@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -61,6 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     private FeedItem selectedFeedItem;
     private NavController navController;
     private NavDirections action;
+    private CheckBox checkbox_event,checkbox_post,checkbox_service,checkbox_photo;
 
     @Nullable
     @Override
@@ -76,6 +78,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         if (getArguments() != null) {
             selectedFeedItem = (FeedItem) requireArguments().getSerializable("feedItem");
         }
+
+        checkbox_event = view.findViewById(R.id.checkbox_event);
+        checkbox_post = view.findViewById(R.id.checkbox_posts);
+        checkbox_service = view.findViewById(R.id.checkbox_services);
+        checkbox_photo = view.findViewById(R.id.checkbox_photos);
 
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);

@@ -1,25 +1,25 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.adapters.RecipeHorizontalListAdapter;
+import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
-import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.utils.BaseDataCallback;
-import edu.northeastern.pawsomepals.utils.FirebaseUtil;
+import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
@@ -27,7 +27,9 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     private final RecipeHorizontalListAdapter recipeHorizontalListAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
 
-    public RecipeFeedsHeaderViewHolder(@NonNull View itemView, OnItemActionListener onItemActionListener) {
+    private List<String> userIds = new ArrayList<>();
+
+    public RecipeFeedsHeaderViewHolder(@NonNull View itemView, List<String> userIds, OnItemActionListener onItemActionListener) {
         super(itemView);
         recipeRecyclerView = itemView.findViewById(R.id.recipeRecyclerView);
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(itemView.getContext(),
@@ -35,6 +37,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
         recipeRecyclerView.setLayoutManager(horizontalLayoutManager);
         recipeHorizontalListAdapter = new RecipeHorizontalListAdapter(recipeList, new ArrayList<>(), onItemActionListener);
         recipeRecyclerView.setAdapter(recipeHorizontalListAdapter);
+        this.userIds = userIds;
     }
 
     public void bindRecylerViewData() {
@@ -42,40 +45,24 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void fetchRecipesFromFirestore() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseUtil.getFollowData(FirebaseAuth.getInstance().getCurrentUser().getUid(), new BaseDataCallback() {
+        CollectionReference recipes = FirebaseFirestore.getInstance().collection("recipes");
+        FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
+            add(recipes);
+        }}, userIds, new FirestoreDataLoader.FirestoreDataListener() {
             @Override
-            public void onFollowingUserIdListReceived(List<String> followingUserIds) {
-                super.onFollowingUserIdListReceived(followingUserIds);
-            }
-        });
-        db.collection("recipes").addSnapshotListener((querySnapshot, error) -> {
-            if (error != null) {
-                Log.e("FeedAllFragment", "Error getting recipes.", error);
-                return;
-            }
+            public void onDataLoaded(List<FeedItem> feedItems) {
+                recipeList.clear();
+                for (FeedItem r : feedItems) {
+                    recipeList.add((Recipe) r);
+                }
 
-            recipeList.clear();
-            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                Recipe recipe = document.toObject(Recipe.class);
-                String userId = recipe.getCreatedBy();
-                getUsernameByUserId(userId, recipe, recipeList);
-                recipeList.add(recipe);
-            }
-            recipeHorizontalListAdapter.notifyDataSetChanged();
-        });
-    }
-
-    public void getUsernameByUserId(String userId, Recipe recipe, List<Recipe> recipeList) {
-        FirebaseUtil.fetchUserInfoFromFirestore(userId, new BaseDataCallback() {
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
-                    public void onUserReceived(Users user) {
-                        recipe.setUsername(user.getName());
-                        recipe.setUserProfileImage(user.getProfileImage());
+                    public void run() {
                         recipeHorizontalListAdapter.notifyDataSetChanged();
                     }
-                }
-        );
+                });
+            }
+        });
     }
-
 }

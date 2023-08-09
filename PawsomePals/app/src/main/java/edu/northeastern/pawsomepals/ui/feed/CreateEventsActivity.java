@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -24,6 +25,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -40,7 +43,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -75,8 +80,6 @@ public class CreateEventsActivity extends AppCompatActivity {
 
     private TaggingOptionsLayout taggingOptionsLayout;
 
-    int selectedHour = 0;
-    int selectedMinute = 0;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
 
@@ -84,6 +87,10 @@ public class CreateEventsActivity extends AppCompatActivity {
     private LatLng currentLatLng;
     private String locationTagged;
     private String usersTagged;
+    private long selectedDate = -1; // Initialize with an invalid value
+    private int selectedHour = -1;
+    private int selectedMinute = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +207,23 @@ public class CreateEventsActivity extends AppCompatActivity {
                     Toast.makeText(CreateEventsActivity.this, "Event Image is mandatory.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy h:mm a", Locale.US);
+                Calendar selectedDateTime = Calendar.getInstance();
+                Calendar currentDateTime = Calendar.getInstance();
+
+                try {
+                    selectedDateTime.setTime(dateTimeFormat.parse(setEventDateTextView.getText().toString() + " " + setEventTimeTextView.getText().toString()));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                if (selectedDateTime.before(currentDateTime)) {
+                    Toast.makeText(getApplicationContext(), "Date and time should not be in the past.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+
 
                 FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
                         "event", new BaseDataCallback() {
@@ -234,6 +258,11 @@ public class CreateEventsActivity extends AppCompatActivity {
     }
 
     private void showTimePicker() {
+        if (selectedDate == -1) {
+            // No valid date selected, show an error message or handle this case
+            return;
+        }
+
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
                 .setHour(selectedHour)
@@ -241,40 +270,61 @@ public class CreateEventsActivity extends AppCompatActivity {
                 .build();
 
         picker.show(getSupportFragmentManager(), "TIME_PICKER");
-        picker.addOnPositiveButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                selectedHour = picker.getHour();
-                selectedMinute = picker.getMinute();
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(Calendar.HOUR_OF_DAY, selectedHour);
-                calendar.set(Calendar.MINUTE, selectedMinute);
+        picker.addOnPositiveButtonClickListener(view -> {
+            selectedHour = picker.getHour();
+            selectedMinute = picker.getMinute();
 
-                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a z", Locale.US);
-                String formattedTime = sdf.format(calendar.getTime());
+            Calendar selectedDateTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            selectedDateTime.setTimeInMillis(selectedDate);
+            selectedDateTime.set(Calendar.HOUR_OF_DAY, selectedHour);
+            selectedDateTime.set(Calendar.MINUTE, selectedMinute);
 
-                setEventTimeTextView.setText(formattedTime);
+            Calendar currentDateTime = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            currentDateTime.getTimeZone();
+            selectedDateTime.setTimeZone(TimeZone.getDefault());
+
+            if (selectedDateTime.before(currentDateTime)) {
+                Toast.makeText(getApplicationContext(), "Date and time should not be a past value.", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
+            String formattedTime = sdf.format(selectedDateTime.getTime()); // Format in local time zone
+
+            setEventTimeTextView.setText(formattedTime);
         });
-
-
     }
+
 
     private void showDatePicker() {
+        CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
+        constraintsBuilder.setValidator(DateValidatorPointForward.now()); // Restrict past dates
 
-        MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select date of the event").build();
+        MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder
+                .datePicker()
+                .setTitleText("Select date of the event")
+                .setCalendarConstraints(constraintsBuilder.build())
+                .build();
+
         materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
-        materialDatePicker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Long>() {
-            @Override
-            public void onPositiveButtonClick(Long selection) {
-                SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
-                String date = sdf.format(selection);
-                setEventDateTextView.setText(date);
-            }
-        });
 
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            Log.d("yoo", "selectedDatefefff " + selection);
+            Calendar selectedCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // Set to UTC
+            selectedCalendar.setTimeInMillis(selection);
+
+            selectedDate = selectedCalendar.getTimeInMillis();
+
+            Log.d("yoo", "selectedDate " + selectedCalendar);
+            SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String date = sdf.format(selectedDate);
+            setEventDateTextView.setText(date);
+        });
     }
+
+
 
 
     private void showEditImageDialog() {
