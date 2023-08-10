@@ -618,7 +618,6 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Handle image capture from the camera
                 try {
                     Uri cameraUri = ChatImgUtil.saveCameraImageToFile(data, this);
-
                     Bitmap bitmap = MediaStore.Images.Media
                             .getBitmap(getContentResolver(), cameraUri);
 
@@ -694,7 +693,6 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                 imgPreviewTextView.setVisibility(View.INVISIBLE);
                 img_preview.setVisibility(View.INVISIBLE);
-                img_preview = null;
 
                 chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), url, null);
                 chatMessageModel.setPicture(true);
