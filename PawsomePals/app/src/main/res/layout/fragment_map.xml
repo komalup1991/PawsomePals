@@ -1,61 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/taggedLocationTextView"
+    <!--    <TextView-->
+    <!--        android:id="@+id/taggedLocationTextView"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:background="@drawable/custom_border_sticker"-->
+    <!--        android:backgroundTint="@color/white"-->
+    <!--        android:text="Tagged Locations"-->
+    <!--        android:textAlignment="center"-->
+    <!--        android:textSize="16sp"-->
+    <!--        android:textStyle="bold"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintTop_toTopOf="parent" />-->
+
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/mapView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Tagged Locations"
-        android:background="@drawable/custom_border_sticker"
-        android:backgroundTint="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textAlignment="center"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/filterLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/taggedLocationTextView"
-        android:padding="16dp">
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <CheckBox
-            android:id="@+id/checkbox_event"
-            android:layout_width="wrap_content"
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Events" />
+            android:background="@drawable/custom_border_sticker"
+            android:orientation="horizontal">
 
-        <CheckBox
-            android:id="@+id/checkbox_services"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Services" />
+            <RadioButton
+                android:id="@+id/radioButtonAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="All" />
 
-        <CheckBox
-            android:id="@+id/checkbox_posts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Posts" />
+            <RadioButton
+                android:id="@+id/radioButtonEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Events" />
 
-        <CheckBox
-            android:id="@+id/checkbox_photos"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Photos" />
+            <RadioButton
+                android:id="@+id/radioButtonServices"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Services" />
 
+            <RadioButton
+                android:id="@+id/radioButtonPosts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Posts" />
+
+            <RadioButton
+                android:id="@+id/radioButtonPhotos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Photos" />
+        </RadioGroup>
     </LinearLayout>
-
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/mapView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/filterLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
