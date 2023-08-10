@@ -1,5 +1,6 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
@@ -8,7 +9,6 @@
     app:cardBackgroundColor="@color/darkPink"
     app:cardCornerRadius="5dp"
     app:cardElevation="5dp">
-
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -29,13 +29,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
         <LinearLayout
             android:id="@+id/layoutDogInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
+            android:clickable="true"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/layoutActions"
@@ -55,8 +55,8 @@
                 android:id="@+id/textDogBreed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Dog's Breed"
                 android:layout_marginTop="16dp"
+                android:text="Dog's Breed"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
@@ -90,6 +90,91 @@
                 android:padding="2dp"
                 android:src="@drawable/baseline_delete_24" />
         </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/expandableLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/imageDog">
+
+            <TextView
+                android:id="@+id/textDogDob"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:text="Date of Birth/ Adoption : "
+                android:textColor="@color/darkPink"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textDogDobValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="01/01/2000"
+                android:textColor="@color/darkPink"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toTopOf="@+id/textDogGender"
+                app:layout_constraintStart_toEndOf="@+id/textDogDob"
+                app:layout_constraintTop_toTopOf="@+id/textDogDob" />
+
+            <TextView
+                android:id="@+id/textDogGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:text="Gender : "
+                android:textColor="@color/darkPink"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textDogDobValue" />
+
+            <TextView
+                android:id="@+id/textDogGenderValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Male"
+                android:textColor="@color/darkPink"
+                android:textSize="16sp"
+                app:layout_constraintStart_toEndOf="@+id/textDogGender"
+                app:layout_constraintTop_toTopOf="@+id/textDogGender" />
+
+            <TextView
+                android:id="@+id/textDogSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="Size : "
+                android:textColor="@color/darkPink"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textDogGenderValue" />
+
+            <TextView
+                android:id="@+id/textDogSizeValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Small"
+                android:textColor="@color/darkPink"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/textDogSize"
+                app:layout_constraintStart_toEndOf="@+id/textDogSize"
+                app:layout_constraintTop_toTopOf="@+id/textDogSize" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
