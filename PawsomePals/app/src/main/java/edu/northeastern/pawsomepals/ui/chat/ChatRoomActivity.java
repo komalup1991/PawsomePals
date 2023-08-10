@@ -131,6 +131,8 @@ public class ChatRoomActivity extends AppCompatActivity {
 
         initialView();
         functionDialog = new Dialog(this);
+        functionDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        functionDialog.setContentView(R.layout.chat_bottom_sheet_layout);
         otherGroupUsers = new ArrayList<>();
         groupUsers = new ArrayList<>();
         groupUsersNames = new ArrayList<>();
@@ -303,9 +305,6 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void showDialog() {
-        functionDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        functionDialog.setContentView(R.layout.chat_bottom_sheet_layout);
-
         LinearLayout cameraLayout = functionDialog.findViewById(R.id.layoutCamera);
         LinearLayout galleryLayout = functionDialog.findViewById(R.id.layoutGallery);
         LinearLayout locationLayout = functionDialog.findViewById(R.id.layoutLocation);
