@@ -104,7 +104,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageView img_preview;
     private TextView imgPreviewTextView, locationPreviewTextView;
     private TextView chatRoomName;
-    private Toolbar chatRoomToolbar;
+    private LinearLayout chatRoomToolbar;
 
     private RecyclerView chatRoomRecyclerView;
     private List<Users> otherGroupUsers;
