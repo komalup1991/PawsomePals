@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
@@ -30,13 +31,18 @@ import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<FeedItem> feedItems;
     private Context context;
-
     private OnItemActionListener onItemActionListener;
+
+    private List<String> userIds = new ArrayList<>();
 
     public FeedAdapter(List<FeedItem> feedItems, Context context, OnItemActionListener onItemActionListener) {
         this.feedItems = feedItems;
         this.context = context;
         this.onItemActionListener = onItemActionListener;
+    }
+
+    public void setUserIds(List<String> userIds) {
+        this.userIds = userIds;
     }
 
     @NonNull
@@ -47,7 +53,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         switch (viewType) {
             case FeedItem.TYPE_RECIPE_HEADER -> {
                 view = layoutInflater.inflate(R.layout.recipe_recycler_view_layout, parent, false);
-                return new RecipeFeedsHeaderViewHolder(view, onItemActionListener);
+                return new RecipeFeedsHeaderViewHolder(view, this.userIds, onItemActionListener);
             }
             case FeedItem.TYPE_POST -> {
                 view = layoutInflater.inflate(R.layout.feed_post_item, parent, false);

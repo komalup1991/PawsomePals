@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.ui.profile.EditUserProfileActivity;
+import edu.northeastern.pawsomepals.ui.profile.NewUserProfileActivity;
 
 public class SignUpActivity extends AppCompatActivity {
 
@@ -103,7 +103,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                         Toast.makeText(SignUpActivity.this, R.string.signup_successful_registration, Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(SignUpActivity.this, EditUserProfileActivity.class);
+                        Intent intent = new Intent(SignUpActivity.this, NewUserProfileActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                         finish();

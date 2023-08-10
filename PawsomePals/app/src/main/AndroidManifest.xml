@@ -29,6 +29,9 @@
         android:theme="@style/Theme.PawsomePals"
         tools:targetApi="31">
         <activity
+            android:name=".ui.profile.NewUserProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.profile.FollowersFollowingActivity"
             android:exported="false" />
         <activity

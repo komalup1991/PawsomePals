@@ -70,7 +70,7 @@
     <string name="set_time">Set Time</string>
     <string name="set_servings">Set Servings</string>
     <string name="save">Save</string>
-    <string name="servings_placeholder">%d servings</string>
+    <string name="servings_placeholder">%d serving</string>
     <string name="select_the_number_of_portions_this_recipe_makes">Select the number of portions this recipe makes</string>
     <string name="cancel">Cancel</string>
     <string name="write_a_caption">Write a caption...</string>
