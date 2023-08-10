@@ -38,7 +38,8 @@
             android:backgroundTint="#D12424"
             android:padding="4dp"
             android:src="@drawable/chat_search_icon"
-            android:visibility="visible" />
+            android:visibility="visible"
+            android:importantForAccessibility="no" />
 
 
 
@@ -92,8 +93,6 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            />
-
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -103,6 +102,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/new_chat_bar"/>
+
 
 
 
@@ -117,22 +117,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Dogs"
-            android:background="@drawable/button_selector"/>
+            android:text="DOGS"
+
+            />
         <Button
             android:id="@+id/user_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Users"
-            android:background="@drawable/button_selector"/>
+            android:text="USERS"
+
+            />
         <Button
             android:id="@+id/recipe_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Recipes"
-            android:background="@drawable/button_selector"/>
+            android:text="RECIPES"
+
+            />
 
 
     </LinearLayout>

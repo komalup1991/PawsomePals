@@ -67,6 +67,11 @@
             android:name=".ui.profile.EditUserProfileActivity"
             android:exported="false" />
         <activity
+
+            android:name=".ui.search.DogDetailActivity"
+            android:label="Dog Detail Activity">
+        </activity>
+        <activity
             android:name=".ui.profile.EditDogUserActivity"
             android:exported="false" />
         <activity
