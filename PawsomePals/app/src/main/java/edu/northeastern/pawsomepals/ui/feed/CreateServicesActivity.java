@@ -179,7 +179,7 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("type",2);
         services.put("feedItemId", UUID.randomUUID().toString());
 
-        FirebaseUtil.createCollectionInFirestore(services,"services" ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(services,FeedCollectionType.SERVICES ,new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);

@@ -29,6 +29,9 @@
         android:theme="@style/Theme.PawsomePals"
         tools:targetApi="31">
         <activity
+            android:name=".ui.feed.LikeActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.profile.NewUserProfileActivity"
             android:exported="false" />
         <activity
@@ -69,6 +72,11 @@
         <activity
             android:name=".ui.profile.EditUserProfileActivity"
             android:exported="false" />
+        <activity
+
+            android:name=".ui.search.DogDetailActivity"
+            android:label="Dog Detail Activity">
+        </activity>
         <activity
             android:name=".ui.profile.EditDogUserActivity"
             android:exported="false" />

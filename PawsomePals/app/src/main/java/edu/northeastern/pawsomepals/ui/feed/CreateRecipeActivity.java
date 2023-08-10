@@ -193,7 +193,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     return;
                 }
 
-                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri, "recipes", new BaseDataCallback() {
+                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri, FeedCollectionType.RECIPES, new BaseDataCallback() {
 
                     @Override
                     public void onImageUriReceived(String imageUrl) {
@@ -332,7 +332,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         recipeCollection.put("username", userNameToSaveInFeed);
         recipeCollection.put("userProfileImage", userProfileUrlToSaveInFeed);
 
-        FirebaseUtil.createCollectionInFirestore(recipeCollection, "recipes", new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(recipeCollection, FeedCollectionType.RECIPES, new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);

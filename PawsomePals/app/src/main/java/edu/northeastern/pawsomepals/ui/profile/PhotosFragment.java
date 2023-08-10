@@ -22,6 +22,7 @@ import java.util.List;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfilePhotoAdapter;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 
 public class PhotosFragment extends Fragment {
     private RecyclerView recyclerViewPhotos;
@@ -87,7 +88,7 @@ public class PhotosFragment extends Fragment {
 
     private void fetchPhotos(String userIdValue) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("photovideo")
+        db.collection(FeedCollectionType.PHOT0VIDEO)
                 .whereEqualTo("createdBy", userIdValue)
                 .addSnapshotListener((querySnapshot, error) -> {
                     if (error != null) {

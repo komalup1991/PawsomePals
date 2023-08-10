@@ -2,15 +2,14 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_pressed="true"
-        android:drawable="@color/darkPink" />
+        android:drawable="@color/black" />
 
     <item
-        android:state_focused="true"
-        android:drawable="@color/darkPink" />
+        android:state_enabled="true"
+        android:drawable="@color/white" />
 
     <item
-        android:state_selected="true"
-        android:drawable="@color/darkPink" />
+        android:state_enabled="false"
+        android:drawable="@color/white" />
 
-    <item android:drawable="@color/pink" />
 </selector>

@@ -177,7 +177,7 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("type",4);
         post.put("feedItemId", UUID.randomUUID().toString());
 
-        FirebaseUtil.createCollectionInFirestore(post,"posts" ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(post,FeedCollectionType.POSTS ,new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);

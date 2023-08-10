@@ -22,6 +22,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.ui.feed.CommentActivity;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
+import edu.northeastern.pawsomepals.ui.feed.LikeActivity;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class FeedActionsLayout extends LinearLayout {
@@ -88,6 +90,17 @@ public class FeedActionsLayout extends LinearLayout {
             }
         });
 
+        likeCountTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), LikeActivity.class);
+                intent.putExtra("feedItemId", feedItem.getFeedItemId());
+                intent.putExtra("postType", getPostType(feedItem));
+                activity.startActivity(intent);
+
+            }
+        });
+
         commentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,11 +140,11 @@ public class FeedActionsLayout extends LinearLayout {
 
     private String getPostType(FeedItem feedItem) {
         return switch (feedItem.getType()) {
-            case FeedItem.TYPE_PHOTO_VIDEO -> "photovideo";
-            case FeedItem.TYPE_SERVICE -> "services";
-            case FeedItem.TYPE_EVENT -> "events";
-            case FeedItem.TYPE_POST -> "posts";
-            case FeedItem.TYPE_RECIPE -> "recipes";
+            case FeedItem.TYPE_PHOTO_VIDEO -> FeedCollectionType.PHOT0VIDEO;
+            case FeedItem.TYPE_SERVICE -> FeedCollectionType.SERVICES;
+            case FeedItem.TYPE_EVENT -> FeedCollectionType.EVENTS;
+            case FeedItem.TYPE_POST -> FeedCollectionType.POSTS;
+            case FeedItem.TYPE_RECIPE -> FeedCollectionType.RECIPES;
             default -> throw new IllegalStateException("Unexpected value: " + feedItem.getType());
         };
     }

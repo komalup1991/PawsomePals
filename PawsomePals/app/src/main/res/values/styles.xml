@@ -34,6 +34,12 @@
 
     </style>
 
+    <style name="CustomPressedButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@drawable/button_selector</item>
+        <item name="android:textColor">@color/pressedTextColor</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
     <style name="CustomCheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
         <item name="android:buttonTint">@color/accentColor</item>
     </style>

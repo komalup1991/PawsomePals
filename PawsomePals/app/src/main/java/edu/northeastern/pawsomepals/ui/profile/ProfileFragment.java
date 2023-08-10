@@ -58,6 +58,7 @@ import java.util.Map;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 
@@ -559,7 +560,7 @@ private ImageButton favImageButton;
 
 
     private void getPostsCount(String userIdValue) {
-        firebaseFirestore.collection("posts")
+        firebaseFirestore.collection(FeedCollectionType.POSTS)
                 .whereEqualTo("createdBy", userIdValue)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
