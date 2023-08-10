@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -17,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+
+import java.util.Locale;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
@@ -103,14 +107,26 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 imageViewHolder.leftCardView.setVisibility(View.GONE);
                 imageViewHolder.rightCardView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.rightImageView);
-//                imageViewHolder.rightImageView.setImageBitmap(ChatImgUtil.getBitmapFromURL(message.getImage()));
+                imageViewHolder.rightCardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(model.getImage()));
+                        holder.itemView.getContext().startActivity(intent);
+                    }
+                });
             } else {
                 imageViewHolder.rightCardView.setVisibility(View.GONE);
                 imageViewHolder.leftCardView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.leftImageView);
-//                imageViewHolder.leftImageView.setImageBitmap(ChatImgUtil.getBitmapFromURL(message.getImage()));
                 imageViewHolder.otherUserNameTextView.setText(model.getSenderName());
                 imageViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
+                imageViewHolder.leftCardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(model.getImage()));
+                        holder.itemView.getContext().startActivity(intent);
+                    }
+                });
             }
         } else if (holder.getItemViewType() == VIEW_TYPE_LOCATION_MESSAGE) {
             LocationViewHolder locationViewHolder = (LocationViewHolder) holder;
@@ -121,6 +137,12 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 locationViewHolder.rightCardView.setVisibility(View.VISIBLE);
                 locationViewHolder.ownLocationNameTextview.setText(model.getLocation().getLocationName());
                 locationViewHolder.ownLocationAddressTextview.setText(model.getLocation().getLocationAddress());
+                locationViewHolder.rightCardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openGoogleMap(holder.itemView.getContext(), model.getLocation().getLatitude(), model.getLocation().getLongitude());
+                    }
+                });
             } else {
                 locationViewHolder.rightCardView.setVisibility(View.GONE);
                 locationViewHolder.leftCardView.setVisibility(View.VISIBLE);
@@ -128,7 +150,24 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 locationViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
                 locationViewHolder.otherLocationNameTextview.setText(model.getLocation().getLocationName());
                 locationViewHolder.otherLocationAddressTextview.setText(model.getLocation().getLocationAddress());
+                locationViewHolder.leftCardView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        openGoogleMap(holder.itemView.getContext(), model.getLocation().getLatitude(), model.getLocation().getLongitude());
+                    }
+                });
             }
+        }
+    }
+
+    private void openGoogleMap(Context context, double latitude, double longitude) {
+        String uri = String.format(Locale.ENGLISH, "geo:%f,%f?q=%f,%f(Label)", latitude, longitude, latitude, longitude);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setPackage("com.google.android.apps.maps");
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        } else {
+            Toast.makeText(context, "Google Maps is not installed!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -166,8 +205,8 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
         CardView leftCardView, rightCardView;
         ImageView leftImageView, rightImageView;
         TextView otherUserNameTextView;
-        TextView otherLocationNameTextview,otherLocationAddressTextview;
-        TextView ownLocationNameTextview,ownLocationAddressTextview;
+        TextView otherLocationNameTextview, otherLocationAddressTextview;
+        TextView ownLocationNameTextview, ownLocationAddressTextview;
 
         public LocationViewHolder(@NonNull View itemView) {
             super(itemView);
