@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.result.ActivityResult;
@@ -69,6 +70,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     private String feedIdFromDeepLink;
     private TextView pullToRefreshTextView;
     private ActivityResultLauncher<Intent> activityResultLauncher;
+    private ProgressBar loadingSpinner;
 
     @Nullable
     @Override
@@ -92,6 +94,10 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         pullToRefreshTextView = view.findViewById(R.id.pullToRefreshTextView);
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         feedsRecyclerView.setLayoutManager(verticalLayoutManager);
+        loadingSpinner = view.findViewById(R.id.loading_spinner);
+
+        // Simulate a delay to show loading spinner
+        showLoadingSpinner();
 
         feedIdFromDeepLink = getActivity().getIntent().getStringExtra("feedId");
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -418,6 +424,14 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
              //   updateFeedItemListOnActivitySuccess (item);
             }
     }}
+
+    private void showLoadingSpinner() {
+        loadingSpinner.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoadingSpinner() {
+        loadingSpinner.setVisibility(View.GONE);
+    }
 }
 
 
