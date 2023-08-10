@@ -66,26 +66,12 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         usersImgs = Arrays.asList(ChatFirebaseUtil.getGroupMemberImgsFromChatRoom(getIntent()).split(" "));
         usersNames = Arrays.asList(ChatFirebaseUtil.getGroupMemberNameFromChatRoom(getIntent()).split(" "));
         for (int i = 0; i < usersImgs.size();i++){
-            userCardViewModels.add(new ChatUserCardViewModel(usersImgs.get(i),usersNames.get(i)));
+            userCardViewModels.add(new ChatUserCardViewModel(groupChatModel.getGroupMembers().get(i),usersImgs.get(i),usersNames.get(i)));
         }
         adapter = new ChatGroupMemberViewsAdapter(this,userCardViewModels, new ChatFragment.ProfilePicClickListener() {
             @Override
             public void onItemClicked(String userIDValue) {
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("profileId", userIDValue);
-                setResult(RESULT_OK, resultIntent);
-
-                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("profileId", userIDValue);
-                editor.apply();
-
-                //Navigate to Profile Fragment
-                ProfileFragment profileFragment = new ProfileFragment();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.chatRoomContainer, profileFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                navigateToProfileFragment(userIDValue);
             }
         });
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -109,6 +95,23 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
             }
         });
 
+    }
+    private void navigateToProfileFragment(String userIDValue) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("profileId", userIDValue);
+        setResult(RESULT_OK, resultIntent);
+
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("profileId", userIDValue);
+        editor.apply();
+
+        //Navigate to Profile Fragment
+        ProfileFragment profileFragment = new ProfileFragment();
+        FragmentTransaction transaction = this.getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.editChatContainer, profileFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 
     private String createMembersDetails() {

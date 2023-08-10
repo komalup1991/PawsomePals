@@ -48,6 +48,17 @@ public class ChatGroupMemberViewsAdapter extends RecyclerView.Adapter<ChatGroupM
                 .load(usersList.get(position).getUserImg())
                 .into(holder.profileImg);
         holder.userName.setText(usersList.get(position).getUserName());
+        holder.profileImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int latestPosition = holder.getAdapterPosition();
+                if (onItemActionListener != null) {
+                    if (latestPosition != RecyclerView.NO_POSITION) {
+                        onItemActionListener.onItemClicked(usersList.get(latestPosition).getUserId());
+                    }
+                }
+            }
+        });
     }
 
     @Override

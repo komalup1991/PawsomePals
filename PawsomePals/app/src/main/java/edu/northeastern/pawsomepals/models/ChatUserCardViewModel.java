@@ -1,10 +1,12 @@
 package edu.northeastern.pawsomepals.models;
 
 public class ChatUserCardViewModel {
+    String userId;
     String userImg;
     String userName;
 
-    public ChatUserCardViewModel(String userImg, String userName) {
+    public ChatUserCardViewModel(String userId,String userImg, String userName) {
+        this.userId = userId;
         this.userImg = userImg;
         this.userName = userName;
     }
@@ -23,5 +25,12 @@ public class ChatUserCardViewModel {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public void setUserId(String userId){
+        this.userId = userId;
+    }
+    public String getUserId() {
+        return  userId;
     }
 }
