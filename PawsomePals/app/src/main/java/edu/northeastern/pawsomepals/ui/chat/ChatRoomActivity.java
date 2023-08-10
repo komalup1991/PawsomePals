@@ -156,20 +156,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         );
 
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> currentUser = task.getResult().toObject(Users.class));
-        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()) == null){
-            otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
-            chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
-            infoBtn.setOnClickListener(v -> {
-                navigateToProfileFragment(otherUser.getUserId());
-            });
-            if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null) {
-                chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
-            } else {
-                chatRoomName.setText(otherUser.getName());
-            }
-
-            getOrCreateChatRoomModel();
-        }else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.ONEONONE.toString())){
+        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.ONEONONE.toString())) {
             otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
             chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
             infoBtn.setOnClickListener(v -> {
@@ -183,7 +170,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
             getOrCreateChatRoomModel();
 
-        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.GROUP)) {
+        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.GROUP.toString())) {
             infoBtn.setOnClickListener(v -> {
                 Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
                 //check
@@ -481,22 +468,49 @@ public class ChatRoomActivity extends AppCompatActivity {
                     Users currentUser = task.getResult().toObject(Users.class);
 
                     try {
+                        if (group == null) {
+                            JSONObject jasonObject = new JSONObject();
+                            JSONObject notificationObj = new JSONObject();
+                            JSONObject dataObj = new JSONObject();
+                            notificationObj.put("title", currentUser.getName());
+                            notificationObj.put("body", message);
 
-                        JSONObject jasonObject = new JSONObject();
-                        JSONObject notificationObj = new JSONObject();
-                        notificationObj.put("title", currentUser.getName());
-                        notificationObj.put("body", message);
-
-                        JSONObject dataObj = new JSONObject();
-                        dataObj.put("userId", currentUser.getUserId());
-
-                        jasonObject.put("notification", notificationObj);
-                        jasonObject.put("data", dataObj);
-                        for (Users user : otherGroupUsers) {
-                            if (user != null) {
-                                jasonObject.put("to", user.getFcmToken());
-                            }
+                            dataObj.put("userId", currentUser.getUserId());
+                            jasonObject.put("notification", notificationObj);
+                            jasonObject.put("data", dataObj);
+                            jasonObject.put("to", otherUser.getFcmToken());
                             callApi(jasonObject);
+                        } else {
+                            for (Users user : otherGroupUsers) {
+                                JSONObject jasonObject = new JSONObject();
+                                JSONObject notificationObj = new JSONObject();
+                                JSONObject dataObj = new JSONObject();
+                                StringBuilder userIdBuilder = new StringBuilder();
+                                StringBuilder userNameBuilder = new StringBuilder();
+                                userIdBuilder.append(currentUser.getUserId() + " ");
+                                userNameBuilder.append(currentUser.getName() + " ");
+                                for (int i = 0; i < otherGroupUsers.size(); i++) {
+                                    userIdBuilder.append(otherGroupUsers.get(i).getUserId());
+                                    userNameBuilder.append(otherGroupUsers.get(i).getName());
+                                    if (i != otherGroupUsers.size() - 1) {
+                                        userIdBuilder.append(" ");
+                                        userNameBuilder.append(" ");
+                                    }
+                                }
+                                notificationObj.put("title", group.getGroupName());
+                                notificationObj.put("body", message);
+
+                                jasonObject.put("notification", notificationObj);
+
+
+                                dataObj.put("groupName", group.getGroupName());
+                                dataObj.put("groupUserNames", userNameBuilder.toString());
+                                dataObj.put("userId", userIdBuilder.toString());
+                                jasonObject.put("data", dataObj);
+
+                                jasonObject.put("to", user.getFcmToken());
+                                callApi(jasonObject);
+                            }
                         }
                     } catch (Exception e) {
                         Log.i("info", "exeption");

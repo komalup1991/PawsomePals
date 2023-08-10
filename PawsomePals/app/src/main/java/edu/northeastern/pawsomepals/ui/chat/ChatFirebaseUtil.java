@@ -81,6 +81,12 @@ public class ChatFirebaseUtil {
         intent.putExtra("name", groupName);
         intent.putExtra("groupUserNames",nameBuilder.toString());
         intent.putExtra("ids", idBuilder.toString());
+        intent.putExtra("chatStyle", ChatStyle.GROUP.toString());
+    }
+    public static void passGroupChatModelFromNotification(Intent intent, String userIds, String userNames,String groupName){
+        intent.putExtra("name", groupName);
+        intent.putExtra("groupUserNames",userNames);
+        intent.putExtra("ids", userIds);
         intent.putExtra("chatStyle", ChatStyle.GROUP);
     }
 
