@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.ui.chat;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,16 +24,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.RecentChatRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
+import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 
 public class ChatFragment extends Fragment {
+
+    private Users currentUser;
     private TextView searchInput;
     private ImageButton searchButton;
     private Button createNewGroupButton;
@@ -62,6 +68,11 @@ public class ChatFragment extends Fragment {
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewGroupButton = view.findViewById(R.id.new_group_chat_btn);
 
+        ChatFirebaseUtil.currentUserDetails().get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot snapshot) {
+                currentUser = snapshot.toObject(Users.class);}
+        });
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
