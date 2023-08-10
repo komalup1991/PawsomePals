@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -40,7 +43,11 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.models.PhotoVideo;
+import edu.northeastern.pawsomepals.models.Post;
+import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, FirestoreDataLoader.FirestoreDataListener {
@@ -53,6 +60,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     private FusedLocationProviderClient fusedLocationClient;
     private Activity activity;
     private FeedItem selectedFeedItem;
+    private NavController navController;
+    private NavDirections action;
+    private CheckBox checkbox_event,checkbox_post,checkbox_service,checkbox_photo;
 
     @Nullable
     @Override
@@ -69,9 +79,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             selectedFeedItem = (FeedItem) requireArguments().getSerializable("feedItem");
         }
 
+        checkbox_event = view.findViewById(R.id.checkbox_event);
+        checkbox_post = view.findViewById(R.id.checkbox_posts);
+        checkbox_service = view.findViewById(R.id.checkbox_services);
+        checkbox_photo = view.findViewById(R.id.checkbox_photos);
+
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
     }
 
     private void moveMapToCurrentLocation(double latitude, double longitude, int zoom) {
@@ -85,6 +101,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
         loadMarkersOnMap();
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);}
         if (selectedFeedItem != null) {
             moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
         }
@@ -96,6 +114,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
     @Override
     public void onDataLoaded(List<FeedItem> feedItems) {
+        if (!isAdded() || !isVisible()) {
+            return;
+        }
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             Marker m;
 
@@ -124,29 +145,36 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                 R.drawable.dogpawheart,
                 80);
 
+
         MarkerOptions marker = new MarkerOptions();
 
         if (feedItem.getType() == 1) {
-            marker.title("Photo").icon(icon).snippet(feedItem.getUsername())
+            marker.title(((PhotoVideo) feedItem).getCaption())
+                    .icon(icon).snippet(feedItem.getUsername())
                     .position(new LatLng(feedItem.getLatLng().getLatitude(),
                             feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 2) {
-            marker.title("Service").icon(icon).snippet(feedItem.getUsername())
+            marker.title(((Services) feedItem).getServiceName())
+                    .icon(icon).snippet(feedItem.getUsername())
                     .position(new LatLng(feedItem.getLatLng().getLatitude(),
                             feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 3) {
-            marker.title("Event").icon(icon).snippet(feedItem.getUsername())
+            marker.title(((Event) feedItem).getEventName())
+                    .icon(icon).snippet(feedItem.getUsername())
                     .position(new LatLng(feedItem.getLatLng().getLatitude(),
                             feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 4) {
-            marker.title("Post").icon(icon).snippet(feedItem.getUsername())
+            marker.title(((Post) feedItem).getCaption())
+                    .icon(icon).snippet(feedItem.getUsername())
                     .position(new LatLng(feedItem.getLatLng().getLatitude(),
                             feedItem.getLatLng().getLongitude()));
         }
         Marker m = googleMap.addMarker(marker);
+        CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter(getContext(), feedItem);
+        googleMap.setInfoWindowAdapter(infoWindowAdapter);
+
         return m;
     }
-
 
     private BitmapDescriptor bitmapFromVector(Context context, int vectorResId, int sizeOfMarker) {
         Drawable vectorDrawable = ContextCompat.getDrawable(

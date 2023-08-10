@@ -41,6 +41,7 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -57,7 +58,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private ImageView selectPhoto;
     private EditText recipeNameEditText;
     private EditText descriptionEditTextView;
-    private EditText ingredientsEditTextView,instructionsEditTextView;
+    private EditText ingredientsEditTextView, instructionsEditTextView;
     private String currentPhotoPath;
     private FirebaseFirestore db;
     private StorageReference storageRef;
@@ -129,12 +130,10 @@ public class CreateRecipeActivity extends AppCompatActivity {
         FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-                userNameToSaveInFeed=user.getName();
-                userProfileUrlToSaveInFeed=user.getProfileImage();
+                userNameToSaveInFeed = user.getName();
+                userProfileUrlToSaveInFeed = user.getProfileImage();
 
-                Glide.with(CreateRecipeActivity.this)
-                        .load(user.getProfileImage())
-                        .into(userProfilePic);
+                Glide.with(CreateRecipeActivity.this).load(user.getProfileImage()).into(userProfilePic);
                 userNameTextView.setText(user.getName());
             }
         });
@@ -184,9 +183,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
         });
 
 
-
-
-
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -197,39 +193,37 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     return;
                 }
 
-                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
-                        "recipes", new BaseDataCallback() {
+                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri, "recipes", new BaseDataCallback() {
 
-                            @Override
-                            public void onImageUriReceived(String imageUrl) {
-                                createFeedMap(imageUrl);
-                            }
+                    @Override
+                    public void onImageUriReceived(String imageUrl) {
+                        createFeedMap(imageUrl);
+                    }
 
-                            @Override
-                            public void onDismiss() {
-                                DialogHelper.hideProgressDialog(progressDialog);
-                                finish();
-                            }
+                    @Override
+                    public void onDismiss() {
+                        DialogHelper.hideProgressDialog(progressDialog);
+                        finish();
+                    }
 
-                            @Override
-                            public void onError(Exception exception) {
-                                Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    @Override
+                    public void onError(Exception exception) {
+                        Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
                 DialogHelper.showProgressDialog("Your Recipe is being saved...", progressDialog, CreateRecipeActivity.this);
             }
         });
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showCancelConfirmationDialog(context, CreateRecipeActivity.this);
-             //   finish();
+                DialogHelper.showCancelConfirmationDialog(view.getContext(), CreateRecipeActivity.this);
+                //   finish();
             }
         });
 
 
     }
-
 
 
     private void showEditImageDialog() {
@@ -310,15 +304,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
         String recipeServing = setServingSizeTextView.getText().toString();
         if (recipeServing.equals(getString(R.string.set_servings))) {
-            recipeServing="";
+            recipeServing = "";
         }
         String recipePrepTime = setPrepTextView.getText().toString();
         if (recipePrepTime.equals(getString(R.string.set_time))) {
-            recipePrepTime="";
+            recipePrepTime = "";
         }
         String recipeCookTime = setCookTextView.getText().toString();
         if (recipeCookTime.equals(getString(R.string.set_time))) {
-            recipeCookTime="";
+            recipeCookTime = "";
         }
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
@@ -332,16 +326,17 @@ public class CreateRecipeActivity extends AppCompatActivity {
         recipeCollection.put("prepTime", recipePrepTime);
         recipeCollection.put("cookTime", recipeCookTime);
         recipeCollection.put("createdAt", createdAt);
-        recipeCollection.put("type",5);
+        recipeCollection.put("type", 5);
         recipeCollection.put("img", imageUrlFromFirebaseStorage);
         recipeCollection.put("feedItemId", UUID.randomUUID().toString());
-        recipeCollection.put("username",userNameToSaveInFeed);
-        recipeCollection.put("userProfileImage",userProfileUrlToSaveInFeed);
+        recipeCollection.put("username", userNameToSaveInFeed);
+        recipeCollection.put("userProfileImage", userProfileUrlToSaveInFeed);
 
-        FirebaseUtil.createCollectionInFirestore(recipeCollection,"recipes" ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(recipeCollection, "recipes", new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
+                ActivityHelper.setResult(CreateRecipeActivity.this, true);
                 finish();
             }
         });
@@ -401,7 +396,13 @@ public class CreateRecipeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 int hours = hourTimePicker.getValue();
                 int minutes = minTimePicker.getValue();
-                String timeText = String.format(Locale.getDefault(), "%d hours %d mins", hours, minutes);
+                String timeText;
+                if (hours == 0) {
+                    timeText = String.format(Locale.getDefault(), "%d mins", minutes);
+                } else {
+                    timeText = String.format(Locale.getDefault(), "%d hours %d mins", hours, minutes);
+                }
+
                 textView.setText(timeText);
                 if (textView == setPrepTextView) {
                     selectedPrepHours = hours;
@@ -433,7 +434,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
                 galleryImageUri = null;
-                cameraImageUri = ImageUtil.saveCameraImageToFile(data,this);
+                cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
                 selectPhoto.setVisibility(View.GONE);
                 Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
@@ -444,7 +445,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
             }
         }
     }
-
 
 
     @Override
@@ -481,60 +481,36 @@ public class CreateRecipeActivity extends AppCompatActivity {
         Dialog dialog = new Dialog(CreateRecipeActivity.this);
         dialog.setContentView(R.layout.dialog_quantity_picker);
 
-        SeekBar seekBar = dialog.findViewById(R.id.seekBar);
+        NumberPicker numberPicker = dialog.findViewById(R.id.numberPicker);
         Button saveButton = dialog.findViewById(R.id.saveButton);
-        valueTextView = dialog.findViewById(R.id.valueTextView);
 
-        // Set initial value for number picker
-        int currentValue;
-        try {
-            currentValue = Integer.parseInt(setServingSizeTextView.getText().toString());
-        } catch (NumberFormatException e) {
-            currentValue = 1; // Set a default value if parsing fails
+        numberPicker.setMinValue(0);
+        numberPicker.setMaxValue(100);
+        View editView = numberPicker.getChildAt(0);
+
+        if (editView instanceof EditText) {
+            ((EditText) editView).setFilters(new InputFilter[0]);
         }
 
-        seekBar.setProgress(currentValue - 1);
-        valueTextView.setText(String.valueOf(currentValue));
-        // Update the value text view when the seek bar progress changes
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int selectedValue = progress + 1;
-                valueTextView.setText(String.valueOf(selectedValue));
-            }
+        numberPicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // Not used
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                // Not used
-            }
-        });
+        numberPicker.setWrapSelectorWheel(true);
 
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedValue = seekBar.getProgress() + 1;
+                selectedValue = numberPicker.getValue();
 
                 String servingsText = getString(R.string.servings_placeholder, selectedValue);
                 setServingSizeTextView.setText(servingsText);
                 dialog.dismiss();
             }
         });
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                isQuantityPickerDialogVisible = false;
-            }
-        });
 
-        isQuantityPickerDialogVisible = true;
         dialog.show();
     }
+
 
     private void showConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -548,112 +524,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        String recipeName = recipeNameEditText.getText().toString();
-        String description = descriptionEditTextView.getText().toString();
-        String ingredients = ingredientsEditTextView.getText().toString();
-
-        outState.putString("recipeName", recipeName);
-        outState.putString("description", description);
-        outState.putString("ingredients", ingredients);
-
-        // Save the selected image URI
-        outState.putParcelable("selectedImageUri", galleryImageUri);
-        outState.putParcelable("cameraImageUri", cameraImageUri);
-
-        //visibility restore
-        outState.putInt("addPhotoImageViewVisibility", selectPhoto.getVisibility());
-
-        outState.putBoolean("isEditImageDialogVisible", isEditImageDialogVisible);
-        outState.putBoolean("isDeleteConfirmationDialogVisible", isDeleteConfirmationDialogVisible);
-
-        outState.putBoolean("isQuantityPickerDialogVisible", isQuantityPickerDialogVisible);
-        outState.putInt("selectedValue", selectedValue);
-
-        if (valueTextView != null) {
-            outState.putString("valueTextViewText", valueTextView.getText().toString());
-        }
-
-        outState.putBoolean("isPrepTimeDialogVisible", isPrepTimeDialogVisible);
-        outState.putBoolean("isCookTimeDialogVisible", isCookTimeDialogVisible);
-        outState.putInt("selectedPrepHours", selectedPrepHours);
-        outState.putInt("selectedPrepMinutes", selectedPrepMinutes);
-        outState.putInt("selectedCookHours", selectedCookHours);
-        outState.putInt("selectedCookMinutes", selectedCookMinutes);
-
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-
-        String recipeName = savedInstanceState.getString("recipeName");
-        String description = savedInstanceState.getString("description");
-        String ingredients = savedInstanceState.getString("ingredients");
-
-        recipeNameEditText.setText(recipeName);
-        descriptionEditTextView.setText(description);
-        ingredientsEditTextView.setText(ingredients);
-
-        // Restore the selected image URI
-        galleryImageUri = savedInstanceState.getParcelable("selectedImageUri");
-        cameraImageUri = savedInstanceState.getParcelable("cameraImageUri");
-
-        if (galleryImageUri != null) {
-            Glide.with(this).load(galleryImageUri).centerCrop().into(recipeImageView);
-        } else if (cameraImageUri != null) {
-            Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
-        }
-
-        //Restore visibility
-        selectPhoto.setVisibility(savedInstanceState.getInt("addPhotoImageViewVisibility"));
-        isEditImageDialogVisible = savedInstanceState.getBoolean("isEditImageDialogVisible");
-        if (isEditImageDialogVisible) {
-            showEditImageDialog();
-        }
-        isDeleteConfirmationDialogVisible = savedInstanceState.getBoolean("isDeleteConfirmationDialogVisible");
-        if (isDeleteConfirmationDialogVisible) {
-            showDeleteConfirmationDialog();
-        }
-
-        isQuantityPickerDialogVisible = savedInstanceState.getBoolean("isQuantityPickerDialogVisible", false);
-        selectedValue = savedInstanceState.getInt("selectedValue");
-        if (isQuantityPickerDialogVisible) {
-            showQuantityPickerDialog();
-        }
-        // Restore the value displayed in the valueTextView
-        String savedValueText = savedInstanceState.getString("valueTextViewText");
-        if (savedValueText != null && valueTextView != null) {
-            valueTextView.setText(savedValueText);
-        }
-        // Update the setServingSizeTextView
-        String servingsText = getString(R.string.servings_placeholder, selectedValue);
-        setServingSizeTextView.setText(servingsText);
-
-        isPrepTimeDialogVisible = savedInstanceState.getBoolean("isPrepTimeDialogVisible");
-        isCookTimeDialogVisible = savedInstanceState.getBoolean("isCookTimeDialogVisible");
-        selectedPrepHours = savedInstanceState.getInt("selectedPrepHours");
-        selectedPrepMinutes = savedInstanceState.getInt("selectedPrepMinutes");
-        selectedCookHours = savedInstanceState.getInt("selectedCookHours");
-        selectedCookMinutes = savedInstanceState.getInt("selectedCookMinutes");
-        String prepTimeText = String.format(Locale.getDefault(), "%d hours %d mins", selectedPrepHours, selectedPrepMinutes);
-        String cookTimeText = String.format(Locale.getDefault(), "%d hours %d mins", selectedCookHours, selectedCookMinutes);
-        setPrepTextView.setText(prepTimeText);
-        setCookTextView.setText(cookTimeText);
-
-
-        if (isPrepTimeDialogVisible) {
-            showTimePickerDialog("Prep Time", "How long does it take to prepare this recipe?", setPrepTextView);
-        }
-        if (isCookTimeDialogVisible) {
-            showTimePickerDialog("Cook Time", "How long does it take to cook this recipe?", setCookTextView);
-        }
-
-
     }
 
 

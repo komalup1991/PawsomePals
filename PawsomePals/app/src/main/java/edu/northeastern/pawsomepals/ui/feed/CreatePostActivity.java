@@ -33,6 +33,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
+import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -180,6 +181,7 @@ public class CreatePostActivity extends AppCompatActivity {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
+                ActivityHelper.setResult(CreatePostActivity.this,true);
                 finish();
             }
         });

@@ -17,7 +17,6 @@
         android:background="@drawable/custom_border_top_round"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -37,6 +36,26 @@
             android:textStyle="bold"
             app:layout_constraintStart_toEndOf="@id/userProfilePic"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:layout_width="8dp"
+            android:layout_height="1dp"
+            android:layout_weight="0.25" />
+
+        <ImageView
+            android:tooltipText="Post"
+            android:id="@+id/firstImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/socialmedia"
+            android:layout_marginStart="8dp" />
+
+        <ImageView
+            android:id="@+id/secondImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/three_dots_icon"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

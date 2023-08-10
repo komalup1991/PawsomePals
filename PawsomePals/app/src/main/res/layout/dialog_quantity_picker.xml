@@ -25,34 +25,24 @@
         android:layout_marginTop="8dp"
         android:textColor="@android:color/darker_gray" />
 
-    <SeekBar
-        android:id="@+id/seekBar"
+    <NumberPicker
+        android:id="@+id/numberPicker"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAlignment="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/messageTextView"
-        android:theme="@style/MyNumberPickerTheme"
-        android:min="1"
-        android:max="99" />
+        android:layout_marginEnd="4dp"/>
 
-    <TextView
-        android:id="@+id/valueTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="1"
-        app:layout_constraintBottom_toBottomOf="@id/seekBar"
-        app:layout_constraintEnd_toStartOf="@+id/saveButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        android:textColor="@android:color/black" />
 
     <Button
         android:id="@+id/saveButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save"
-        app:layout_constraintTop_toBottomOf="@id/seekBar"
+        app:layout_constraintTop_toBottomOf="@id/numberPicker"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

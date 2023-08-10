@@ -285,8 +285,16 @@ private ImageButton favImageButton;
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Fetch and update user info when the fragment resumes
+        getUserInfo(profileId);
+    }
 
     private void navigateToEditUserProfile() {
+        Intent intent = new Intent(getContext(), EditUserProfileActivity.class);
+        getContext().startActivity(intent);
     }
 
     private void followProfile() {
@@ -389,8 +397,7 @@ private ImageButton favImageButton;
                                                                     progressBar.setVisibility(View.GONE);
 
                                                                     // Update the Followers count in the UI
-                                                                    followersCountValue = followersList.size();
-                                                                    followersCount.setText(String.valueOf(followersCountValue));
+                                                                    getFollowersCount(profileId);
                                                                 })
                                                                 .addOnFailureListener(e -> {
                                                                     progressBar.setVisibility(View.GONE);
@@ -413,8 +420,7 @@ private ImageButton favImageButton;
                                                                 progressBar.setVisibility(View.GONE);
 
                                                                 // Update the Followers count in the UI
-                                                                followersCountValue = 1;
-                                                                followersCount.setText(String.valueOf(followersCountValue));
+                                                                getFollowersCount(profileId);
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 progressBar.setVisibility(View.GONE);
@@ -467,17 +473,7 @@ private ImageButton favImageButton;
                                                                 editOrFollowButton.setText("Follow");
                                                                 progressBar.setVisibility(View.GONE);
 
-                                                                // Update the Following count in the UI
-                                                                if (followingCountValue > 0) {
-                                                                    followingCountValue--;
-                                                                    followingCount.setText(String.valueOf(followingCountValue));
-                                                                }
-
-                                                                // Update the Followers count in the UI
-                                                                if (followersCountValue > 0) {
-                                                                    followersCountValue--;
-                                                                    followersCount.setText(String.valueOf(followersCountValue));
-                                                                }
+                                                                getFollowersCount(profileId);
                                                             })
                                                             .addOnFailureListener(e -> {
                                                                 progressBar.setVisibility(View.GONE);

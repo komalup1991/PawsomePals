@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.ui.feed;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +12,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultCaller;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,6 +30,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,22 +54,30 @@ import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
+import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
-public class FeedAllFragment extends Fragment {
+public class FeedAllFragment extends Fragment implements ActivityResultCallback<ActivityResult> {
     private RecyclerView feedsRecyclerView;
     private final List<FeedItem> feedItemList = new ArrayList<>();
+    private final List<Users> userList = new ArrayList<>();
     private FeedAdapter feedAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private FeedFragmentViewType feedFragmentViewType;
     private String feedIdFromDeepLink;
+    private TextView pullToRefreshTextView;
+    private ActivityResultLauncher<Intent> activityResultLauncher;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_feed_all, container, false);
+        activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this // Use the current fragment as the callback
+        );
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
         return rootView;
     }
@@ -72,6 +89,7 @@ public class FeedAllFragment extends Fragment {
         feedFragmentViewType = (FeedFragmentViewType) requireArguments().getSerializable("feed_view_type");
 
         feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
+        pullToRefreshTextView = view.findViewById(R.id.pullToRefreshTextView);
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         feedsRecyclerView.setLayoutManager(verticalLayoutManager);
 
@@ -80,9 +98,19 @@ public class FeedAllFragment extends Fragment {
             @Override
             public void onRefresh() {
                 refreshFeeds();
+                pullToRefreshTextView.setVisibility(View.GONE);
             }
         });
 
+        List<String> usersIds = new ArrayList<>();
+        if (feedFragmentViewType == FeedFragmentViewType.FRIEND) {
+            FirebaseUtil.getFollowData(FirebaseAuth.getInstance().getCurrentUser().getUid(), new BaseDataCallback() {
+                @Override
+                public void onFollowingUserIdListReceived(List<String> followingUserIds) {
+                    feedAdapter.setUserIds(followingUserIds);
+                }
+            });
+        }
         feedAdapter = new FeedAdapter(feedItemList, requireContext(), new OnItemActionListener() {
             @Override
             public void onRecipeClick(Recipe recipe) {
@@ -116,13 +144,16 @@ public class FeedAllFragment extends Fragment {
             }
         });
         feedsRecyclerView.setAdapter(feedAdapter);
+        Log.d("yoo", "yooooooo = " + feedItemList.size());
         fetchFeeds();
+        addCollectionListeners();
     }
 
     private void refreshFeeds() {
         feedItemList.clear();
         fetchFeeds();
         swipeRefreshLayout.setRefreshing(false);
+        pullToRefreshTextView.setVisibility(View.GONE);
     }
 
     private void fetchFeeds() {
@@ -152,15 +183,18 @@ public class FeedAllFragment extends Fragment {
         userIds.add(profileId);
 
         CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
-        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Post e = doc.toObject(Post.class);
-                    updateFeedItemList(e);
-                }
-            }
-        });
+        //TODO check this listener
+//        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+//                for (DocumentChange doc : value.getDocumentChanges()) {
+//                    Post e = doc.getDocument().toObject(Post.class);
+//                    if (feedFragmentViewType == FeedFragmentViewType.RECIPE) {
+//                        updateFeedItemList(e);
+//                    }
+//                }
+//            }
+//        });
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
                                                                   add(posts);
                                                               }},
@@ -178,61 +212,11 @@ public class FeedAllFragment extends Fragment {
         if (!feedItemList.isEmpty()) {
             return;
         }
-        List<CollectionReference> collections = new ArrayList<>();
-        CollectionReference event = FirebaseFirestore.getInstance().collection("events");
-        event.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Event e = doc.toObject(Event.class);
-                    updateFeedItemList(e);
-                }
-            }
-        });
-        collections.add(event);
-        CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
-        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Post p = doc.toObject(Post.class);
-                    updateFeedItemList(p);
-                }
-            }
-        });
-        collections.add(posts);
-
-        CollectionReference services = FirebaseFirestore.getInstance().collection("services");
-        services.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Services s = doc.toObject(Services.class);
-                    updateFeedItemList(s);
-                }
-            }
-        });
-        collections.add(services);
-
-        CollectionReference photoVideo = FirebaseFirestore.getInstance().collection("photovideo");
-        photoVideo.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    PhotoVideo pv = doc.toObject(PhotoVideo.class);
-                    updateFeedItemList(pv);
-                }
-            }
-        });
-
-        collections.add(photoVideo);
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 List<String> feedIds = new ArrayList<>(FirestoreDataLoader.fetchUserFavFeedIds());
-
-                FirestoreDataLoader.loadDataFromCollectionsForFeedIds(collections, feedIds,
+                FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollections(), feedIds,
                         new FirestoreDataLoader.FirestoreDataListener() {
                             @Override
                             public void onDataLoaded(List<FeedItem> feedItems) {
@@ -244,8 +228,6 @@ public class FeedAllFragment extends Fragment {
         }).start();
 
 
-
-
     }
 
 
@@ -254,9 +236,11 @@ public class FeedAllFragment extends Fragment {
         recipes.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Recipe e = doc.toObject(Recipe.class);
-                    updateFeedItemList(e);
+                for (DocumentChange doc : value.getDocumentChanges()) {
+                    Recipe e = doc.getDocument().toObject(Recipe.class);
+                    if (feedFragmentViewType == FeedFragmentViewType.RECIPE) {
+                        updateFeedItemList(e);
+                    }
                 }
             }
         });
@@ -292,62 +276,40 @@ public class FeedAllFragment extends Fragment {
         if (!feedItemList.isEmpty()) {
             return;
         }
-        List<CollectionReference> collections = new ArrayList<>();
-        CollectionReference event = FirebaseFirestore.getInstance().collection("events");
-        event.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Event e = doc.toObject(Event.class);
-                    updateFeedItemList(e);
-                }
-            }
-        });
-        collections.add(event);
-        CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
-        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Post p = doc.toObject(Post.class);
-                    updateFeedItemList(p);
-                }
-            }
-        });
-        collections.add(posts);
-
-        CollectionReference services = FirebaseFirestore.getInstance().collection("services");
-        services.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    Services s = doc.toObject(Services.class);
-                    updateFeedItemList(s);
-                }
-            }
-        });
-        collections.add(services);
-
-        CollectionReference photoVideo = FirebaseFirestore.getInstance().collection("photovideo");
-        photoVideo.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                for (DocumentSnapshot doc : value.getDocuments()) {
-                    PhotoVideo pv = doc.toObject(PhotoVideo.class);
-                    updateFeedItemList(pv);
-                }
-            }
-        });
-
-        collections.add(photoVideo);
-
-        FirestoreDataLoader.loadDataFromCollections(collections,
+        FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(),
                 new FirestoreDataLoader.FirestoreDataListener() {
                     @Override
                     public void onDataLoaded(List<FeedItem> feedItems) {
                         notifyDatasetChange(feedItems);
                     }
                 });
+    }
+
+    private void addCollectionListeners() {
+        for (CollectionReference collectionReference : FirestoreDataLoader.getAllCollectionsWithRecipes()) {
+            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                    if (feedFragmentViewType != FeedFragmentViewType.RECIPE && feedFragmentViewType != FeedFragmentViewType.POST
+                            && feedFragmentViewType != FeedFragmentViewType.FAVOURITE) {
+                        for (DocumentChange doc : value.getDocumentChanges()) {
+                            DocumentSnapshot d = doc.getDocument();
+                            int type = Integer.parseInt(Objects.requireNonNull(doc.getDocument().get("type")).toString());
+                            switch (type) {
+                                case FeedItem.TYPE_EVENT ->
+                                        updateFeedItemList(d.toObject(Event.class));
+                                case FeedItem.TYPE_SERVICE ->
+                                        updateFeedItemList(d.toObject(Services.class));
+                                case FeedItem.TYPE_POST ->
+                                        updateFeedItemList(d.toObject(Post.class));
+                                case FeedItem.TYPE_PHOTO_VIDEO ->
+                                        updateFeedItemList(d.toObject(PhotoVideo.class));
+                            }
+                        }
+                    }
+                }
+            });
+        }
     }
 
     public void notifyDatasetChange(List<FeedItem> feedItems) {
@@ -373,23 +335,40 @@ public class FeedAllFragment extends Fragment {
     }
 
     private void updateFeedItemList(FeedItem item) {
+
         if (!feedItemList.contains(item)) {
-            int index = 0;
-            if (!feedItemList.isEmpty()) {
-                index = 1; // account for header
-            }
-            feedItemList.add(index, item);
-            feedAdapter.notifyItemChanged(index);
+//            int index = 0;
+//            if (!feedItemList.isEmpty()) {
+//                index = 1; // account for header
+//            }
+//            feedItemList.add(index, item);
+//            feedAdapter.notifyItemChanged(index);
+//            Log.d("yoo", "item = " + item.getFeedItemId());
         } else {
-            for (FeedItem feedItem : feedItemList) {
-                Log.d("feednow ", feedItem + "");
-                if (Objects.equals(feedItem.getFeedItemId(), item.getFeedItemId())) {
-                    feedItem.setCommentCount(item.getCommentCount());
+            for (int i = 0; i < feedItemList.size(); i++) {
+                if (Objects.equals(feedItemList.get(i).getFeedItemId(), item.getFeedItemId())) {
+                    if (feedItemList.get(i).getCommentCount() != item.getCommentCount()) {
+                        feedItemList.get(i).setCommentCount(item.getCommentCount());
+                        Log.d("yoo", "item else = " + item.getFeedItemId());
+                        feedAdapter.notifyItemChanged(i);
+                    }
+                    break;
                 }
             }
-            feedAdapter.notifyDataSetChanged();
         }
     }
+
+//    private void updateFeedItemListOnActivitySuccess(FeedItem item) {
+//
+//        if (!feedItemList.contains(item)) {
+//            int index = 0;
+//            if (!feedItemList.isEmpty()) {
+//                index = 1; // account for header
+//            }
+//            feedItemList.add(index, item);
+//            feedAdapter.notifyItemChanged(index);
+//            Log.d("yoo", "item = " + item.getFeedItemId());
+//        }}
 
     private void scrollToFeedItem(String feedId) {
         new Handler().postDelayed(new Runnable() {
@@ -407,6 +386,38 @@ public class FeedAllFragment extends Fragment {
             }
         }, 500);
     }
+
+//    void function() {
+//        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+//                new ActivityResultContracts.StartActivityForResult(),
+//                new ActivityResultCallback<ActivityResult>() {
+//                    @Override
+//                    public void onActivityResult(ActivityResult result) {
+//                        if (result.getResultCode() == Activity.RESULT_OK) {
+//                            // There are no request codes
+//                            Intent data = result.getData();
+//
+//                        }
+//                    }
+//                });
+//    }
+
+
+    @Override
+    public void onActivityResult(ActivityResult result) {
+        int resultCode = result.getResultCode();
+        Log.d("yoo","result.getResultCode() "+result.getResultCode());
+        if (resultCode == Activity.RESULT_OK) {
+            int creationStatus = result.getData().getIntExtra(ActivityHelper.CREATION_STATUS, 0);
+            if (creationStatus == ActivityHelper.SUCCESS_CODE) {
+                Log.d("yoo","creationStatus "+creationStatus);
+                Log.d("yoo","ActivityHelper.SUCCESS_CODE "+ActivityHelper.SUCCESS_CODE);
+                // Handle successful post creation
+                // For example, you can refresh the feed
+                refreshFeeds();
+             //   updateFeedItemListOnActivitySuccess (item);
+            }
+    }}
 }
 
 
