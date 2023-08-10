@@ -447,7 +447,7 @@ public class NewDogProfileActivity extends AppCompatActivity {
                                 navigateToHomeActivity();
                                 finish();
                             } else {
-                                navigateToProfileFragment();
+                                finish();
                             }
 
                         })
