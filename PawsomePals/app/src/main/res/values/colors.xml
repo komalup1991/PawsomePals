@@ -28,6 +28,9 @@
     <color name="yellow">#F6C01E</color>
 
     <color name="primaryColor">@color/darkPink</color>
+    <color name="pressedButtonColor">@color/pastelBlue</color>
+    <color name="pressedTextColor">@color/black</color>
+
     <color name="colorSecondary">@color/darkPink</color>
     <color name="primaryText">@color/black</color>
     <color name="primaryButtonColor">@color/darkPink</color>

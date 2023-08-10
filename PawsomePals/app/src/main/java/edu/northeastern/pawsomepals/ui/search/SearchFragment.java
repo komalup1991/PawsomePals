@@ -1,6 +1,8 @@
 package edu.northeastern.pawsomepals.ui.search;
 
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,7 +27,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -55,6 +59,8 @@ import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
+import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 
 
 public class SearchFragment extends Fragment {
@@ -89,6 +95,8 @@ public class SearchFragment extends Fragment {
     private PawsomePalWebService pawsomePalWebService;
 
 
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -112,6 +120,8 @@ public class SearchFragment extends Fragment {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext());
         searchRecyclerView.setLayoutManager(layoutManager);
+
+        CardView cardView = view.findViewById(R.id.golden_retriever);
 
         Button dogBtn = view.findViewById(R.id.dog_btn);
         Button userBtn = view.findViewById(R.id.user_btn);
@@ -160,6 +170,7 @@ public class SearchFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                cardView.setVisibility(View.GONE);
                 if (selectedSearchType.isEmpty()) {
                     showToast("Please select a search type");
                     return;
@@ -223,7 +234,6 @@ public class SearchFragment extends Fragment {
 
     }
 
-
     PawsomePalWebService.UiThreadCallback uiThreadCallback = new BaseUiThreadCallback() {
 
         public void onGetAllBreedsDetails(List<BreedDetails> breeds) {
@@ -247,23 +257,11 @@ public class SearchFragment extends Fragment {
 
         }
 
-        @Override
-        public void onError() {
-            //progressBar.setVisibility(View.GONE);
-            //Toast.makeText(NewDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
-        }
 
-        @Override
-        public void onEmptyResult() {
-//            progressBar.setVisibility(View.GONE);
-//            Toast.makeText(NewDogProfileActivity.this, "Error while fetching breeds.", Toast.LENGTH_SHORT).show();
-        }
+
 
     };
 
-//    pawsomePalWebService = new PawsomePalWebService(uiThreadCallback);
-//        pawsomePalWebService.getBreedsNames();
-//        progressBar.setVisibility(View.VISIBLE);
 
     private void performSearch(String searchType) {
         String inputSearch = searchInput.getText().toString().trim();
@@ -340,10 +338,38 @@ public class SearchFragment extends Fragment {
         onItemActionListenerDog = new SearchDogAdapter.OnItemActionListener() {
             @Override
             public void onDogsClick(Dogs dogs) {
-                Intent intent = new Intent(getActivity(), DogDetailActivity.class);
+                Intent intent = new Intent(requireContext(), DogDetailActivity.class);
                 intent.putExtra("name", dogs.getName());
                 intent.putExtra("image",dogs.getProfileImage());
                 startActivity(intent);
+            }
+        };
+
+        onItemActionListenerRecipe = new SearchRecipeAdapter.OnItemActionListener() {
+            @Override
+            public void onRecipeClick(Recipe recipe) {
+                Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
+                intent.putExtra("recipe", recipe);
+                startActivity(intent);
+
+            }
+        };
+
+        onItemActionListenerUser = new SearchUserAdapter.OnItemActionListener() {
+            @Override
+            public void onUserClick(Users user) {
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("ProfileId", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("profileId", user.getUserId());
+                editor.apply();
+
+                //Navigate to Profile Fragment
+                ProfileFragment profileFragment = new ProfileFragment();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container_view, profileFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+
             }
         };
     }
@@ -442,5 +468,7 @@ public class SearchFragment extends Fragment {
     public int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
     }
+
+
 
 }
