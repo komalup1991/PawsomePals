@@ -55,9 +55,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.profile.DogProfileActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.feed.CommentActivity"
             android:exported="false" />
         <activity

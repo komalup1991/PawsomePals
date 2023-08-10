@@ -2,6 +2,8 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -22,7 +26,6 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
-import edu.northeastern.pawsomepals.ui.profile.DogProfileActivity;
 import edu.northeastern.pawsomepals.ui.profile.EditDogUserActivity;
 
 public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.DogProfileViewHolder> {
@@ -102,9 +105,15 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
                 holder.layoutDogInfo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(context, DogProfileActivity.class);
-                        intent.putExtra("dogId", dogProfile.getDogId());
-                        context.startActivity(intent);
+                        if(holder.expandableLayout.getVisibility() == View.GONE)
+                        {
+                            TransitionManager.beginDelayedTransition(holder.cardView, new AutoTransition());
+                            holder.expandableLayout.setVisibility(View.VISIBLE);
+                        }
+                        else {
+                            TransitionManager.beginDelayedTransition(holder.cardView, new AutoTransition());
+                            holder.expandableLayout.setVisibility(View.GONE);
+                        }
                     }
                 });
 
@@ -145,7 +154,11 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
         private ImageButton editButton;
         private ImageButton deleteButton;
         private LinearLayout layoutDogInfo;
-
+        private ConstraintLayout expandableLayout;
+        private TextView textDogDobValue;
+        private TextView textDogGenderValue;
+        private TextView textDogSizeValue;
+        private CardView cardView;
         public DogProfileViewHolder(@NonNull View itemView) {
             super(itemView);
             imageDog = itemView.findViewById(R.id.imageDog);
@@ -155,6 +168,12 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
             editButton = itemView.findViewById(R.id.btnEdit);
             deleteButton = itemView.findViewById(R.id.btnDelete);
             layoutDogInfo = itemView.findViewById(R.id.layoutDogInfo);
+
+            textDogDobValue = itemView.findViewById(R.id.textDogDobValue);
+            textDogGenderValue = itemView.findViewById(R.id.textDogGenderValue);
+            textDogSizeValue = itemView.findViewById(R.id.textDogSizeValue);
+            expandableLayout = itemView.findViewById(R.id.expandableLayout);
+            cardView = itemView.findViewById(R.id.cardView);
         }
 
         public void bind(Dogs dogProfile) throws ParseException {
@@ -188,7 +207,9 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
                 editButton.setVisibility(View.GONE);
                 deleteButton.setVisibility(View.GONE);
             }
-
+            textDogDobValue.setText(dogProfile.getDob());
+            textDogGenderValue.setText(dogProfile.getGender());
+            textDogSizeValue.setText(dogProfile.getSize());
 
         }
 
@@ -199,6 +220,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
             breedTextView.setVisibility(View.GONE);
             editButton.setVisibility(View.GONE);
             deleteButton.setVisibility(View.GONE);
+            expandableLayout.setVisibility(View.GONE);
         }
 
         private void showViews() {

@@ -339,6 +339,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void onDogsClick(Dogs dogs) {
                 Intent intent = new Intent(requireContext(), DogDetailActivity.class);
+                intent.putExtra("dogs", dogs);
                 intent.putExtra("name", dogs.getName());
                 intent.putExtra("image",dogs.getProfileImage());
                 startActivity(intent);
