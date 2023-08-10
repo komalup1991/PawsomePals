@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FBFAFA"
+    android:background="#FAE8E8"
+    android:id="@+id/editChatContainer"
     tools:context=".ui.chat.EditChatRoomInfoActivity">
 
     <androidx.appcompat.widget.Toolbar
@@ -41,6 +42,7 @@
 
     <LinearLayout
         android:id="@+id/groupNameLayout"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -65,40 +67,40 @@
             android:text="group 1 >"
             android:textSize="20sp" />
     </LinearLayout>
-    <LinearLayout
-        android:id="@+id/groupNoticeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_below="@id/groupNameLayout">
+<!--    <LinearLayout-->
+<!--        android:id="@+id/groupNoticeLayout"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        android:layout_below="@id/groupNameLayout">-->
 
-        <View
-            android:id="@+id/view3"
-            android:layout_width="match_parent"
-            android:layout_height="18dp"
-            android:layout_weight="4"
-            android:background="#FAE8E8" />
+<!--        <View-->
+<!--            android:id="@+id/view3"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="18dp"-->
+<!--            android:layout_weight="4"-->
+<!--            android:background="#FAE8E8" />-->
 
-        <TextView
-            android:id="@+id/group_notice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:text="Group Notice"
-            android:padding="8dp"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+<!--        <TextView-->
+<!--            android:id="@+id/group_notice"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="4"-->
+<!--            android:text="Group Notice"-->
+<!--            android:padding="8dp"-->
+<!--            android:textSize="24sp"-->
+<!--            android:textStyle="bold" />-->
 
-        <TextView
-            android:id="@+id/group_notice_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:padding="8dp"
-            android:text="Notice >"
-            android:textSize="20sp" />
-    </LinearLayout>
+<!--        <TextView-->
+<!--            android:id="@+id/group_notice_text"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_weight="1"-->
+<!--            android:padding="8dp"-->
+<!--            android:text="Notice >"-->
+<!--            android:textSize="20sp" />-->
+<!--    </LinearLayout>-->
 
     <View
         android:id="@+id/view4"
@@ -106,10 +108,11 @@
         android:layout_height="18dp"
         android:layout_weight="4"
         android:background="#FAE8E8"
-        android:layout_below="@id/groupNoticeLayout"/>
+        android:layout_below="@id/groupNameLayout"/>
 
     <LinearLayout
         android:id="@+id/groupMembers"
+        android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -127,19 +130,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:text="group members' name"
+            android:text="Group Members"
             android:padding="8dp"
             android:textSize="24sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/group_members_text"
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:padding="8dp"
-            android:text="Members' name >"
-            android:textSize="20sp" />
+            android:orientation="horizontal"
+            android:id="@+id/group_member_card_views">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
     </LinearLayout>
 
     <ScrollView

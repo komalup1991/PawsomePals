@@ -192,7 +192,17 @@ public class ChatFirebaseUtil {
     public static CollectionReference allChatRoomCollectionReference() {
         return FirebaseFirestore.getInstance().collection("chatroom");
     }
+    public static void passMembersCardViewsDataAsIntent(Intent intent, List<Users> groupUsers ){
+        StringBuilder imgBuilder = new StringBuilder();
+        StringBuilder nameBuilder = new StringBuilder();
 
+        for(Users user:groupUsers){
+            imgBuilder.append(user.getProfileImage()+" ");
+            nameBuilder.append(user.getName()+" ");
+        }
+        intent.putExtra("userImgs",imgBuilder.toString());
+        intent.putExtra("groupUserNames",nameBuilder.toString());
+    }
     public static DocumentReference getOtherUserFromChatroom(List<String> userIds) {
         if (userIds.get(0).equals(ChatFirebaseUtil.currentUserId())) {
             return allUserCollectionReference().document(userIds.get(1));
@@ -207,6 +217,13 @@ public class ChatFirebaseUtil {
             references.add(allUserCollectionReference().document(userIds.get(i)));
         }
         return references;
+    }
+
+    public static String getGroupMemberImgsFromChatRoom(Intent intent){
+        return intent.getStringExtra("userImgs");
+    }
+    public static String getGroupMemberNameFromChatRoom(Intent intent){
+        return intent.getStringExtra("groupUserNames");
     }
 
     public static String timestampToString(Timestamp timestamp) {

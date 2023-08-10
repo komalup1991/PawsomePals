@@ -177,6 +177,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
                 //check
                 ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers, chatRoomName.getText().toString());
+                ChatFirebaseUtil.passMembersCardViewsDataAsIntent(intent,groupUsers);
                 StringBuilder builder = new StringBuilder();
                 startActivity(intent);
             });
@@ -238,7 +239,6 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void navigateToProfileFragment(String userIDValue) {
-        int bgColor = Color.argb(100, 253, 182, 182);
         Intent resultIntent = new Intent();
         resultIntent.putExtra("profileId", userIDValue);
         setResult(RESULT_OK, resultIntent);
