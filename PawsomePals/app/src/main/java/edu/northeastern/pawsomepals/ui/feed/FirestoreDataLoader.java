@@ -152,6 +152,7 @@ public class FirestoreDataLoader {
         return likeFeedIds;
     }
 
+
     private static List<FeedItem> process(List<QuerySnapshot> querySnapshots, Set<String> favoriteFeedIds, Set<String> likeFeedIds) {
         List<FeedItem> feedItemList = new ArrayList<>();
         Map<String, Users> users = new HashMap<>();

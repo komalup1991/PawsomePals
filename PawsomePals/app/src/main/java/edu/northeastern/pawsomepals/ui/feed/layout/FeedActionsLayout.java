@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.ui.feed.CommentActivity;
+import edu.northeastern.pawsomepals.ui.feed.LikeActivity;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class FeedActionsLayout extends LinearLayout {
@@ -85,6 +86,17 @@ public class FeedActionsLayout extends LinearLayout {
                     likeButton.setImageResource(R.drawable.like);
                     FirebaseUtil.addLikeToFirestore(feedItem.getFeedItemId(), FirebaseAuth.getInstance().getCurrentUser().getUid(), getPostType(feedItem));
                 }
+            }
+        });
+
+        likeCountTextView.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), LikeActivity.class);
+                intent.putExtra("feedItemId", feedItem.getFeedItemId());
+                intent.putExtra("postType", getPostType(feedItem));
+                activity.startActivity(intent);
+
             }
         });
 
