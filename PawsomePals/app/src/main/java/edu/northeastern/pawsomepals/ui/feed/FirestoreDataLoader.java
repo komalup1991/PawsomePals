@@ -39,20 +39,20 @@ public class FirestoreDataLoader {
 
     public static List<CollectionReference> getAllCollections() {
         List<CollectionReference> collections = new ArrayList<>();
-        collections.add(FirebaseFirestore.getInstance().collection("events"));
-        collections.add(FirebaseFirestore.getInstance().collection("posts"));
-        collections.add(FirebaseFirestore.getInstance().collection("services"));
-        collections.add(FirebaseFirestore.getInstance().collection("photovideo"));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.EVENTS));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.POSTS));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.SERVICES));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.PHOT0VIDEO));
         return collections;
     }
 
     public static List<CollectionReference> getAllCollectionsWithRecipes() {
         List<CollectionReference> collections = new ArrayList<>();
-        collections.add(FirebaseFirestore.getInstance().collection("events"));
-        collections.add(FirebaseFirestore.getInstance().collection("posts"));
-        collections.add(FirebaseFirestore.getInstance().collection("services"));
-        collections.add(FirebaseFirestore.getInstance().collection("photovideo"));
-        collections.add(FirebaseFirestore.getInstance().collection("recipes"));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.EVENTS));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.POSTS));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.SERVICES));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.PHOT0VIDEO));
+        collections.add(FirebaseFirestore.getInstance().collection(FeedCollectionType.RECIPES));
         return collections;
     }
 

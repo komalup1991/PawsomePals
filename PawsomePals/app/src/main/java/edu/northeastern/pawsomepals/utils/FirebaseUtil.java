@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 
 public class FirebaseUtil {
 
@@ -403,7 +404,7 @@ public class FirebaseUtil {
 
     public static void fetchRecipeFromFirestore(String recipeId, DataCallback dataCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("recipes").whereEqualTo("recipeId", recipeId).get().addOnCompleteListener(task -> {
+        db.collection(FeedCollectionType.RECIPES).whereEqualTo("recipeId", recipeId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().size() > 0) {
                 DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                 Recipe recipe = documentSnapshot.toObject(Recipe.class);
