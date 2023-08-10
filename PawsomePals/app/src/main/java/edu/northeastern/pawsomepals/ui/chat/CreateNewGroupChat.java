@@ -30,6 +30,7 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ChatGroupUserRecyclerAdapter;
+import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class CreateNewGroupChat extends AppCompatActivity {
@@ -83,6 +84,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
                 currentUser = task.getResult().toObject(Users.class);
                 if (!userList.contains(currentUser)) {
                     userList.add(currentUser);
@@ -109,15 +111,14 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 userList.add(model);
             }
         }
-        for (Users user : userList) {
-            Log.i("create", user.getName() + "info");
-        }
 
         if (userList.size() > 2 && userList.size() <= 5) {
             createDialogAndCreateIntent();
         } else if (userList.size() == 2) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+            ChatFirebaseUtil.passCurrentUserNameAsIntent(intent,currentUser.getName());
             ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(1));
+            ChatFirebaseUtil.passChatStyleFromIntent(intent, ChatStyle.ONEONONE);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
         } else {
