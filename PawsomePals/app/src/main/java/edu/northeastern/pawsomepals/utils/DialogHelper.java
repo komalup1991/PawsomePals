@@ -6,11 +6,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.FeedItem;
 
 public class DialogHelper {
 
@@ -55,4 +60,30 @@ public class DialogHelper {
         progressDialog.show();
     }
 
+    public static void showMoreOptionsMenu(Context context, FeedItem feedItem, View view){
+      //  Dialog moreOptionDialog = new Dialog(context);
+      //  moreOptionDialog.setContentView(R.layout.dialog_more_options);
+        PopupMenu popupMenu = new PopupMenu(context, view);
+        popupMenu.inflate(R.menu.post_overflow_menu);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_edit) {
+                    Toast.makeText(context,"dfdf",Toast.LENGTH_SHORT).show();
+                    // Handle edit action
+                    return true;
+                } else if (itemId == R.id.action_delete) {
+                    Toast.makeText(context,"dfdf",Toast.LENGTH_SHORT).show();
+                    // Handle delete action
+                    return true;
+                }
+                // Handle other menu items as needed
+                return false;
+            }
+        });
+        popupMenu.show();
+    }
 }
+
+

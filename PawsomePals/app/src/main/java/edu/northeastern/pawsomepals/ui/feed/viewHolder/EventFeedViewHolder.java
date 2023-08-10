@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
@@ -31,7 +33,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
     TextView eventDetailsTextView;
     TextView eventDateTextView;
     TextView eventTimeTextView, eventNameTextView;
-    ImageView userTaggedImageView,locationTaggedImageView;
+    ImageView userTaggedImageView,locationTaggedImageView,moreOptionImageView;
     FeedActionsLayout feedActionsLayout;
 
     public EventFeedViewHolder(@NonNull View itemView) {
@@ -49,6 +51,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         eventTimeTextView = itemView.findViewById(R.id.eventTimeTextView);
         eventNameTextView = itemView.findViewById(R.id.eventNameTextView);
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
+        moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
     public void bindData(Activity activity, Event event, OnItemActionListener onItemActionListener) {
@@ -67,6 +70,13 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         String eventTime = event.getEventTime();
         String eventName = event.getEventName();
         eventNameTextView.setText(eventName);
+
+        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showMoreOptionsMenu(view.getContext(), event, view);
+            }
+        });
 
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
             userTaggedTextView.setText(userTagged);
