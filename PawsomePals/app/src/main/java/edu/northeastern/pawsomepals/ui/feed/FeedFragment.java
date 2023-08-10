@@ -46,7 +46,7 @@ public class FeedFragment extends Fragment {
             switch (position) {
                 case 0 -> tab.setText("All");
                 case 1 -> tab.setText("Friends");
-                case 2 -> tab.setText("Recipes");
+                case 2 -> tab.setText(FeedCollectionType.RECIPES);
             }
         }).attach();
 

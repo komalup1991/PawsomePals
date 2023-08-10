@@ -182,7 +182,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         String profileId = getArguments().getString("profileId");
         userIds.add(profileId);
 
-        CollectionReference posts = FirebaseFirestore.getInstance().collection("posts");
+        CollectionReference posts = FirebaseFirestore.getInstance().collection(FeedCollectionType.POSTS);
         //TODO check this listener
 //        posts.addSnapshotListener(new EventListener<QuerySnapshot>() {
 //            @Override
@@ -232,7 +232,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
 
 
     private void fetchRecipes() {
-        CollectionReference recipes = FirebaseFirestore.getInstance().collection("recipes");
+        CollectionReference recipes = FirebaseFirestore.getInstance().collection(FeedCollectionType.RECIPES);
         recipes.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {

@@ -19,6 +19,7 @@ import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.adapters.RecipeHorizontalListAdapter;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
@@ -45,7 +46,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void fetchRecipesFromFirestore() {
-        CollectionReference recipes = FirebaseFirestore.getInstance().collection("recipes");
+        CollectionReference recipes = FirebaseFirestore.getInstance().collection(FeedCollectionType.RECIPES);
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
             add(recipes);
         }}, userIds, new FirestoreDataLoader.FirestoreDataListener() {

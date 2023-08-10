@@ -451,7 +451,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         events.put("feedItemId", UUID.randomUUID().toString());
         events.put("img", imageUrlFromFirebaseStorage);
 
-        FirebaseUtil.createCollectionInFirestore(events, "events", new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(events, FeedCollectionType.EVENTS, new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);

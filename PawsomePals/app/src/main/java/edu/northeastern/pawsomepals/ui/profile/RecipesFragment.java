@@ -24,6 +24,7 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileRecipeAdapter;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Recipe;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 
 public class RecipesFragment extends Fragment {
 
@@ -90,7 +91,7 @@ public class RecipesFragment extends Fragment {
 
     private void fetchRecipes(String userIdValue) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("recipes")
+        db.collection(FeedCollectionType.RECIPES)
                 .whereEqualTo("createdBy", userIdValue)
                 .addSnapshotListener((querySnapshot, error) -> {
                     if (error != null) {

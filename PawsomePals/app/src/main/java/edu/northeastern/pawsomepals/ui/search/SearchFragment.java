@@ -237,6 +237,9 @@ public class SearchFragment extends Fragment {
     PawsomePalWebService.UiThreadCallback uiThreadCallback = new BaseUiThreadCallback() {
 
         public void onGetAllBreedsDetails(List<BreedDetails> breeds) {
+            if (!isAdded() || !isVisible()) {
+                return;
+            }
             int random = getRandomNumber(0,breeds.size()-1);
             Log.d("breeds",breeds.get(0).toString());
             BreedDetails randomBreed = breeds.get(random);

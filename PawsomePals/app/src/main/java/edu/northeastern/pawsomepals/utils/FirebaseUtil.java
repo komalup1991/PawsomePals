@@ -11,8 +11,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -30,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 
 public class FirebaseUtil {
 
@@ -160,10 +164,15 @@ public class FirebaseUtil {
         Map<String, Object> likeData = new HashMap<>();
         likeData.put("feedItemId", feedItemId);
 
-        db.collection("user").document(createdBy).collection("likes").add(likeData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        db.collection("user")
+                .document(createdBy)
+                .collection("likes")
+                .add(likeData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 Log.d("likes", "Like added successfully to " + feedItemId);
+                addLikeInfo(feedItemId,postType);
                 updateFeedWithLikeCount(feedItemId, 1, postType);
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -185,6 +194,7 @@ public class FirebaseUtil {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d("likes", "Like removed successfully from " + feedItemId);
+                            removeLikeInfo(feedItemId,postType);
                             updateFeedWithLikeCount(feedItemId, -1, postType);
                         }
                     }).addOnFailureListener(new OnFailureListener() {
@@ -198,11 +208,130 @@ public class FirebaseUtil {
         });
 
     }
+    private static void addLikeInfo(String feedItemId, String postType){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        Map<String, Object> likeData = new HashMap<>();
+        String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
+        likeData.put("feedItemId",feedItemId);
+        likeData.put("createdBy", FirebaseAuth.getInstance().getCurrentUser().getUid());
+        likeData.put("createdAt", createdAt);
+
+        db.collection(postType)
+                .whereEqualTo("feedItemId", feedItemId)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        if (!querySnapshot.isEmpty()) {
+                            DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                            String documentId = documentSnapshot.getId();
+
+                            db.collection(postType)
+                                    .document(documentId)
+                                    .collection("likes")
+                                    .add(likeData)
+                                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d("likes", "Like added successfully to " + feedItemId);
+                                           // updateFeedWithLikeCount(feedItemId, 1, postType);
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("likes", "Like not added to " + feedItemId);
+                                        }
+                                    });
+                        } else {
+                            Log.d("likes", "No matching document found for feedItemId: " + feedItemId);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("likes", "Error querying collection: " + e.getMessage());
+                    }
+                });
+
+    }
+
+    private static void removeLikeInfo(String feedItemId, String postType) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Query the collection based on the condition
+        db.collection(postType)
+                .whereEqualTo("feedItemId", feedItemId)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot querySnapshot) {
+                        if (!querySnapshot.isEmpty()) {
+                            DocumentSnapshot documentSnapshot = querySnapshot.getDocuments().get(0);
+                            String documentId = documentSnapshot.getId();
+
+                            // Remove the like document from the "likes" subcollection
+                            db.collection(postType)
+                                    .document(documentId)
+                                    .collection("likes")
+                                    .whereEqualTo("feedItemId", feedItemId)
+                                    .get()
+                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot likeQuerySnapshot) {
+                                            if (!likeQuerySnapshot.isEmpty()) {
+                                                DocumentSnapshot likeDocumentSnapshot = likeQuerySnapshot.getDocuments().get(0);
+                                                String likeDocumentId = likeDocumentSnapshot.getId();
+
+                                                // Delete the like document
+                                                db.collection(postType)
+                                                        .document(documentId)
+                                                        .collection("likes")
+                                                        .document(likeDocumentId)
+                                                        .delete()
+                                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                Log.d("likes", "Like removed successfully from " + feedItemId);
+                                                            }
+                                                        })
+                                                        .addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Log.d("likes", "Failed to remove like from " + feedItemId);
+                                                            }
+                                                        });
+                                            } else {
+                                                Log.d("likes", "No matching like document found for feedItemId: " + feedItemId);
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.d("likes", "Error querying likes subcollection: " + e.getMessage());
+                                        }
+                                    });
+                        } else {
+                            Log.d("likes", "No matching document found for feedItemId: " + feedItemId);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("likes", "Error querying collection: " + e.getMessage());
+                    }
+                });
+    }
+
 
     private static void updateFeedWithLikeCount(String feedItemId, int likeChange, String postType) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection(postType) // Replace "your_feed_collection" with your actual feed collection name
+        db.collection(postType)
                 .whereEqualTo("feedItemId", feedItemId).limit(1).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -227,6 +356,7 @@ public class FirebaseUtil {
                     public void onFailure(@NonNull Exception e) {
                     }
                 });
+
     }
 
     public static void addFavToFirestore(String feedItemId, String createdBy, String postType) {
@@ -274,7 +404,7 @@ public class FirebaseUtil {
 
     public static void fetchRecipeFromFirestore(String recipeId, DataCallback dataCallback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("recipes").whereEqualTo("recipeId", recipeId).get().addOnCompleteListener(task -> {
+        db.collection(FeedCollectionType.RECIPES).whereEqualTo("recipeId", recipeId).get().addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult().size() > 0) {
                 DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
                 Recipe recipe = documentSnapshot.toObject(Recipe.class);
