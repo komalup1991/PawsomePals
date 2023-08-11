@@ -11,14 +11,20 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
+import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -39,8 +45,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
@@ -48,6 +58,7 @@ import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, FirestoreDataLoader.FirestoreDataListener {
@@ -62,7 +73,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     private FeedItem selectedFeedItem;
     private NavController navController;
     private NavDirections action;
-    private CheckBox checkbox_event,checkbox_post,checkbox_service,checkbox_photo;
+    private RadioButton radioButtonAll;
+
+    private final Map<String, FeedItem> feedItemMap = new HashMap<>();
 
     @Nullable
     @Override
@@ -79,10 +92,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             selectedFeedItem = (FeedItem) requireArguments().getSerializable("feedItem");
         }
 
-        checkbox_event = view.findViewById(R.id.checkbox_event);
-        checkbox_post = view.findViewById(R.id.checkbox_posts);
-        checkbox_service = view.findViewById(R.id.checkbox_services);
-        checkbox_photo = view.findViewById(R.id.checkbox_photos);
+        RadioGroup radioGroup = view.findViewById(R.id.radioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
+                if (id == R.id.radioButtonAll) {
+                    loadMarkersOnMapAll();
+                } else if (id == R.id.radioButtonEvent) {
+                    loadMarkersOnMap(FeedCollectionType.EVENTS);
+                } else if (id == R.id.radioButtonPhotos) {
+                    loadMarkersOnMap(FeedCollectionType.PHOT0VIDEO);
+                } else if (id == R.id.radioButtonPosts) {
+                    loadMarkersOnMap(FeedCollectionType.POSTS);
+                } else if (id == R.id.radioButtonServices) {
+                    loadMarkersOnMap(FeedCollectionType.SERVICES);
+                }
+            }
+        });
+
+        radioButtonAll = view.findViewById(R.id.radioButtonAll);
+        radioButtonAll.setChecked(true);
 
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -94,22 +123,40 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         if (googleMap == null) {
             return;
         }
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), zoom));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), zoom));
     }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
-        loadMarkersOnMap();
+        loadMarkersOnMapAll();
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);}
-        if (selectedFeedItem != null) {
-            moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
+            googleMap.setMyLocationEnabled(true);
         }
+        if (selectedFeedItem != null) {
+            if(Double.isNaN(selectedFeedItem.getLatLng().getLatitude())){
+              Toast.makeText(getContext(),"Please check the coordinates",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
+            }
+        }
+        }
+
+
+    private void loadMarkersOnMapAll() {
+        loadMarkersOnMap(null);
     }
 
-    private void loadMarkersOnMap() {
-        FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(), this);
+    private void loadMarkersOnMap(String feedCollectionType) {
+        if (feedCollectionType == null) {
+            // Set a listener to handle radio button selection changes
+            FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(), this);
+        } else {
+            FirestoreDataLoader.loadDataFromCollections(new ArrayList<>() {{
+                add(FirebaseFirestore.getInstance().collection(feedCollectionType));
+            }}, this);
+        }
     }
 
     @Override
@@ -118,21 +165,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             return;
         }
         new Handler(Looper.getMainLooper()).post(new Runnable() {
-            Marker m;
-
             @Override
             public void run() {
                 if (googleMap != null) {
+                    googleMap.clear();
+                    FeedItem firstItem = null;
                     for (FeedItem item : feedItems) {
                         if (item.getLatLng() != null) {
-                            m = feedMarker(item);
-                            if (selectedFeedItem != null && item.getFeedItemId().equals(selectedFeedItem.getFeedItemId())) {
-                                m.setZIndex(9);
-                                m.showInfoWindow();
+                            if (firstItem == null) {
+                                firstItem = item;
                             }
-                            m.setTag(item.getFeedItemId());
-
+                            feedItemMap.put(item.getFeedItemId(), item);
+                            Marker newMarker = feedMarker(item);
+                            newMarker.setTag(item.getFeedItemId());
                         }
+                    }
+
+                    if (firstItem != null) {
+                        moveMapToCurrentLocation(firstItem.getLatLng().getLatitude(), firstItem.getLatLng().getLongitude(), 12);
                     }
                 }
             }
@@ -169,11 +219,21 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                     .position(new LatLng(feedItem.getLatLng().getLatitude(),
                             feedItem.getLatLng().getLongitude()));
         }
-        Marker m = googleMap.addMarker(marker);
-        CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter(getContext(), feedItem);
-        googleMap.setInfoWindowAdapter(infoWindowAdapter);
 
-        return m;
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                FeedItem selectedItem = feedItemMap.get(marker.getTag());
+                if (selectedItem != null) {
+                    CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter((AppCompatActivity) requireActivity(), selectedItem);
+                    googleMap.setInfoWindowAdapter(infoWindowAdapter);
+                }
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
+        return googleMap.addMarker(marker);
     }
 
     private BitmapDescriptor bitmapFromVector(Context context, int vectorResId, int sizeOfMarker) {

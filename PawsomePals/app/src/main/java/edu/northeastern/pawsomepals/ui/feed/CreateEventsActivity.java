@@ -28,7 +28,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
-import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
@@ -45,10 +44,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Event;
+import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.models.PhotoVideo;
+import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.ActivityHelper;
@@ -76,7 +78,7 @@ public class CreateEventsActivity extends AppCompatActivity {
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
     private ImageView selectPhoto, eventImageView;
-    private Uri galleryImageUri, cameraImageUri;
+    private Uri imageUri;
 
     private TaggingOptionsLayout taggingOptionsLayout;
 
@@ -90,6 +92,11 @@ public class CreateEventsActivity extends AppCompatActivity {
     private long selectedDate = -1; // Initialize with an invalid value
     private int selectedHour = -1;
     private int selectedMinute = 0;
+    private Event existingFeedItem;
+
+    private String currentFeedItemId;
+
+    private boolean hasImageChanged = false;
 
 
     @Override
@@ -105,7 +112,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         userNameTextView = findViewById(R.id.userNameTextView);
         eventNameEditText = findViewById(R.id.eventNameEditText);
         eventDetailsEditText = findViewById(R.id.eventDetailsEditText);
-        eventImageView = findViewById(R.id.photoVideoImageView);
+        eventImageView = findViewById(R.id.eventImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
         taggingOptionsLayout = findViewById(R.id.tag_location_layout);
         taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
@@ -124,6 +131,31 @@ public class CreateEventsActivity extends AppCompatActivity {
         ImageView deleteImageView = findViewById(R.id.deleteImageView);
         ImageView editImageView = findViewById(R.id.editImageView);
 
+        existingFeedItem = (Event) getIntent().getSerializableExtra("existingFeedItem");
+
+        if (SaveOrUpdateFeedUtil.isEditMode(existingFeedItem)) {
+            eventNameEditText.setText(existingFeedItem.getEventName());
+            eventDetailsEditText.setText(existingFeedItem.getEventDetails());
+            selectPhoto.setVisibility(View.GONE);
+            Glide.with(this).load(existingFeedItem.getImg()).centerCrop().into(eventImageView);
+            if (existingFeedItem.getEventDate() != null) {
+                setEventDateTextView.setText(existingFeedItem.getEventDate());
+            }
+
+            if (existingFeedItem.getUserTagged() != null) {
+                taggingOptionsLayout.setTagPeopleTextView(existingFeedItem.getUserTagged());
+            }
+
+            if (existingFeedItem.getLocationTagged() != null) {
+                taggingOptionsLayout.setTagLocationTextView(existingFeedItem.getLocationTagged());
+            }
+
+            imageUri = Uri.parse(existingFeedItem.getImg());
+            currentFeedItemId = existingFeedItem.getFeedItemId();
+        } else {
+            currentFeedItemId = UUID.randomUUID().toString();
+        }
+
 
         Button saveButton = findViewById(R.id.saveButton);
         Button cancelButton = findViewById(R.id.cancelButton);
@@ -132,21 +164,6 @@ public class CreateEventsActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         currentUser = auth.getCurrentUser();
         loggedInUserId = currentUser.getUid();
-
-        setEventDateTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showDatePicker();
-            }
-        });
-        setEventTimeTextView = findViewById(R.id.setEventTimeTextView);
-        setEventTimeTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showTimePicker();
-            }
-        });
-
 
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -164,6 +181,21 @@ public class CreateEventsActivity extends AppCompatActivity {
                         .load(user.getProfileImage())
                         .into(userProfilePic);
                 userNameTextView.setText(user.getName());
+            }
+        });
+
+        setEventDateTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showDatePicker();
+            }
+        });
+
+        setEventTimeTextView = findViewById(R.id.setEventTimeTextView);
+        setEventTimeTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showTimePicker();
             }
         });
 
@@ -202,17 +234,33 @@ public class CreateEventsActivity extends AppCompatActivity {
                     Toast.makeText(CreateEventsActivity.this, "Event Detail is mandatory.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if (cameraImageUri==null && galleryImageUri==null ) {
-                    eventDetailsEditText.setError("This field is required");
+                if (imageUri == null) {
                     Toast.makeText(CreateEventsActivity.this, "Event Image is mandatory.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                if (selectedDate == -1) {
+                    Toast.makeText(CreateEventsActivity.this, "Date is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (selectedHour == -1) {
+                    Toast.makeText(CreateEventsActivity.this, "Time is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (setEventTimeTextView.getText().toString().isEmpty()) {
+                    Toast.makeText(CreateEventsActivity.this, "Time is mandatory.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MM/dd/yyyy h:mm a", Locale.US);
                 Calendar selectedDateTime = Calendar.getInstance();
                 Calendar currentDateTime = Calendar.getInstance();
 
                 try {
-                    selectedDateTime.setTime(dateTimeFormat.parse(setEventDateTextView.getText().toString() + " " + setEventTimeTextView.getText().toString()));
+                    selectedDateTime.setTime(dateTimeFormat.parse(setEventDateTextView.getText().toString()
+                            + " " + setEventTimeTextView.getText().toString()));
                 } catch (Exception e) {
                     e.printStackTrace();
                     return;
@@ -223,45 +271,56 @@ public class CreateEventsActivity extends AppCompatActivity {
                     return;
                 }
 
+                SaveOrUpdateFeedUtil.handleSaveFeed(CreateEventsActivity.this, progressDialog, createEvent(existingFeedItem), imageUri, hasImageChanged);
 
-
-                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
-                        "event", new BaseDataCallback() {
-
-                            @Override
-                            public void onImageUriReceived(String imageUrl) {
-                                createFeedMap(imageUrl);
-                            }
-
-                            @Override
-                            public void onDismiss() {
-                                DialogHelper.hideProgressDialog(progressDialog);
-                                finish();
-                            }
-
-                            @Override
-                            public void onError(Exception exception) {
-                                Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
                 DialogHelper.showProgressDialog("Your Event is being saved...", progressDialog, CreateEventsActivity.this);
             }
+
         });
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DialogHelper.showCancelConfirmationDialog(context, CreateEventsActivity.this);
-                //     finish();
             }
         });
     }
 
-    private void showTimePicker() {
-        if (selectedDate == -1) {
-            // No valid date selected, show an error message or handle this case
-            return;
+    private Event createEvent(Event feedItem) {
+        if (feedItem == null) {
+            feedItem = new Event();
         }
+
+        feedItem.setEventName(eventNameEditText.getText().toString());
+        feedItem.setEventDetails(eventDetailsEditText.getText().toString());
+        feedItem.setCreatedBy(loggedInUserId);
+        feedItem.setUsername(userNameToSaveInFeed);
+        feedItem.setUserTagged(usersTagged);
+        feedItem.setEventDate(setEventDateTextView.getText().toString());
+        feedItem.setEventTime(setEventTimeTextView.getText().toString());
+        feedItem.setFeedItemId(currentFeedItemId);
+        feedItem.setType(3);
+        feedItem.setUserProfileImage(userProfileUrlToSaveInFeed);
+        feedItem.setLocationTagged(locationTagged);
+        if (existingFeedItem != null) {
+            feedItem.setCommentCount(existingFeedItem.getCommentCount());
+            feedItem.setLikeCount(existingFeedItem.getLikeCount());
+            feedItem.setFavorite(existingFeedItem.isFavorite());
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        feedItem.setCreatedAt(String.valueOf(dateFormat.format(System.currentTimeMillis())));
+        if (currentLatLng != null) {
+            feedItem.setLatLng(new edu.northeastern.pawsomepals.models.LatLng(currentLatLng.latitude, currentLatLng.longitude));
+        }
+        return feedItem;
+    }
+
+    private void showTimePicker() {
+//        if (selectedDate == -1) {
+//            // No valid date selected, show an error message or handle this case
+//            return;
+//        }
 
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
@@ -325,8 +384,6 @@ public class CreateEventsActivity extends AppCompatActivity {
     }
 
 
-
-
     private void showEditImageDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Edit Photo");
@@ -351,7 +408,6 @@ public class CreateEventsActivity extends AppCompatActivity {
                 }
             }
         });
-        builder.show();
 
         AlertDialog dialog = builder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -369,19 +425,18 @@ public class CreateEventsActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
-                galleryImageUri = null;
-                cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
+                imageUri = ImageUtil.saveCameraImageToFile(data, this);
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(cameraImageUri).centerCrop().into(eventImageView);
+                Glide.with(this).load(imageUri).centerCrop().into(eventImageView);
+                hasImageChanged = true;
             } else if (requestCode == REQUEST_CODE_GALLERY) {
-                cameraImageUri = null;
-                galleryImageUri = data.getData();
+                imageUri = data.getData();
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(galleryImageUri).centerCrop().into(eventImageView);
+                Glide.with(this).load(imageUri).centerCrop().into(eventImageView);
+                hasImageChanged = true;
             }
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -422,45 +477,8 @@ public class CreateEventsActivity extends AppCompatActivity {
     private void deleteImage() {
         eventImageView.setImageDrawable(null);
         selectPhoto.setVisibility(View.VISIBLE);
-        galleryImageUri = null;
-        cameraImageUri = null;
+        imageUri = null;
     }
-
-
-    private void createFeedMap(String imageUrlFromFirebaseStorage) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-
-        String eventName = eventNameEditText.getText().toString();
-        String eventDetails = eventDetailsEditText.getText().toString();
-        String eventDate = setEventDateTextView.getText().toString();
-        String eventTime = setEventTimeTextView.getText().toString();
-        String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
-        Map<String, Object> events = new HashMap<>();
-        events.put("createdBy", loggedInUserId);
-        events.put("eventName", eventName);
-        events.put("eventTime", eventTime);
-        events.put("eventDate", eventDate);
-        events.put("eventDetails", eventDetails);
-        events.put("userTagged", usersTagged);
-        events.put("locationTagged", locationTagged);
-        events.put("latLng", currentLatLng);
-        events.put("createdAt", createdAt);
-        events.put("username", userNameToSaveInFeed);
-        events.put("userProfileImage", userProfileUrlToSaveInFeed);
-        events.put("type", 3);
-        events.put("feedItemId", UUID.randomUUID().toString());
-        events.put("img", imageUrlFromFirebaseStorage);
-
-        FirebaseUtil.createCollectionInFirestore(events, FeedCollectionType.EVENTS, new BaseDataCallback() {
-            @Override
-            public void onDismiss() {
-                DialogHelper.hideProgressDialog(progressDialog);
-                ActivityHelper.setResult(CreateEventsActivity.this,true);
-                finish();
-            }
-        });
-    }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

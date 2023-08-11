@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
+import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
@@ -71,22 +72,19 @@ public class FirebaseUtil {
         return map;
     }
 
-    public static void uploadImageToStorage(Uri cameraImageUri, Uri galleryImageUri, String postType, DataCallback dataCallback) {
+    public static void uploadImageToStorage(Uri imageUri, String postType, DataCallback dataCallback) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference();
 
-        Uri uploadImageUri = null;
-        if (cameraImageUri != null) {
-            uploadImageUri = cameraImageUri;
-        } else if (galleryImageUri != null) {
-            uploadImageUri = galleryImageUri;
-        }
-
-        if (uploadImageUri != null) {
+        if (imageUri != null) {
+            Log.d("yoo","image uri "+ imageUri);
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String imageName = postType + "_image_" + timestamp + ".jpg";
             StorageReference imageRef = storageRef.child(postType + "_images/" + imageName);
-            UploadTask uploadTask = imageRef.putFile(uploadImageUri);
+            Log.d("yoo","image ref "+imageRef);
+            UploadTask uploadTask = imageRef.putFile(imageUri);
+            Log.d("yoo","image task "+uploadTask);
+
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
                 public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
@@ -143,18 +141,34 @@ public class FirebaseUtil {
 
     }
 
-    public static void createCollectionInFirestore(Map<String, Object> feedTypeObj, String feedType, DataCallback dataCallback) {
+    public static void createCollectionInFirestore(Map<String, Object> feedTypeObj, String documentId, String feedType, DataCallback dataCallback) {
+        if (documentId == null) {
+            return;
+        }
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        //Add a new document with a generated ID
-        db.collection(feedType).add(feedTypeObj).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        //Add feedItemId as documentId
+        db.collection(feedType).document(documentId).set(feedTypeObj).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
-            public void onSuccess(DocumentReference documentReference) {
+            public void onSuccess(Void unused) {
                 dataCallback.onDismiss();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onFailure(@NonNull Exception e) {
+            public void onFailure(@NonNull Exception e) {}
+        });
+    }
+
+    public static void createCollectionInFirestoreNew(FeedItem feedItem, String feedType, DataCallback dataCallback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        //Add feedItemId as documentId
+        db.collection(feedType).document(feedItem.getFeedItemId()).set(feedItem).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                dataCallback.onDismiss();
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {}
         });
     }
 
@@ -440,5 +454,16 @@ public class FirebaseUtil {
         void onRecipeReceived(Recipe recipe);
 
         void onFollowingUserIdListReceived(List<String> followingUserIds);
+    }
+
+    public static String getPostType(FeedItem feedItem) {
+        return switch (feedItem.getType()) {
+            case FeedItem.TYPE_PHOTO_VIDEO -> FeedCollectionType.PHOT0VIDEO;
+            case FeedItem.TYPE_SERVICE -> FeedCollectionType.SERVICES;
+            case FeedItem.TYPE_EVENT -> FeedCollectionType.EVENTS;
+            case FeedItem.TYPE_POST -> FeedCollectionType.POSTS;
+            case FeedItem.TYPE_RECIPE -> FeedCollectionType.RECIPES;
+            default -> throw new IllegalStateException("Unexpected value: " + feedItem.getType());
+        };
     }
 }

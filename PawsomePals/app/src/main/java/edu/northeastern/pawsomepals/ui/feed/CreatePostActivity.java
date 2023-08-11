@@ -31,6 +31,8 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Event;
+import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.ActivityHelper;
@@ -48,8 +50,6 @@ public class CreatePostActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser currentUser;
     private String loggedInUserId;
-    private String postDocId;
-    private Context context;
 
     private TaggingOptionsLayout taggingOptionsLayout;
     private String userNameToSaveInFeed;
@@ -59,6 +59,8 @@ public class CreatePostActivity extends AppCompatActivity {
     private String locationTagged;
 
     private String usersTagged;
+    private Post existingFeedItem;
+    private String currentFeedItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,26 @@ public class CreatePostActivity extends AppCompatActivity {
                 userNameTextView.setText(user.getName());
             }
         });
+
+        existingFeedItem = (Post)getIntent().getSerializableExtra("existingFeedItem");
+        if(existingFeedItem!=null){
+            captionEditTextView.setText(existingFeedItem.getCaption());
+            postContentEditTextView.setText(existingFeedItem.getPostContent());
+            if (existingFeedItem.getUserTagged() != null) {
+                taggingOptionsLayout.setTagPeopleTextView(existingFeedItem.getUserTagged());
+            }
+
+            if (existingFeedItem.getLocationTagged() != null) {
+                taggingOptionsLayout.setTagLocationTextView(existingFeedItem.getLocationTagged());
+            }
+
+            usersTagged = existingFeedItem.getUserTagged();
+            locationTagged = existingFeedItem.getLocationTagged();
+
+            currentFeedItemId = existingFeedItem.getFeedItemId();
+        } else {
+            currentFeedItemId = UUID.randomUUID().toString();
+        }
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,9 +197,16 @@ public class CreatePostActivity extends AppCompatActivity {
         post.put("username",userNameToSaveInFeed);
         post.put("userProfileImage",userProfileUrlToSaveInFeed);
         post.put("type",4);
-        post.put("feedItemId", UUID.randomUUID().toString());
+        post.put("feedItemId", currentFeedItemId);
+        if (existingFeedItem != null) {
+            post.put("commentCount", existingFeedItem.getCommentCount());
+            post.put("likeCount", existingFeedItem.getLikeCount());
+            if (existingFeedItem.getLatLng() != null) {
+                post.put("latLng", existingFeedItem.getLatLng());
+            }
+        }
 
-        FirebaseUtil.createCollectionInFirestore(post,FeedCollectionType.POSTS ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(post, currentFeedItemId,FeedCollectionType.POSTS ,new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);

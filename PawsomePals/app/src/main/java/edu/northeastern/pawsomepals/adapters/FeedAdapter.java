@@ -86,13 +86,13 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case FeedItem.TYPE_RECIPE_HEADER ->
                     ((RecipeFeedsHeaderViewHolder) holder).bindRecylerViewData();
             case FeedItem.TYPE_POST ->
-                    ((PostFeedViewHolder) holder).bindData(((Activity) context), (Post) feedItem, onItemActionListener);
+                    ((PostFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Post) feedItem, onItemActionListener);
             case FeedItem.TYPE_PHOTO_VIDEO ->
-                    ((PhotoVideoFeedViewHolder) holder).bindData(((Activity) context), (PhotoVideo) feedItem, onItemActionListener);
+                    ((PhotoVideoFeedViewHolder) holder).bindData(((AppCompatActivity) context), (PhotoVideo) feedItem, onItemActionListener);
             case FeedItem.TYPE_EVENT ->
-                    ((EventFeedViewHolder) holder).bindData(((Activity) context), (Event) feedItem, onItemActionListener);
+                    ((EventFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Event) feedItem, onItemActionListener);
             case FeedItem.TYPE_SERVICE ->
-                    ((ServicesFeedViewHolder) holder).bindData(((Activity) context), (Services) feedItem, onItemActionListener);
+                    ((ServicesFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Services) feedItem, onItemActionListener);
             case FeedItem.TYPE_RECIPE ->
                     ((RecipeFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Recipe) feedItem, onItemActionListener);
         }

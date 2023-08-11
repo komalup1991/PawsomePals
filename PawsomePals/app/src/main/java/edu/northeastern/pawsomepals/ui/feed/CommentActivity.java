@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.CommentAdapter;
@@ -152,6 +153,8 @@ public class CommentActivity extends AppCompatActivity {
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         Map<String, Object> comments = new HashMap<>();
+        String commentId = UUID.randomUUID().toString();
+        comments.put("commentId", commentId);
         comments.put("createdBy", createdBy);
         comments.put("comment", comment);
         comments.put("feedItemId", feedItemId);
@@ -159,7 +162,7 @@ public class CommentActivity extends AppCompatActivity {
         comments.put("username", userNameToSaveInFeed);
         comments.put("userProfileImage", userProfileUrlToSaveInFeed);
 
-        FirebaseUtil.createCollectionInFirestore(comments, "comments", new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(comments, commentId, "comments", new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);

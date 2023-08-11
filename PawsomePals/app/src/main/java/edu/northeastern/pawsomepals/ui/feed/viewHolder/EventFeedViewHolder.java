@@ -2,22 +2,27 @@ package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.common.eventbus.EventBus;
+import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
@@ -31,7 +36,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
     TextView eventDetailsTextView;
     TextView eventDateTextView;
     TextView eventTimeTextView, eventNameTextView;
-    ImageView userTaggedImageView,locationTaggedImageView;
+    ImageView userTaggedImageView,locationTaggedImageView,moreOptionImageView;
     FeedActionsLayout feedActionsLayout;
 
     public EventFeedViewHolder(@NonNull View itemView) {
@@ -49,9 +54,10 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         eventTimeTextView = itemView.findViewById(R.id.eventTimeTextView);
         eventNameTextView = itemView.findViewById(R.id.eventNameTextView);
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
+        moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
-    public void bindData(Activity activity, Event event, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, Event event, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, event);
         Glide.with(userProfilePic.getContext())
                 .load(event.getUserProfileImage())
@@ -127,6 +133,17 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onUserClick(event.getCreatedBy());
+            }
+        });
+
+        setupMoreButton(event, activity);
+    }
+
+    private void setupMoreButton(Event event, AppCompatActivity activity) {
+        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showMoreOptionsMenu(activity, event, view);
             }
         });
     }

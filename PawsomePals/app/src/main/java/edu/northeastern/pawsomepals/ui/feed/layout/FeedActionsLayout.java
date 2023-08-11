@@ -1,5 +1,7 @@
 package edu.northeastern.pawsomepals.ui.feed.layout;
 
+import static edu.northeastern.pawsomepals.ui.login.HomeActivity.PROFILE_ACTIVITY_REQUEST_CODE;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -69,6 +71,8 @@ public class FeedActionsLayout extends LinearLayout {
                 setText("(" + feedItem.getLikeCount() + ")");
         if (feedItem.isLiked()) {
             likeButton.setImageResource(R.drawable.like);
+        } else {
+            likeButton.setImageResource(R.drawable.likenew);
         }
 
         likeButton.setOnClickListener(new View.OnClickListener() {
@@ -96,12 +100,13 @@ public class FeedActionsLayout extends LinearLayout {
                 Intent intent = new Intent(view.getContext(), LikeActivity.class);
                 intent.putExtra("feedItemId", feedItem.getFeedItemId());
                 intent.putExtra("postType", getPostType(feedItem));
-                activity.startActivity(intent);
+                activity.startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
+
 
             }
         });
 
-        commentButton.setOnClickListener(new View.OnClickListener() {
+        commentCountTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), CommentActivity.class);
@@ -120,6 +125,8 @@ public class FeedActionsLayout extends LinearLayout {
 
         if (feedItem.isFavorite()) {
             favImageButton.setImageResource(R.drawable.pawprintfull);
+        } else {
+            favImageButton.setImageResource(R.drawable.pawprintempty);
         }
 
         favImageButton.setOnClickListener(new View.OnClickListener() {
