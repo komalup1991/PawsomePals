@@ -122,6 +122,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:text="Event Details"
+            android:inputType="textMultiLine"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/timestampTextView"
             app:layout_constraintHorizontal_bias="0.0"

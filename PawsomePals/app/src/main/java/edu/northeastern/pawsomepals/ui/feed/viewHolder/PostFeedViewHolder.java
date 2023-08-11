@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -14,6 +15,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
@@ -25,7 +27,7 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
     TextView postCaptionTextView;
     TextView postContentTextView;
     TextView userTaggedTextView;
-    ImageView userTaggedImageView,locationTaggedImageView;
+    ImageView userTaggedImageView,locationTaggedImageView,moreOptionImageView;
     TextView locationTaggedTextView;
     FeedActionsLayout feedActionsLayout;
 
@@ -41,10 +43,11 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
         userTaggedImageView= itemView.findViewById(R.id.userTaggedImageView);
         locationTaggedImageView= itemView.findViewById(R.id.locationTaggedImageView);
+        moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
 
     }
 
-    public void bindData(Activity activity, Post post, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, Post post, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, post);
         Glide.with(userProfilePic.getContext())
                 .load(post.getUserProfileImage())
@@ -87,6 +90,13 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onUserClick(post.getCreatedBy());
+            }
+        });
+
+        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showMoreOptionsMenu(activity, post, view);
             }
         });
     }

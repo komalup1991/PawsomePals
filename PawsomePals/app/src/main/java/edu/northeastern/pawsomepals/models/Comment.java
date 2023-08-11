@@ -1,9 +1,10 @@
 package edu.northeastern.pawsomepals.models;
 
 public class Comment {
+
+    private String commentId;
     private String comment;
     private String createdBy;
-    private String commentId;
     private String createdAt;
     private String username;
     private String userProfileImage;

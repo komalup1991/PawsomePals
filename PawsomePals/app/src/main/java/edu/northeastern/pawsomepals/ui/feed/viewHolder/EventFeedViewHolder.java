@@ -8,12 +8,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.google.common.eventbus.EventBus;
+import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
@@ -54,7 +57,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
-    public void bindData(Activity activity, Event event, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, Event event, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, event);
         Glide.with(userProfilePic.getContext())
                 .load(event.getUserProfileImage())
@@ -70,13 +73,6 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         String eventTime = event.getEventTime();
         String eventName = event.getEventName();
         eventNameTextView.setText(eventName);
-
-        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogHelper.showMoreOptionsMenu(view.getContext(), event, view);
-            }
-        });
 
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
             userTaggedTextView.setText(userTagged);
@@ -137,6 +133,17 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onUserClick(event.getCreatedBy());
+            }
+        });
+
+        setupMoreButton(event, activity);
+    }
+
+    private void setupMoreButton(Event event, AppCompatActivity activity) {
+        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showMoreOptionsMenu(activity, event, view);
             }
         });
     }

@@ -4,18 +4,31 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
+import edu.northeastern.pawsomepals.ui.feed.CreatePhotoVideoActivity;
+import edu.northeastern.pawsomepals.ui.feed.CreatePostActivity;
+import edu.northeastern.pawsomepals.ui.feed.CreateRecipeActivity;
+import edu.northeastern.pawsomepals.ui.feed.CreateServicesActivity;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFeedFragment;
 
 public class DialogHelper {
 
@@ -60,25 +73,55 @@ public class DialogHelper {
         progressDialog.show();
     }
 
-    public static void showMoreOptionsMenu(Context context, FeedItem feedItem, View view){
-      //  Dialog moreOptionDialog = new Dialog(context);
-      //  moreOptionDialog.setContentView(R.layout.dialog_more_options);
+    public static void showMoreOptionsMenu(AppCompatActivity activity, FeedItem feedItem, View view){
+        Context context = activity.getBaseContext();
         PopupMenu popupMenu = new PopupMenu(context, view);
         popupMenu.inflate(R.menu.post_overflow_menu);
+        MenuItem editMenuItem = popupMenu.getMenu().findItem(R.id.action_edit);
+        if (editMenuItem != null) {
+            if (feedItem.getCreatedBy().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                editMenuItem.setVisible(true);
+            } else {
+                editMenuItem.setVisible(false);
+            }
+        }
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 int itemId = item.getItemId();
                 if (itemId == R.id.action_edit) {
-                    Toast.makeText(context,"dfdf",Toast.LENGTH_SHORT).show();
-                    // Handle edit action
+                    Intent intent = null;
+
+                    if(feedItem.getType()==1){
+                     intent = new Intent(context, CreatePhotoVideoActivity.class);}
+                    else if (feedItem.getType()==2) {
+                        intent = new Intent(context, CreateServicesActivity.class);}
+                    else if (feedItem.getType()==3) {
+                        intent = new Intent(context, CreateEventsActivity.class);}
+                    else if (feedItem.getType()==4) {
+                        intent = new Intent(context, CreatePostActivity.class);}
+                    else if (feedItem.getType()==5) {
+                        intent = new Intent(context, CreateRecipeActivity.class);}
+
+                    intent.putExtra("existingFeedItem", feedItem);
+                    activity.startActivity(intent);
                     return true;
-                } else if (itemId == R.id.action_delete) {
-                    Toast.makeText(context,"dfdf",Toast.LENGTH_SHORT).show();
-                    // Handle delete action
+                } else if (itemId == R.id.action_goToFav) {
+                    ProfileFeedFragment feedFragment = new ProfileFeedFragment();
+                    Bundle args = new Bundle();
+
+                    args.putString("profileId", feedItem.getCreatedBy());
+                    args.putString("tabText", "Favourites");
+                    args.putSerializable("feed_view_type", FeedFragmentViewType.FAVOURITE);
+                    feedFragment.setArguments(args);
+
+                    FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container_view, feedFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+
                     return true;
                 }
-                // Handle other menu items as needed
                 return false;
             }
         });

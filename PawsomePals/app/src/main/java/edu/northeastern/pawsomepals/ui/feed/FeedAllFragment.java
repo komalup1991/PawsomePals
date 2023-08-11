@@ -99,7 +99,10 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         // Simulate a delay to show loading spinner
         showLoadingSpinner();
 
-        feedIdFromDeepLink = getActivity().getIntent().getStringExtra("feedId");
+        if (getActivity() != null) {
+            feedIdFromDeepLink = requireActivity().getIntent().getStringExtra("feedId");
+        }
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -333,6 +336,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
             @Override
             public void run() {
                 feedAdapter.notifyDataSetChanged();
+                hideLoadingSpinner();
                 if (feedIdFromDeepLink != null) {
                     scrollToFeedItem(feedIdFromDeepLink);
                 }
@@ -341,7 +345,6 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     }
 
     private void updateFeedItemList(FeedItem item) {
-
         if (!feedItemList.contains(item)) {
 //            int index = 0;
 //            if (!feedItemList.isEmpty()) {
@@ -353,9 +356,10 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         } else {
             for (int i = 0; i < feedItemList.size(); i++) {
                 if (Objects.equals(feedItemList.get(i).getFeedItemId(), item.getFeedItemId())) {
-                    if (feedItemList.get(i).getCommentCount() != item.getCommentCount()) {
-                        feedItemList.get(i).setCommentCount(item.getCommentCount());
-                        Log.d("yoo", "item else = " + item.getFeedItemId());
+                    if (!feedItemList.get(i).equals(item)) {
+                        FeedItem oldItem = feedItemList.get(i);
+                        item.setFavorite(oldItem.isFavorite());
+                        feedItemList.set(i, item);
                         feedAdapter.notifyItemChanged(i);
                     }
                     break;
@@ -430,7 +434,9 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     }
 
     private void hideLoadingSpinner() {
-        loadingSpinner.setVisibility(View.GONE);
+        if (loadingSpinner != null) {
+            loadingSpinner.setVisibility(View.GONE);
+        }
     }
 }
 

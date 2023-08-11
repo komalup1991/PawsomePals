@@ -41,6 +41,10 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.models.PhotoVideo;
+import edu.northeastern.pawsomepals.models.Recipe;
+import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.ActivityHelper;
@@ -68,7 +72,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private Map<String, Users> allUsers;
     private List<Users> selectedUsers;
     private ImageView selectPhoto, photoVideoImageView;
-    private Uri galleryImageUri, cameraImageUri;
+    private Uri imageUri;
     private String userNameToSaveInFeed;
     private String userProfileUrlToSaveInFeed;
     private Context context;
@@ -76,6 +80,11 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private String locationTagged;
     private TaggingOptionsLayout taggingOptionsLayout;
     private String usersTagged;
+    private PhotoVideo existingFeedItem;
+
+    private String currentFeedItemId;
+    private boolean hasImageChanged;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +97,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         userProfilePic = findViewById(R.id.userProfilePic);
         userNameTextView = findViewById(R.id.userNameTextView);
         captionEditTextView = findViewById(R.id.captionEditTextView);
-        photoVideoImageView = findViewById(R.id.photoVideoImageView);
+        photoVideoImageView = findViewById(R.id.eventImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
         taggingOptionsLayout = findViewById(R.id.tag_location_layout);
         taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
@@ -136,6 +145,24 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             }
         });
 
+        existingFeedItem = (PhotoVideo) getIntent().getSerializableExtra("existingFeedItem");
+        if (existingFeedItem != null) {
+            captionEditTextView.setText(existingFeedItem.getCaption());
+            selectPhoto.setVisibility(View.GONE);
+            Glide.with(this).load(existingFeedItem.getImg()).centerCrop().into(photoVideoImageView);
+            if (existingFeedItem.getUserTagged() != null) {
+                taggingOptionsLayout.setTagPeopleTextView(existingFeedItem.getUserTagged());
+            }
+
+            if (existingFeedItem.getLocationTagged() != null) {
+                taggingOptionsLayout.setTagLocationTextView(existingFeedItem.getLocationTagged());
+            }
+
+            currentFeedItemId = existingFeedItem.getFeedItemId();
+        } else {
+            currentFeedItemId = UUID.randomUUID().toString();
+        }
+
         selectPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,25 +197,9 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                     return;
                 }
 
-                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri,
-                        FeedCollectionType.PHOT0VIDEO, new BaseDataCallback() {
+                SaveOrUpdateFeedUtil.handleSaveFeed(CreatePhotoVideoActivity.this, progressDialog,
+                        createPhoto(existingFeedItem), imageUri, hasImageChanged);
 
-                            @Override
-                            public void onImageUriReceived(String imageUrl) {
-                                createFeedMap(imageUrl);
-                            }
-
-                            @Override
-                            public void onDismiss() {
-                                DialogHelper.hideProgressDialog(progressDialog);
-                                finish();
-                            }
-
-                            @Override
-                            public void onError(Exception exception) {
-                                Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
                 DialogHelper.showProgressDialog("Your Photo/Video is being saved...", progressDialog, CreatePhotoVideoActivity.this);
             }
         });
@@ -201,6 +212,35 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private PhotoVideo createPhoto(PhotoVideo feedItem) {
+        if (feedItem == null) {
+            feedItem = new PhotoVideo();
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+        String caption = captionEditTextView.getText().toString();
+        String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
+
+        feedItem.setCreatedAt(createdAt);
+        feedItem.setUserTagged(usersTagged);
+        feedItem.setLocationTagged(locationTagged);
+        feedItem.setUsername(userNameToSaveInFeed);
+        if (currentLatLng != null) {
+            feedItem.setLatLng(new edu.northeastern.pawsomepals.models.LatLng(currentLatLng.latitude, currentLatLng.longitude));
+        }
+        if (existingFeedItem != null) {
+            feedItem.setCommentCount(existingFeedItem.getCommentCount());
+            feedItem.setLikeCount(existingFeedItem.getLikeCount());
+            feedItem.setFavorite(existingFeedItem.isFavorite());
+        }
+        feedItem.setCaption(caption);
+        feedItem.setFeedItemId(currentFeedItemId);
+        feedItem.setType(1);
+        feedItem.setUserProfileImage(userProfileUrlToSaveInFeed);
+        feedItem.setCreatedBy(loggedInUserId);
+        return feedItem;
     }
 
     private void showEditImageDialog() {
@@ -243,19 +283,18 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
-                galleryImageUri = null;
-                cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
+                hasImageChanged = true;
+                imageUri = ImageUtil.saveCameraImageToFile(data, this);
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(cameraImageUri).centerCrop().into(photoVideoImageView);
+                Glide.with(this).load(imageUri).centerCrop().into(photoVideoImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
-                cameraImageUri = null;
-                galleryImageUri = data.getData();
+                hasImageChanged = true;
+                imageUri = data.getData();
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(galleryImageUri).centerCrop().into(photoVideoImageView);
+                Glide.with(this).load(imageUri).centerCrop().into(photoVideoImageView);
             }
         }
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -272,7 +311,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             }
         }
     }
-
 
     private void showDeleteConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -296,40 +334,8 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     private void deleteImage() {
         photoVideoImageView.setImageDrawable(null);
         selectPhoto.setVisibility(View.VISIBLE);
-        galleryImageUri = null;
-        cameraImageUri = null;
+        imageUri = null;
     }
-
-
-    private void createFeedMap(String imageUrlFromFirebaseStorage) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
-
-        String caption = captionEditTextView.getText().toString();
-        String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
-
-        Map<String, Object> photoVideoPosts = new HashMap<>();
-        photoVideoPosts.put("createdBy", loggedInUserId);
-        photoVideoPosts.put("caption", caption);
-        photoVideoPosts.put("userTagged", usersTagged);
-        photoVideoPosts.put("locationTagged", locationTagged);
-        photoVideoPosts.put("latLng", currentLatLng);
-        photoVideoPosts.put("createdAt", createdAt);
-        photoVideoPosts.put("username", userNameToSaveInFeed);
-        photoVideoPosts.put("userProfileImage", userProfileUrlToSaveInFeed);
-        photoVideoPosts.put("type", 1);
-        photoVideoPosts.put("img", imageUrlFromFirebaseStorage);
-        photoVideoPosts.put("feedItemId", UUID.randomUUID().toString());
-
-        FirebaseUtil.createCollectionInFirestore(photoVideoPosts, FeedCollectionType.PHOT0VIDEO, new BaseDataCallback() {
-            @Override
-            public void onDismiss() {
-                DialogHelper.hideProgressDialog(progressDialog);
-                ActivityHelper.setResult(CreatePhotoVideoActivity.this,true);
-                finish();
-            }
-        });
-    }
-
 
 
     private void showCancelConfirmationDialog() {

@@ -71,6 +71,8 @@ public class FeedActionsLayout extends LinearLayout {
                 setText("(" + feedItem.getLikeCount() + ")");
         if (feedItem.isLiked()) {
             likeButton.setImageResource(R.drawable.like);
+        } else {
+            likeButton.setImageResource(R.drawable.likenew);
         }
 
         likeButton.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +125,8 @@ public class FeedActionsLayout extends LinearLayout {
 
         if (feedItem.isFavorite()) {
             favImageButton.setImageResource(R.drawable.pawprintfull);
+        } else {
+            favImageButton.setImageResource(R.drawable.pawprintempty);
         }
 
         favImageButton.setOnClickListener(new View.OnClickListener() {

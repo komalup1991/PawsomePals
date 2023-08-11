@@ -134,9 +134,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             googleMap.setMyLocationEnabled(true);
         }
         if (selectedFeedItem != null) {
-            moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
+            if(Double.isNaN(selectedFeedItem.getLatLng().getLatitude())){
+              Toast.makeText(getContext(),"Please check the coordinates",Toast.LENGTH_SHORT).show();
+            }
+            else{
+                moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
+            }
         }
-    }
+        }
+
 
     private void loadMarkersOnMapAll() {
         loadMarkersOnMap(null);

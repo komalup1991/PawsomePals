@@ -96,7 +96,7 @@
                 app:layout_constraintTop_toBottomOf="@id/userNameTextView" />
 
             <ImageView
-                android:id="@+id/photoVideoImageView"
+                android:id="@+id/eventImageView"
                 android:layout_width="0dp"
                 android:layout_height="200dp"
                 android:layout_margin="8dp"
@@ -112,10 +112,10 @@
                 android:layout_width="0dp"
                 android:layout_height="43dp"
                 android:src="@drawable/addphoto"
-                app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+                app:layout_constraintBottom_toBottomOf="@id/eventImageView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/photoVideoImageView" />
+                app:layout_constraintTop_toTopOf="@id/eventImageView" />
 
             <!-- Delete and Edit Icons -->
             <ImageView
@@ -125,7 +125,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/delete48px"
-                app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+                app:layout_constraintBottom_toBottomOf="@id/eventImageView"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
@@ -135,8 +135,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/edit48px"
-                app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
-                app:layout_constraintEnd_toEndOf="@id/photoVideoImageView" />
+                app:layout_constraintBottom_toBottomOf="@id/eventImageView"
+                app:layout_constraintEnd_toEndOf="@id/eventImageView" />
 
             <edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout
                 android:id="@+id/tag_location_layout"
@@ -147,7 +147,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.025"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/photoVideoImageView" />
+                app:layout_constraintTop_toBottomOf="@+id/eventImageView" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

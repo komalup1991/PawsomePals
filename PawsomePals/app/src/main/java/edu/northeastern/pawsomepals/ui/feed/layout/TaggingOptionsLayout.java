@@ -45,6 +45,22 @@ public class TaggingOptionsLayout extends LinearLayout {
     private final Map<String, Users> allUsers = new HashMap<>();
     private List<Users> selectedUsers = new ArrayList<>();
 
+    public TextView getTagPeopleTextView() {
+        return tagPeopleTextView;
+    }
+
+    public void setTagPeopleTextView(String tagPeopleTextView) {
+        this.tagPeopleTextView.setText(tagPeopleTextView);
+    }
+
+    public TextView getTagLocationSearchTextView() {
+        return tagLocationSearchTextView;
+    }
+
+    public void setTagLocationTextView(String tagLocationSearchTextView) {
+        this.tagLocationSearchTextView.setText(tagLocationSearchTextView);
+    }
+
     private ActivityResultLauncher<Intent> startAutocomplete = null;
 
     public TaggingOptionsLayout(Context context) {

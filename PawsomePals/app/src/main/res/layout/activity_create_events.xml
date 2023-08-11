@@ -99,13 +99,13 @@
                 app:layout_constraintTop_toBottomOf="@id/userNameTextView" />
 
             <ImageView
-                android:id="@+id/photoVideoImageView"
+                android:id="@+id/eventImageView"
                 android:layout_width="0dp"
                 android:layout_height="200dp"
                 android:layout_margin="8dp"
                 android:required="true"
                 android:background="@drawable/border"
-                android:contentDescription="@string/photoVideo"
+                android:contentDescription="Event Photo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
@@ -116,10 +116,10 @@
                 android:layout_width="0dp"
                 android:layout_height="43dp"
                 android:src="@drawable/addphoto"
-                app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+                app:layout_constraintBottom_toBottomOf="@id/eventImageView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/photoVideoImageView" />
+                app:layout_constraintTop_toTopOf="@id/eventImageView" />
 
             <!-- Delete and Edit Icons -->
             <ImageView
@@ -129,7 +129,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/delete48px"
-                app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
+                app:layout_constraintBottom_toBottomOf="@id/eventImageView"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
@@ -139,8 +139,8 @@
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:src="@drawable/edit48px"
-                app:layout_constraintBottom_toBottomOf="@id/photoVideoImageView"
-                app:layout_constraintEnd_toEndOf="@id/photoVideoImageView" />
+                app:layout_constraintBottom_toBottomOf="@id/eventImageView"
+                app:layout_constraintEnd_toEndOf="@id/eventImageView" />
 
 
             <TextView
@@ -152,7 +152,7 @@
                 android:text="@string/event_date"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/photoVideoImageView" />
+                app:layout_constraintTop_toBottomOf="@id/eventImageView" />
 
             <TextView
                 android:id="@+id/eventDateDescTextView"
@@ -230,7 +230,7 @@
                 android:background="@drawable/border"
                 android:ems="10"
                 android:hint="@string/about_the_event"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:required="true"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
