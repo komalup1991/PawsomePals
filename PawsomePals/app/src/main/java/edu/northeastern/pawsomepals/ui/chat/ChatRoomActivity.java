@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.MediaRouteButton;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
@@ -101,8 +103,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private EditText messageInput;
     private ImageButton sendMessageBtn;
-    private ImageButton functionBtn,imgDisMissBtn;
-    private ImageButton backBtn;
+    private ImageButton functionBtn,imgDisMissBtn,preview_dismiss_button,preview_location_dismiss_button,backBtn;
     private ImageButton infoBtn;
     private ImageView img_preview,image_view_container;
     private CardView img_cardview;
@@ -114,7 +115,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
     private List<String> groupUsersNames;
-    private LinearLayout bottomLayout;
+    private ConstraintLayout chat_image_preview_container,chat_location_preview_container;
 
     private Users currentUser, otherUser;
     private FrameLayout profileShowBackground;
@@ -162,7 +163,20 @@ public class ChatRoomActivity extends AppCompatActivity {
                 img_cardview.setVisibility(View.INVISIBLE);
             }
         });
-
+        preview_dismiss_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chat_image_preview_container.setVisibility(View.INVISIBLE);
+                fileUri = null;
+            }
+        });
+        preview_location_dismiss_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chat_location_preview_container.setVisibility(View.INVISIBLE);
+                location = null;
+            }
+        });
 
         functionBtn.setOnClickListener(view -> showDialog()
         );
@@ -226,9 +240,8 @@ public class ChatRoomActivity extends AppCompatActivity {
             chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
             chatRoomModel.setLastMessage("<Location>");
             ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
-
             uploadLocation(location);
-            locationPreviewTextView.setVisibility(View.INVISIBLE);
+            chat_location_preview_container.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -288,7 +301,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 String displayText = place.getName() + "\n" + place.getAddress();
                                 place.getLatLng();
                                 locationPreviewTextView.setText(displayText);
-                                locationPreviewTextView.setVisibility(View.VISIBLE);
+                                chat_location_preview_container.setVisibility(View.VISIBLE);
                                 location = new ChatLocationModel(place.getName(), place.getAddress(), place.getLatLng().latitude, place.getLatLng().longitude);
                             }
                         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
@@ -305,15 +318,18 @@ public class ChatRoomActivity extends AppCompatActivity {
         functionBtn = findViewById(R.id.function_btn);
         imgDisMissBtn = findViewById(R.id.dismiss_button);
         infoBtn = findViewById(R.id.chatroom_more_button);
+        preview_dismiss_button = findViewById(R.id.preview_dismiss_button);
+        preview_location_dismiss_button = findViewById(R.id.preview_location_dismiss_button);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
         backBtn = findViewById(R.id.message_back_button);
         img_preview = findViewById(R.id.chat_image_preview);
         img_cardview = findViewById(R.id.image_cardview);
+        chat_location_preview_container = findViewById(R.id.chat_location_preview_container);
         image_view_container = findViewById(R.id.image_view_container);
         imgPreviewTextView = findViewById(R.id.image_preview_textView);
         locationPreviewTextView = findViewById(R.id.location_preview_textView);
         profileShowBackground = findViewById(R.id.profile_show_background);
-        bottomLayout = findViewById(R.id.bottomLayout);
+        chat_image_preview_container = findViewById(R.id.chat_image_preview_container);
         chatRoomToolbar = findViewById(R.id.chatRoomToolBar);
     }
 
@@ -373,10 +389,10 @@ public class ChatRoomActivity extends AppCompatActivity {
         adapter.setOnItemClickListener(new ChatMessageRecyclerAdapter.OnImgItemClickListener() {
             @Override
             public void onItemClick(int position) {
+                img_cardview.setVisibility(View.VISIBLE);
                 Glide.with(getApplicationContext())
                         .load(options.getSnapshots().get(position).getImage())
                         .into(image_view_container);
-                img_cardview.setVisibility(View.VISIBLE);
             }
         });
         LinearLayoutManager manager = new LinearLayoutManager(this);
@@ -634,8 +650,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                             .getBitmap(getContentResolver(), cameraUri);
 
                     img_preview.setImageBitmap(bitmap);
-                    img_preview.setVisibility(View.VISIBLE);
-                    imgPreviewTextView.setVisibility(View.VISIBLE);
+                    chat_image_preview_container.setVisibility(View.VISIBLE);
                     fileUri = cameraUri;
                 } catch (Exception e) {
                     Toast.makeText(this, "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
@@ -650,8 +665,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     int targetHeight = 400;
                     bitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
                     img_preview.setImageBitmap(bitmap);
-                    img_preview.setVisibility(View.VISIBLE);
-                    imgPreviewTextView.setVisibility(View.VISIBLE);
+                    chat_image_preview_container.setVisibility(View.VISIBLE);
                     fileUri = imageUri;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -703,8 +717,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 String url = task12.getResult().toString();
                 dialog.dismiss();
 
-                imgPreviewTextView.setVisibility(View.INVISIBLE);
-                img_preview.setVisibility(View.INVISIBLE);
+                chat_image_preview_container.setVisibility(View.INVISIBLE);
 
                 chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), url, null);
                 chatMessageModel.setPicture(true);
