@@ -76,29 +76,9 @@ public class SaveOrUpdateFeedUtil {
                     @Override
                     public void onError(Exception exception) {
                         Log.d("yoo", exception.getMessage());
-//                        Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-//    String eventName = eventNameEditText.getText().toString();
-//    String eventDetails = eventDetailsEditText.getText().toString();
-//    String eventDate = setEventDateTextView.getText().toString();
-//    String eventTime = setEventTimeTextView.getText().toString();
-//    String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
-//    Map<String, Object> events = new HashMap<>();
-//        events.put("createdBy", loggedInUserId);
-//        events.put("eventName", eventName);
-//        events.put("eventTime", eventTime);
-//        events.put("eventDate", eventDate);
-//        events.put("eventDetails", eventDetails);
-//        events.put("userTagged", usersTagged);
-//        events.put("locationTagged", locationTagged);
-//        events.put("latLng", currentLatLng);
-//        events.put("createdAt", createdAt);
-//        events.put("username", userNameToSaveInFeed);
-//        events.put("userProfileImage", userProfileUrlToSaveInFeed);
-//        events.put("type", 3);
-//        events.put("feedItemId", currentFeedItemId);
-//        events.put("img", imageUrlFromFirebaseStorage);
+
 }
