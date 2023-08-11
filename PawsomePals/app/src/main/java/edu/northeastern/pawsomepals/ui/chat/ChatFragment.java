@@ -2,7 +2,6 @@ package edu.northeastern.pawsomepals.ui.chat;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -26,6 +24,7 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -44,6 +43,7 @@ public class ChatFragment extends Fragment {
     private Button createNewGroupButton;
     private RecyclerView chatRecyclerview;
     private RecentChatRecyclerAdapter adapter;
+    private int resumeCount;
 
     public interface ProfilePicClickListener {
         void onItemClicked(String userId);
@@ -64,15 +64,16 @@ public class ChatFragment extends Fragment {
 
         searchInput = view.findViewById(R.id.chat_search_chat);
         searchButton = view.findViewById(R.id.chat_search_chat_btn);
-//        createNewChatButton = view.findViewById(R.id.new_chat_btn);
         chatRecyclerview = view.findViewById(R.id.chat_search_user_recyclerView);
         createNewGroupButton = view.findViewById(R.id.new_group_chat_btn);
 
         ChatFirebaseUtil.currentUserDetails().get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot snapshot) {
-                currentUser = snapshot.toObject(Users.class);}
+                currentUser = snapshot.toObject(Users.class);
+            }
         });
+        resumeCount = 0;
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,6 +142,10 @@ public class ChatFragment extends Fragment {
                 transaction.replace(R.id.fragment_container_view, profileFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
+            }
+        }, new RecentChatRecyclerAdapter.DataUpdateListener() {
+            @Override
+            public void onDataUpdated() {
             }
         });
         chatRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));

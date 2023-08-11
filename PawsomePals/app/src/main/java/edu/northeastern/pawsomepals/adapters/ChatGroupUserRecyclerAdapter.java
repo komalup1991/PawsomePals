@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,15 @@ import java.util.List;
 public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users,ChatGroupUserRecyclerAdapter.UserModelViewHolder> {
 
     private Context context;
+    private OnItemClickListener mListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
 
 
     public ChatGroupUserRecyclerAdapter(@NonNull FirestoreRecyclerOptions<Users> options, Context context) {
@@ -46,21 +56,24 @@ public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users
         if (model.getUserId().equals(ChatFirebaseUtil.currentUserId())){
             holder.userNameText.setText(model.getName()+"(Me)");
         }
+        bindHolder(holder,model);
+    }
+    private void bindHolder(final UserModelViewHolder holder,final Users model){
         holder.addCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                model.setChatSelected(isChecked);
-            }
-        });
-        //Listener to open new ChatRoomActivity
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //navigate to chat activity;
-                Intent intent = new Intent(context, ChatRoomActivity.class);
-                ChatFirebaseUtil.passUserModelAsIntent(intent,model);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                final int position = holder.getAdapterPosition();
+                if(model.isChatSelected()){
+                    model.setChatSelected(false);
+                }else{
+                    model.setChatSelected(true);
+                }
+                Log.d("butt", "click " + position);
+                if(model.isChatSelected()){
+                    if (mListener != null) {
+                        mListener.onItemClick(position);
+                    }
+                }
             }
         });
     }

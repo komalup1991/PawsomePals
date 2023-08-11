@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -78,6 +80,7 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.login.MainActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
 import okhttp3.Call;
@@ -98,10 +101,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private EditText messageInput;
     private ImageButton sendMessageBtn;
-    private ImageButton functionBtn;
+    private ImageButton functionBtn,imgDisMissBtn;
     private ImageButton backBtn;
     private ImageButton infoBtn;
-    private ImageView img_preview;
+    private ImageView img_preview,image_view_container;
+    private CardView img_cardview;
     private TextView imgPreviewTextView, locationPreviewTextView;
     private TextView chatRoomName;
     private LinearLayout chatRoomToolbar;
@@ -152,6 +156,12 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
 
         backBtn.setOnClickListener(v -> onBackPressed());
+        imgDisMissBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                img_cardview.setVisibility(View.INVISIBLE);
+            }
+        });
 
 
         functionBtn.setOnClickListener(view -> showDialog()
@@ -293,10 +303,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
         functionBtn = findViewById(R.id.function_btn);
+        imgDisMissBtn = findViewById(R.id.dismiss_button);
         infoBtn = findViewById(R.id.chatroom_more_button);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
         backBtn = findViewById(R.id.message_back_button);
         img_preview = findViewById(R.id.chat_image_preview);
+        img_cardview = findViewById(R.id.image_cardview);
+        image_view_container = findViewById(R.id.image_view_container);
         imgPreviewTextView = findViewById(R.id.image_preview_textView);
         locationPreviewTextView = findViewById(R.id.location_preview_textView);
         profileShowBackground = findViewById(R.id.profile_show_background);
@@ -357,6 +370,15 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .setQuery(query, ChatMessageModel.class).build();
 
         adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
+        adapter.setOnItemClickListener(new ChatMessageRecyclerAdapter.OnImgItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Glide.with(getApplicationContext())
+                        .load(options.getSnapshots().get(position).getImage())
+                        .into(image_view_container);
+                img_cardview.setVisibility(View.VISIBLE);
+            }
+        });
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);
@@ -522,13 +544,14 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void callApi(JSONObject jasonObject) {
         MediaType JSON = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
+        String playload= jasonObject.toString();
 
         String url = "https://fcm.googleapis.com/fcm/send";
-        RequestBody body = RequestBody.create(jasonObject.toString(), JSON);
+        RequestBody body = RequestBody.create(playload, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
-                .header("Authorization", "Bearer AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
+                .addHeader("Authorization", "key=AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -538,22 +561,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-//                if (response.isSuccessful()){
-//                    try {
-//                        if (response.body() != null) {
-//                            JSONObject responseJson = new JSONObject();
-//                            JSONArray results = responseJson.getJSONArray("results");
-//                            if(responseJson.getInt("failure")==1){
-//                                JSONObject error = (JSONObject) results.get(0);
-//                                Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
-//                                return;
-//                            }
-//                        }
-//                    } catch (JSONException e){
-//                        e.printStackTrace();
-//                    }
-//                    showToast("Notification sent successfully");
-////                }
+                if (response.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show());
+                }
             }
         });
     }
