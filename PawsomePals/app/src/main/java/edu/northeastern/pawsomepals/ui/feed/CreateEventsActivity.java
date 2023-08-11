@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.auth.FirebaseAuth;
@@ -281,7 +282,7 @@ public class CreateEventsActivity extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showCancelConfirmationDialog(context, CreateEventsActivity.this);
+                showCancelConfirmationDialog();
             }
         });
     }
@@ -382,6 +383,26 @@ public class CreateEventsActivity extends AppCompatActivity {
             setEventDateTextView.setText(date);
         });
     }
+
+    private void showCancelConfirmationDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Confirm Action")
+                .setMessage("Are you sure you want to cancel?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
 
 
     private void showEditImageDialog() {
