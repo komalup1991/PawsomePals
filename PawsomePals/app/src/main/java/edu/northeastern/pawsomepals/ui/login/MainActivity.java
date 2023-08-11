@@ -1,7 +1,9 @@
 package edu.northeastern.pawsomepals.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.widget.ImageView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
 
 public class MainActivity extends AppCompatActivity {
     private ImageView login;
@@ -24,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         auth = FirebaseAuth.getInstance();
-
         final Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override

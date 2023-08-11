@@ -273,7 +273,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     }
 
     private void fetchAllFeeds() {
-        if (!feedItemList.isEmpty()) {
+        if (! feedItemList.isEmpty()) {
             return;
         }
         FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(),

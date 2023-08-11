@@ -5,7 +5,6 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,11 +17,8 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.firestore.Query;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.ChatGroupUserRecyclerAdapter;
 import edu.northeastern.pawsomepals.adapters.RecentChatRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
-import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 
 public class ChatSearchChatroomActivity extends AppCompatActivity {
     private EditText searchInput;
@@ -79,16 +75,11 @@ public class ChatSearchChatroomActivity extends AppCompatActivity {
         adapter = new RecentChatRecyclerAdapter(options, this.getApplicationContext(), new ChatFragment.ProfilePicClickListener() {
             @Override
             public void onItemClicked(String userId) {
-//                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("ProfileId", MODE_PRIVATE);
-//                SharedPreferences.Editor editor = sharedPreferences.edit();
-//                editor.putString("profileId", userId);
-//                editor.apply();
-//
-//                ProfileFragment profileFragment = new ProfileFragment();
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.fragment_container_view, profileFragment)
-//                        .addToBackStack(null)
-//                        .commit();
+            }
+        }, new RecentChatRecyclerAdapter.DataUpdateListener() {
+            @Override
+            public void onDataUpdated() {
+
             }
         }
         );

@@ -78,6 +78,7 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.login.MainActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
 import okhttp3.Call;
@@ -522,13 +523,14 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void callApi(JSONObject jasonObject) {
         MediaType JSON = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
+        String playload= jasonObject.toString();
 
         String url = "https://fcm.googleapis.com/fcm/send";
-        RequestBody body = RequestBody.create(jasonObject.toString(), JSON);
+        RequestBody body = RequestBody.create(playload, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
-                .header("Authorization", "Bearer AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
+                .addHeader("Authorization", "key=AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -538,22 +540,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-//                if (response.isSuccessful()){
-//                    try {
-//                        if (response.body() != null) {
-//                            JSONObject responseJson = new JSONObject();
-//                            JSONArray results = responseJson.getJSONArray("results");
-//                            if(responseJson.getInt("failure")==1){
-//                                JSONObject error = (JSONObject) results.get(0);
-//                                Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
-//                                return;
-//                            }
-//                        }
-//                    } catch (JSONException e){
-//                        e.printStackTrace();
-//                    }
-//                    showToast("Notification sent successfully");
-////                }
+                if (response.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show());
+                }
             }
         });
     }
