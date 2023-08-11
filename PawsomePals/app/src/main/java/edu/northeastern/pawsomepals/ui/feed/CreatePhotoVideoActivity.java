@@ -209,7 +209,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showCancelConfirmationDialog();
-                finish();
+               // finish();
             }
         });
     }

@@ -155,7 +155,7 @@ public class CreatePostActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showCancelConfirmationDialog();
-                finish();
+              //  finish();
             }
         });
     }
