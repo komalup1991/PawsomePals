@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -99,10 +101,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private EditText messageInput;
     private ImageButton sendMessageBtn;
-    private ImageButton functionBtn;
+    private ImageButton functionBtn,imgDisMissBtn;
     private ImageButton backBtn;
     private ImageButton infoBtn;
-    private ImageView img_preview;
+    private ImageView img_preview,image_view_container;
+    private CardView img_cardview;
     private TextView imgPreviewTextView, locationPreviewTextView;
     private TextView chatRoomName;
     private LinearLayout chatRoomToolbar;
@@ -153,6 +156,12 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
 
         backBtn.setOnClickListener(v -> onBackPressed());
+        imgDisMissBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                img_cardview.setVisibility(View.INVISIBLE);
+            }
+        });
 
 
         functionBtn.setOnClickListener(view -> showDialog()
@@ -294,10 +303,13 @@ public class ChatRoomActivity extends AppCompatActivity {
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
         functionBtn = findViewById(R.id.function_btn);
+        imgDisMissBtn = findViewById(R.id.dismiss_button);
         infoBtn = findViewById(R.id.chatroom_more_button);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
         backBtn = findViewById(R.id.message_back_button);
         img_preview = findViewById(R.id.chat_image_preview);
+        img_cardview = findViewById(R.id.image_cardview);
+        image_view_container = findViewById(R.id.image_view_container);
         imgPreviewTextView = findViewById(R.id.image_preview_textView);
         locationPreviewTextView = findViewById(R.id.location_preview_textView);
         profileShowBackground = findViewById(R.id.profile_show_background);
@@ -358,6 +370,15 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .setQuery(query, ChatMessageModel.class).build();
 
         adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
+        adapter.setOnItemClickListener(new ChatMessageRecyclerAdapter.OnImgItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Glide.with(getApplicationContext())
+                        .load(options.getSnapshots().get(position).getImage())
+                        .into(image_view_container);
+                img_cardview.setVisibility(View.VISIBLE);
+            }
+        });
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);

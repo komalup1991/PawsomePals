@@ -32,17 +32,19 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
     private static final int VIEW_TYPE_TEXT_MESSAGE = 0;
     private static final int VIEW_TYPE_IMAGE_MESSAGE = 1;
     private static final int VIEW_TYPE_LOCATION_MESSAGE = 2;
-
-
     private Context context;
     private FirestoreRecyclerOptions<ChatMessageModel> options;
+    private ChatMessageRecyclerAdapter.OnImgItemClickListener mListener;
 
-    /**
-     * Create a new RecyclerView adapter that listens to a Firestore Query.  See {@link
-     * FirestoreRecyclerOptions} for configuration options.
-     *
-     * @param options
-     */
+    public interface OnImgItemClickListener {
+        void onItemClick(int position);
+    }
+
+    public void setOnItemClickListener(ChatMessageRecyclerAdapter.OnImgItemClickListener listener) {
+        this.mListener = listener;
+    }
+
+
     public ChatMessageRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatMessageModel> options, Context context) {
         super(options);
         this.context = context;
@@ -107,26 +109,14 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 imageViewHolder.leftCardView.setVisibility(View.GONE);
                 imageViewHolder.rightCardView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.rightImageView);
-                imageViewHolder.rightCardView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(model.getImage()));
-                        holder.itemView.getContext().startActivity(intent);
-                    }
-                });
+                bindHolder(imageViewHolder,"OWN");
             } else {
                 imageViewHolder.rightCardView.setVisibility(View.GONE);
                 imageViewHolder.leftCardView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.leftImageView);
                 imageViewHolder.otherUserNameTextView.setText(model.getSenderName());
                 imageViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
-                imageViewHolder.leftCardView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(model.getImage()));
-                        holder.itemView.getContext().startActivity(intent);
-                    }
-                });
+                bindHolder(imageViewHolder,"FRIEND");
             }
         } else if (holder.getItemViewType() == VIEW_TYPE_LOCATION_MESSAGE) {
             LocationViewHolder locationViewHolder = (LocationViewHolder) holder;
@@ -157,6 +147,30 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                     }
                 });
             }
+        }
+    }
+    private void bindHolder(ImageViewHolder holder,String ownOrFriend){
+        int position = holder.getAdapterPosition();
+        if (ownOrFriend.equals("OWN")){
+            holder.rightCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null){
+                        mListener.onItemClick(position);
+                    }
+                }
+            });
+        }
+
+        if (ownOrFriend.equals("FRIEND")){
+            holder.leftCardView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mListener != null){
+                        mListener.onItemClick(position);
+                    }
+                }
+            });
         }
     }
 

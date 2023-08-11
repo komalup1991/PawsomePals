@@ -87,9 +87,6 @@
             android:name=".ui.login.SignUpActivity"
             android:exported="false"
             android:windowSoftInputMode="stateHidden" />
-<!--        <activity-->
-<!--            android:name=".ui.chat.CreateNewChatActivity"-->
-<!--            android:exported="false" />-->
         <activity
             android:name=".ui.chat.CreateNewGroupChat"
             android:exported="false" />
