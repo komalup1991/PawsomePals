@@ -248,7 +248,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void uploadLocation(ChatLocationModel location) {
         ChatMessageModel chatMessageModel;
         if (location != null) {
-            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), null, location);
+            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), null, location);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(true);
             ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
@@ -417,7 +417,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
         if (fileUri == null && location == null) {
-            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), null, null);
+            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), null, null);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(false);
 
@@ -719,7 +719,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                 chat_image_preview_container.setVisibility(View.INVISIBLE);
 
-                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), url, null);
+                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), url, null);
                 chatMessageModel.setPicture(true);
                 chatMessageModel.setPlace(false);
                 ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)

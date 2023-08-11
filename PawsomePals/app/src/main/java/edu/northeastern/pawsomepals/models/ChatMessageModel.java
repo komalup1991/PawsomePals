@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp;
 
 public class ChatMessageModel {
     private String senderName;
+    private String senderProfilePic;
     private String message;
     private String senderId;
     private Timestamp timestamp;
@@ -15,9 +16,10 @@ public class ChatMessageModel {
     public ChatMessageModel() {
     }
 
-    public ChatMessageModel(String message, String senderId, Timestamp Timestamp, String senderName, String image, ChatLocationModel location) {
+    public ChatMessageModel(String message, String senderId, String senderProfilePic,Timestamp Timestamp, String senderName, String image, ChatLocationModel location) {
         this.message = message;
         this.senderId = senderId;
+        this.senderProfilePic = senderProfilePic;
         this.timestamp = Timestamp;
         this.senderName = senderName;
         this.image = image;
@@ -82,5 +84,13 @@ public class ChatMessageModel {
 
     public void setLocation(ChatLocationModel location) {
         this.location = location;
+    }
+
+    public String getSenderProfilePic() {
+        return senderProfilePic;
+    }
+
+    public void setSenderProfilePic(String senderProfilePic) {
+        this.senderProfilePic = senderProfilePic;
     }
 }

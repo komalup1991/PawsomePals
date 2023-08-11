@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:padding="8dp">
+
     <TextView
         android:id="@+id/other_user_name"
         android:layout_width="wrap_content"
@@ -12,23 +13,36 @@
         android:text="Other Name"
         android:textColor="#989494"
         android:textSize="16sp" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/chat_profile_pic"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:scaleType="centerCrop"
+        android:layout_below="@id/other_user_name"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/group_chat_icon"
+        app:civ_border_color="#FFFFFF"
+        app:civ_border_width="2dp" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view_friend"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/other_user_name"
         app:cardBackgroundColor="@color/orange"
         app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
-        android:layout_toRightOf="@id/other_user_name"
-        android:layout_marginStart="4dp">
+        app:cardElevation="8dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/other_user_name"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_toRightOf="@id/other_user_name">
+            android:padding="16dp">
+
             <TextView
                 android:id="@+id/other_location_name"
                 android:layout_width="wrap_content"
@@ -36,6 +50,7 @@
                 android:text="Location name"
                 android:textColor="#989494"
                 android:textSize="18sp" />
+
             <TextView
                 android:id="@+id/other_location_address"
                 android:layout_width="wrap_content"
@@ -49,7 +64,7 @@
                 android:layout_width="300dp"
                 android:layout_height="250dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/chat_location_img"/>
+                android:src="@drawable/chat_location_img" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
@@ -58,17 +73,17 @@
         android:id="@+id/card_view_own"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/yellow"
         android:layout_alignParentRight="true"
+        app:cardBackgroundColor="@color/yellow"
         app:cardCornerRadius="8dp"
-        app:cardElevation="8dp"
-        >
+        app:cardElevation="8dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
             <TextView
                 android:id="@+id/own_location_name"
                 android:layout_width="wrap_content"
@@ -76,6 +91,7 @@
                 android:text="Location name"
                 android:textColor="#989494"
                 android:textSize="18sp" />
+
             <TextView
                 android:id="@+id/own_location_address"
                 android:layout_width="wrap_content"
@@ -88,11 +104,12 @@
                 android:id="@+id/img_own"
                 android:layout_width="300dp"
                 android:layout_height="250dp"
+                android:layout_alignParentRight="true"
                 android:scaleType="fitXY"
-                android:src="@drawable/chat_location_img"
-                android:layout_alignParentRight="true" />
+                android:src="@drawable/chat_location_img" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
 
 </RelativeLayout>

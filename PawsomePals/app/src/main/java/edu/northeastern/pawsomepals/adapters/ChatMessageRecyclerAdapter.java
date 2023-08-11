@@ -92,6 +92,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             // Set data to text view holder
             if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())) {
                 textViewHolder.otherUserNameTextView.setVisibility(View.GONE);
+                textViewHolder.otherUserProfilePic.setVisibility(View.GONE);
                 textViewHolder.leftChatLayout.setVisibility(View.GONE);
                 textViewHolder.rightChatLayout.setVisibility(View.VISIBLE);
                 textViewHolder.rightChatTextView.setText(model.getMessage());
@@ -100,12 +101,15 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 textViewHolder.leftChatLayout.setVisibility(View.VISIBLE);
                 textViewHolder.leftChatTextView.setText(model.getMessage());
                 textViewHolder.otherUserNameTextView.setText(model.getSenderName());
+                textViewHolder.otherUserProfilePic.setVisibility(View.VISIBLE);
+                Glide.with(context).load(model.getSenderProfilePic()).into(textViewHolder.otherUserProfilePic);
             }
         } else if (holder.getItemViewType() == VIEW_TYPE_IMAGE_MESSAGE) {
             ImageViewHolder imageViewHolder = (ImageViewHolder) holder;
             // Set data to image view holder
             if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())) {
                 imageViewHolder.otherUserNameTextView.setVisibility(View.GONE);
+                imageViewHolder.otherUserProfilePic.setVisibility(View.GONE);
                 imageViewHolder.leftCardView.setVisibility(View.GONE);
                 imageViewHolder.rightCardView.setVisibility(View.VISIBLE);
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.rightImageView);
@@ -116,6 +120,8 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 Glide.with(context).load(model.getImage()).into(imageViewHolder.leftImageView);
                 imageViewHolder.otherUserNameTextView.setText(model.getSenderName());
                 imageViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
+                Glide.with(context).load(model.getSenderProfilePic()).into(imageViewHolder.otherUserProfilePic);
+                imageViewHolder.otherUserProfilePic.setVisibility(View.VISIBLE);
                 bindHolder(imageViewHolder,"FRIEND");
             }
         } else if (holder.getItemViewType() == VIEW_TYPE_LOCATION_MESSAGE) {
@@ -123,6 +129,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             // Set data to image view holder
             if (model.getSenderId().equals(ChatFirebaseUtil.currentUserId())) {
                 locationViewHolder.otherUserNameTextView.setVisibility(View.GONE);
+                locationViewHolder.otherUserProfilePic.setVisibility(View.GONE);
                 locationViewHolder.leftCardView.setVisibility(View.GONE);
                 locationViewHolder.rightCardView.setVisibility(View.VISIBLE);
                 locationViewHolder.ownLocationNameTextview.setText(model.getLocation().getLocationName());
@@ -138,6 +145,8 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
                 locationViewHolder.leftCardView.setVisibility(View.VISIBLE);
                 locationViewHolder.otherUserNameTextView.setText(model.getSenderName());
                 locationViewHolder.otherUserNameTextView.setVisibility(View.VISIBLE);
+                locationViewHolder.otherUserProfilePic.setVisibility(View.VISIBLE);
+                Glide.with(context).load(model.getSenderProfilePic()).into(locationViewHolder.otherUserProfilePic);
                 locationViewHolder.otherLocationNameTextview.setText(model.getLocation().getLocationName());
                 locationViewHolder.otherLocationAddressTextview.setText(model.getLocation().getLocationAddress());
                 locationViewHolder.leftCardView.setOnClickListener(new View.OnClickListener() {
@@ -188,6 +197,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
     class ChatModelViewHolder extends RecyclerView.ViewHolder {
         LinearLayout leftChatLayout, rightChatLayout;
         TextView otherUserNameTextView, leftChatTextView, rightChatTextView;
+        ImageView otherUserProfilePic;
 
 
         public ChatModelViewHolder(@NonNull View itemView) {
@@ -197,12 +207,13 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             rightChatTextView = itemView.findViewById(R.id.right_chat_textview);
             leftChatLayout = itemView.findViewById(R.id.left_chat_layout);
             rightChatLayout = itemView.findViewById(R.id.right_chat_layout);
+            otherUserProfilePic = itemView.findViewById(R.id.chat_profile_pic);
         }
     }
 
     class ImageViewHolder extends RecyclerView.ViewHolder {
         CardView leftCardView, rightCardView;
-        ImageView leftImageView, rightImageView;
+        ImageView leftImageView, rightImageView,otherUserProfilePic;
         TextView otherUserNameTextView;
 
         public ImageViewHolder(@NonNull View itemView) {
@@ -212,12 +223,13 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             rightImageView = itemView.findViewById(R.id.img_own);
             leftCardView = itemView.findViewById(R.id.card_view_friend);
             rightCardView = itemView.findViewById(R.id.card_view_own);
+            otherUserProfilePic = itemView.findViewById(R.id.chat_profile_pic);
         }
     }
 
     class LocationViewHolder extends RecyclerView.ViewHolder {
         CardView leftCardView, rightCardView;
-        ImageView leftImageView, rightImageView;
+        ImageView leftImageView, rightImageView,otherUserProfilePic;
         TextView otherUserNameTextView;
         TextView otherLocationNameTextview, otherLocationAddressTextview;
         TextView ownLocationNameTextview, ownLocationAddressTextview;
@@ -233,6 +245,7 @@ public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMes
             otherLocationAddressTextview = itemView.findViewById(R.id.other_location_address);
             ownLocationNameTextview = itemView.findViewById(R.id.own_location_name);
             ownLocationAddressTextview = itemView.findViewById(R.id.own_location_address);
+            otherUserProfilePic = itemView.findViewById(R.id.chat_profile_pic);
         }
     }
 }
