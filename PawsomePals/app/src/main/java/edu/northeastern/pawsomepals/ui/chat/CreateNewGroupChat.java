@@ -114,7 +114,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 Users selectedUser = options.getSnapshots().get(position);
-                if(!userList.contains(selectedUser)){
+                if(!imgList.contains(selectedUser.getProfileImage())){
                 userList.add(selectedUser);
                 imgList.add(selectedUser.getProfileImage());
                 imgAdapter.updateData(imgList);}else{
@@ -133,8 +133,8 @@ public class CreateNewGroupChat extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
                 Users selectedUser = userList.get(position);
-                userList.remove(selectedUser);
-                imgList.remove(selectedUser.getProfileImage());
+                userList.remove(position);
+                imgList.remove(position);
                 imgAdapter.updateData(imgList);
             }
         });

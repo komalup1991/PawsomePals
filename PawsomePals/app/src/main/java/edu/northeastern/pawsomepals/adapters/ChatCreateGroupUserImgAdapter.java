@@ -62,7 +62,6 @@ public class ChatCreateGroupUserImgAdapter extends RecyclerView.Adapter<ChatCrea
 
                 if (mListener != null) {
                     mListener.onItemClick(position);
-                    notifyItemRemoved(position);
                 }
             }
         });
