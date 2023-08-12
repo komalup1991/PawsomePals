@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,15 +32,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -62,7 +59,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private String currentPhotoPath;
     private FirebaseFirestore db;
     private StorageReference storageRef;
-    private Uri galleryImageUri, cameraImageUri;
+    private Uri imageUri;
     private TextView setServingSizeTextView, setPrepTextView, setCookTextView, valueTextView;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
@@ -81,6 +78,11 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private String userProfileUrlToSaveInFeed;
     private Dialog progressDialog;
     private Context context;
+    private Recipe existingFeedItem;
+
+    private String currentFeedItemId;
+
+    private boolean hasImageChanged = false;
 
 
     @Override
@@ -138,6 +140,25 @@ public class CreateRecipeActivity extends AppCompatActivity {
             }
         });
 
+
+        existingFeedItem = (Recipe) getIntent().getSerializableExtra("existingFeedItem");
+        if (existingFeedItem != null) {
+            recipeNameEditText.setText(existingFeedItem.getTitle());
+            selectPhoto.setVisibility(View.GONE);
+            Glide.with(this).load(existingFeedItem.getImg()).centerCrop().into(recipeImageView);
+            descriptionEditTextView.setText(existingFeedItem.getInstructions());
+            ingredientsEditTextView.setText(existingFeedItem.getIngredients());
+            instructionsEditTextView.setText(existingFeedItem.getInstructions());
+            setServingSizeTextView.setText(existingFeedItem.getServing());
+            setPrepTextView.setText(existingFeedItem.getPrepTime());
+            setCookTextView.setText(existingFeedItem.getCookTime());
+            currentFeedItemId = existingFeedItem.getFeedItemId();
+            imageUri = Uri.parse(existingFeedItem.getImg());
+        } else {
+            currentFeedItemId = UUID.randomUUID().toString();
+        }
+
+
         selectPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -193,24 +214,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
                     return;
                 }
 
-                FirebaseUtil.uploadImageToStorage(cameraImageUri, galleryImageUri, FeedCollectionType.RECIPES, new BaseDataCallback() {
-
-                    @Override
-                    public void onImageUriReceived(String imageUrl) {
-                        createFeedMap(imageUrl);
-                    }
-
-                    @Override
-                    public void onDismiss() {
-                        DialogHelper.hideProgressDialog(progressDialog);
-                        finish();
-                    }
-
-                    @Override
-                    public void onError(Exception exception) {
-                        Toast.makeText(context, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                SaveOrUpdateFeedUtil.handleSaveFeed(CreateRecipeActivity.this, progressDialog, createRecipe(existingFeedItem), imageUri, hasImageChanged);
                 DialogHelper.showProgressDialog("Your Recipe is being saved...", progressDialog, CreateRecipeActivity.this);
             }
         });
@@ -289,12 +293,14 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private void deleteImage() {
         recipeImageView.setImageDrawable(null);
         selectPhoto.setVisibility(View.VISIBLE);
-        galleryImageUri = null;
-        cameraImageUri = null;
+        imageUri = null;
     }
 
+    private Recipe createRecipe(Recipe feedItem) {
+        if (feedItem == null) {
+            feedItem = new Recipe();
+        }
 
-    private void createFeedMap(String imageUrlFromFirebaseStorage) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
         String recipeTitle = recipeNameEditText.getText().toString();
@@ -303,43 +309,38 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeInstructions = instructionsEditTextView.getText().toString();
 
         String recipeServing = setServingSizeTextView.getText().toString();
-        if (recipeServing.equals(getString(R.string.set_servings))) {
-            recipeServing = "";
-        }
+//        if (recipeServing.equals(getString(R.string.set_servings))) {
+//            recipeServing = "";
+//        }
         String recipePrepTime = setPrepTextView.getText().toString();
-        if (recipePrepTime.equals(getString(R.string.set_time))) {
-            recipePrepTime = "";
-        }
+//        if (recipePrepTime.equals(getString(R.string.set_time))) {
+//            recipePrepTime = "";
+//        }
         String recipeCookTime = setCookTextView.getText().toString();
-        if (recipeCookTime.equals(getString(R.string.set_time))) {
-            recipeCookTime = "";
-        }
+//        if (recipeCookTime.equals(getString(R.string.set_time))) {
+//            recipeCookTime = "";
+//        }
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
-        Map<String, Object> recipeCollection = new HashMap<>();
-        recipeCollection.put("createdBy", loggedInUserId);
-        recipeCollection.put("title", recipeTitle);
-        recipeCollection.put("desc", recipeDescription);
-        recipeCollection.put("ingredients", recipeIngredients);
-        recipeCollection.put("instructions", recipeInstructions);
-        recipeCollection.put("serving", recipeServing);
-        recipeCollection.put("prepTime", recipePrepTime);
-        recipeCollection.put("cookTime", recipeCookTime);
-        recipeCollection.put("createdAt", createdAt);
-        recipeCollection.put("type", 5);
-        recipeCollection.put("img", imageUrlFromFirebaseStorage);
-        recipeCollection.put("feedItemId", UUID.randomUUID().toString());
-        recipeCollection.put("username", userNameToSaveInFeed);
-        recipeCollection.put("userProfileImage", userProfileUrlToSaveInFeed);
-
-        FirebaseUtil.createCollectionInFirestore(recipeCollection, FeedCollectionType.RECIPES, new BaseDataCallback() {
-            @Override
-            public void onDismiss() {
-                DialogHelper.hideProgressDialog(progressDialog);
-                ActivityHelper.setResult(CreateRecipeActivity.this, true);
-                finish();
-            }
-        });
+        feedItem.setTitle(recipeTitle);
+        feedItem.setDesc(recipeDescription);
+        feedItem.setCreatedBy(loggedInUserId);
+        feedItem.setUsername(userNameToSaveInFeed);
+        feedItem.setIngredients(recipeIngredients);
+        feedItem.setInstructions(recipeInstructions);
+        feedItem.setCookTime(recipeCookTime);
+        feedItem.setServing(recipeServing);
+        feedItem.setPrepTime(recipePrepTime);
+        feedItem.setFeedItemId(currentFeedItemId);
+        feedItem.setType(5);
+        feedItem.setUserProfileImage(userProfileUrlToSaveInFeed);
+        feedItem.setCreatedAt(createdAt);
+        if (existingFeedItem != null) {
+            feedItem.setCommentCount(existingFeedItem.getCommentCount());
+            feedItem.setLikeCount(existingFeedItem.getLikeCount());
+            feedItem.setFavorite(existingFeedItem.isFavorite());
+        }
+        return feedItem;
     }
 
     private void showTimePickerDialog(String title, String message, TextView textView) {
@@ -433,15 +434,15 @@ public class CreateRecipeActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_CAMERA) {
-                galleryImageUri = null;
-                cameraImageUri = ImageUtil.saveCameraImageToFile(data, this);
+                hasImageChanged = true;
+                imageUri = ImageUtil.saveCameraImageToFile(data, this);
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(cameraImageUri).centerCrop().into(recipeImageView);
+                Glide.with(this).load(imageUri).centerCrop().into(recipeImageView);
             } else if (requestCode == REQUEST_CODE_GALLERY) {
-                cameraImageUri = null;
-                galleryImageUri = data.getData();
+                hasImageChanged = true;
+                imageUri = data.getData();
                 selectPhoto.setVisibility(View.GONE);
-                Glide.with(this).load(galleryImageUri).centerCrop().into(recipeImageView);
+                Glide.with(this).load(imageUri).centerCrop().into(recipeImageView);
             }
         }
     }

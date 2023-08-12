@@ -4,9 +4,8 @@ import androidx.annotation.Nullable;
 
 import java.io.Serializable;
 
-public class Recipe extends FeedItem implements Serializable {
+public class Recipe extends FeedItemWithImage implements Serializable {
     private String title;
-    private String img;
     private String desc;
     private String createdBy;
     private String ingredients;
@@ -18,6 +17,7 @@ public class Recipe extends FeedItem implements Serializable {
     private String createdAt;
     private String notes;
     private String instructions;
+
     public Recipe() {
     }
 
@@ -27,14 +27,6 @@ public class Recipe extends FeedItem implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
     }
 
     public String getDesc() {
@@ -144,8 +136,4 @@ public class Recipe extends FeedItem implements Serializable {
         return this.getFeedItemId().equals(otherRecipe.getFeedItemId());
     }
 
-    @Override
-    public String toString() {
-        return "Recipe{" + "title='" + title + '\'' + ", img='" + img + '\'' + ", desc='" + desc + '\'' + ", createdBy='" + createdBy + '\'' + ", ingredients='" + ingredients + '\'' + ", serving='" + serving + '\'' + ", prepTime='" + prepTime + '\'' + ", cookTime='" + cookTime + '\'' + ", username='" + username + '\'' + ", userProfileImage='" + userProfileImage + '\'' + ", createdAt='" + createdAt + '\'' + '}';
-    }
 }

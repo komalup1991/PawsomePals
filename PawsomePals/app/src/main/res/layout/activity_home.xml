@@ -27,7 +27,19 @@
             app:itemIconTint="@color/tab_item_foreground"
             app:itemTextColor="@color/tab_item_foreground" />
 
-
+        <ImageView
+            android:id="@+id/dogBreeds"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            android:padding="8dp"
+            android:src="@drawable/dog_icon"
+            app:itemIconTint="@color/tab_item_foreground"
+            app:itemTextColor="@color/tab_item_foreground"
+            app:tint="@color/white" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.fragment.app.FragmentContainerView

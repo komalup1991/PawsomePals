@@ -5,34 +5,46 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/search_user_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/search_user_toolbar">
+        android:layout_height="wrap_content">
+
         <ImageButton
             android:id="@+id/chat_user_back_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="start"
+            android:background="@null"
             android:clickable="true"
             android:focusable="true"
             android:padding="8dp"
-            android:background="@null"
             android:src="@drawable/chat_back_icon"
             app:tint="@color/white" />
 
-        <EditText
-            android:id="@+id/chat_search_username"
-            android:layout_width="328dp"
+        <LinearLayout
+            android:id="@+id/search_user_added_container"
+            android:layout_width="310dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_weight="1"
             android:background="@drawable/edit_text_round_corner"
-            android:elevation="4dp"
-            android:hint="Search User Name"
-            android:padding="10dp" />
+            android:orientation="horizontal">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/create_group_imgs_recyclerview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                />
+
+            <EditText
+                android:id="@+id/chat_search_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:elevation="4dp"
+                android:hint="Search User Name"
+                android:background="@null"
+                android:padding="10dp"/>
+
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/chat_search_user_btn"
@@ -56,8 +68,8 @@
         android:id="@+id/chat_search_user_recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/search_user_toolbar"
-        android:layout_above="@id/finish_select_button"/>
+        android:layout_above="@id/finish_select_button"
+        android:layout_below="@id/search_user_toolbar" />
 
     <Button
         android:id="@+id/finish_select_button"

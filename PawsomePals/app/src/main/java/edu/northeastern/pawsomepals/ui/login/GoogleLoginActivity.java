@@ -23,6 +23,12 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
 
@@ -110,9 +116,44 @@ public class GoogleLoginActivity extends LoginActivity {
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
-    private void updateUI(FirebaseUser user) {
+    private void navigateToHome(){
         Intent intent = new Intent(GoogleLoginActivity.this, HomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+    }
+
+    private void updateUI(FirebaseUser user) {
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(GoogleLoginActivity.this);
+        String userUID = account.getId(); // Get user's unique identifier (UID)
+
+        // Query Firestore to check if a document with the UID exists
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference userDocRef = db.collection("user").document(userUID);
+
+        userDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    navigateToHome();
+                } else {
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("name", account.getDisplayName());
+                    userData.put("email", account.getEmail());
+                    userData.put("profileImage", String.valueOf(account.getPhotoUrl()));
+                    userData.put("userId", user.getUid());
+
+                    userDocRef.set(userData)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.w("Create User", "Document created successfully");
+                                navigateToHome();
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.w("Create User", "Error adding document", e);
+                            });
+                }
+            } else {
+
+            }
+        });
     }
 }

@@ -14,7 +14,10 @@ public class Dogs implements Serializable {
     private String dob;
     private String size;
     private Boolean isDeleted;
+
+    private Boolean isExpandable;
     public Dogs() {
+
     }
 
     public Dogs(String dogId, String name, String breed, Boolean isMixedBreed, String mixedBreed, String profileImage, String gender, String dob, String size) {
@@ -29,6 +32,15 @@ public class Dogs implements Serializable {
         this.dob = dob;
         this.size = size;
         this.isDeleted = false;
+        this.isExpandable = false;
+    }
+
+    public Boolean getExpandable() {
+        return isExpandable;
+    }
+
+    public void setExpandable(Boolean expandable) {
+        isExpandable = expandable;
     }
 
     public String getDogId() {

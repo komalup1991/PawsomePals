@@ -7,6 +7,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,6 +19,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.MediaRouteButton;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.SharedPreferences;
@@ -47,6 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -78,6 +82,7 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.login.MainActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
 import okhttp3.Call;
@@ -98,10 +103,10 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private EditText messageInput;
     private ImageButton sendMessageBtn;
-    private ImageButton functionBtn;
-    private ImageButton backBtn;
+    private ImageButton functionBtn,imgDisMissBtn,preview_dismiss_button,preview_location_dismiss_button,backBtn;
     private ImageButton infoBtn;
-    private ImageView img_preview;
+    private ImageView img_preview,image_view_container;
+    private CardView img_cardview;
     private TextView imgPreviewTextView, locationPreviewTextView;
     private TextView chatRoomName;
     private LinearLayout chatRoomToolbar;
@@ -110,7 +115,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
     private List<String> groupUsersNames;
-    private LinearLayout bottomLayout;
+    private ConstraintLayout chat_image_preview_container,chat_location_preview_container;
 
     private Users currentUser, otherUser;
     private FrameLayout profileShowBackground;
@@ -152,7 +157,26 @@ public class ChatRoomActivity extends AppCompatActivity {
         });
 
         backBtn.setOnClickListener(v -> onBackPressed());
-
+        imgDisMissBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                img_cardview.setVisibility(View.INVISIBLE);
+            }
+        });
+        preview_dismiss_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chat_image_preview_container.setVisibility(View.INVISIBLE);
+                fileUri = null;
+            }
+        });
+        preview_location_dismiss_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                chat_location_preview_container.setVisibility(View.INVISIBLE);
+                location = null;
+            }
+        });
 
         functionBtn.setOnClickListener(view -> showDialog()
         );
@@ -216,16 +240,15 @@ public class ChatRoomActivity extends AppCompatActivity {
             chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
             chatRoomModel.setLastMessage("<Location>");
             ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
-
             uploadLocation(location);
-            locationPreviewTextView.setVisibility(View.INVISIBLE);
+            chat_location_preview_container.setVisibility(View.INVISIBLE);
         }
     }
 
     private void uploadLocation(ChatLocationModel location) {
         ChatMessageModel chatMessageModel;
         if (location != null) {
-            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), null, location);
+            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), null, location);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(true);
             ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
@@ -278,7 +301,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                                 String displayText = place.getName() + "\n" + place.getAddress();
                                 place.getLatLng();
                                 locationPreviewTextView.setText(displayText);
-                                locationPreviewTextView.setVisibility(View.VISIBLE);
+                                chat_location_preview_container.setVisibility(View.VISIBLE);
                                 location = new ChatLocationModel(place.getName(), place.getAddress(), place.getLatLng().latitude, place.getLatLng().longitude);
                             }
                         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
@@ -293,14 +316,20 @@ public class ChatRoomActivity extends AppCompatActivity {
         messageInput = findViewById(R.id.message_input);
         sendMessageBtn = findViewById(R.id.message_send_btn);
         functionBtn = findViewById(R.id.function_btn);
+        imgDisMissBtn = findViewById(R.id.dismiss_button);
         infoBtn = findViewById(R.id.chatroom_more_button);
+        preview_dismiss_button = findViewById(R.id.preview_dismiss_button);
+        preview_location_dismiss_button = findViewById(R.id.preview_location_dismiss_button);
         chatRoomRecyclerView = findViewById(R.id.message_recycler_view);
         backBtn = findViewById(R.id.message_back_button);
         img_preview = findViewById(R.id.chat_image_preview);
+        img_cardview = findViewById(R.id.image_cardview);
+        chat_location_preview_container = findViewById(R.id.chat_location_preview_container);
+        image_view_container = findViewById(R.id.image_view_container);
         imgPreviewTextView = findViewById(R.id.image_preview_textView);
         locationPreviewTextView = findViewById(R.id.location_preview_textView);
         profileShowBackground = findViewById(R.id.profile_show_background);
-        bottomLayout = findViewById(R.id.bottomLayout);
+        chat_image_preview_container = findViewById(R.id.chat_image_preview_container);
         chatRoomToolbar = findViewById(R.id.chatRoomToolBar);
     }
 
@@ -357,6 +386,15 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .setQuery(query, ChatMessageModel.class).build();
 
         adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
+        adapter.setOnItemClickListener(new ChatMessageRecyclerAdapter.OnImgItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                img_cardview.setVisibility(View.VISIBLE);
+                Glide.with(getApplicationContext())
+                        .load(options.getSnapshots().get(position).getImage())
+                        .into(image_view_container);
+            }
+        });
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
         chatRoomRecyclerView.setLayoutManager(manager);
@@ -379,7 +417,7 @@ public class ChatRoomActivity extends AppCompatActivity {
         ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
         if (fileUri == null && location == null) {
-            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), null, null);
+            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), null, null);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(false);
 
@@ -522,13 +560,14 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void callApi(JSONObject jasonObject) {
         MediaType JSON = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
+        String playload= jasonObject.toString();
 
         String url = "https://fcm.googleapis.com/fcm/send";
-        RequestBody body = RequestBody.create(jasonObject.toString(), JSON);
+        RequestBody body = RequestBody.create(playload, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
-                .header("Authorization", "Bearer AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
+                .addHeader("Authorization", "key=AAAA7LggfNU:APA91bHUj7USk9d2fCoErjjeekUeYJ7LM1JHYAvqX1SeBxyuKYVXn0yl4onyw2hRt8TUo7Pd_Q0LfaqmUNpl5X8--ylQb5qvBoFTCxNHwBfBwQ901LkGbGGkofPpOizcy-Vo74Nfa8CU")
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -538,22 +577,11 @@ public class ChatRoomActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-//                if (response.isSuccessful()){
-//                    try {
-//                        if (response.body() != null) {
-//                            JSONObject responseJson = new JSONObject();
-//                            JSONArray results = responseJson.getJSONArray("results");
-//                            if(responseJson.getInt("failure")==1){
-//                                JSONObject error = (JSONObject) results.get(0);
-//                                Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
-//                                return;
-//                            }
-//                        }
-//                    } catch (JSONException e){
-//                        e.printStackTrace();
-//                    }
-//                    showToast("Notification sent successfully");
-////                }
+                if (response.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
+                } else {
+                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show());
+                }
             }
         });
     }
@@ -618,13 +646,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                 // Handle image capture from the camera
                 try {
                     Uri cameraUri = ChatImgUtil.saveCameraImageToFile(data, this);
-
                     Bitmap bitmap = MediaStore.Images.Media
                             .getBitmap(getContentResolver(), cameraUri);
 
                     img_preview.setImageBitmap(bitmap);
-                    img_preview.setVisibility(View.VISIBLE);
-                    imgPreviewTextView.setVisibility(View.VISIBLE);
+                    chat_image_preview_container.setVisibility(View.VISIBLE);
                     fileUri = cameraUri;
                 } catch (Exception e) {
                     Toast.makeText(this, "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
@@ -639,8 +665,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                     int targetHeight = 400;
                     bitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
                     img_preview.setImageBitmap(bitmap);
-                    img_preview.setVisibility(View.VISIBLE);
-                    imgPreviewTextView.setVisibility(View.VISIBLE);
+                    chat_image_preview_container.setVisibility(View.VISIBLE);
                     fileUri = imageUri;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -692,11 +717,9 @@ public class ChatRoomActivity extends AppCompatActivity {
                 String url = task12.getResult().toString();
                 dialog.dismiss();
 
-                imgPreviewTextView.setVisibility(View.INVISIBLE);
-                img_preview.setVisibility(View.INVISIBLE);
-                img_preview = null;
+                chat_image_preview_container.setVisibility(View.INVISIBLE);
 
-                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), Timestamp.now(), currentUser.getName(), url, null);
+                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), url, null);
                 chatMessageModel.setPicture(true);
                 chatMessageModel.setPlace(false);
                 ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)

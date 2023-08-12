@@ -16,13 +16,14 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class RecipeFeedViewHolder extends RecyclerView.ViewHolder {
     ImageView recipeImage;
     TextView username;
-    ImageView userProfilePic;
+    ImageView userProfilePic,moreOptionImageView;
     TextView recipeName, timestampTextView;
 
     FeedActionsLayout feedActionsLayout;
@@ -36,6 +37,7 @@ public class RecipeFeedViewHolder extends RecyclerView.ViewHolder {
         username = itemView.findViewById(R.id.usernameTextView);
         timestampTextView = itemView.findViewById(R.id.timestampTextView);
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
+        moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
     public void bindData(AppCompatActivity activity, Recipe recipe, OnItemActionListener onItemActionListener) {
@@ -78,6 +80,13 @@ public class RecipeFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onUserClick(recipe.getCreatedBy());
+            }
+        });
+
+        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showMoreOptionsMenu(activity, recipe, view);
             }
         });
     }

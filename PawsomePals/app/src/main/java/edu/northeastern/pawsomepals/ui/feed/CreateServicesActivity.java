@@ -31,6 +31,7 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
 import edu.northeastern.pawsomepals.utils.ActivityHelper;
@@ -42,7 +43,7 @@ public class CreateServicesActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private CircleImageView userProfilePic;
     private TextView userNameTextView;
-    private EditText serviceNameEditTextView,notesOnServiceEditTextView;
+    private EditText serviceNameEditTextView, notesOnServiceEditTextView;
     private Spinner serviceTypeSpinnerOptions;
     private Dialog progressDialog;
     private FirebaseFirestore db;
@@ -56,6 +57,9 @@ public class CreateServicesActivity extends AppCompatActivity {
     private LatLng currentLatLng;
     private String locationTagged;
     private String usersTagged;
+    private Services existingFeedItem;
+
+    private String currentFeedItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,29 @@ public class CreateServicesActivity extends AppCompatActivity {
                 CreateServicesActivity.this.usersTagged = usersTagged;
             }
         });
+        existingFeedItem = (Services) getIntent().getSerializableExtra("existingFeedItem");
+        if (existingFeedItem != null) {
+            serviceNameEditTextView.setText(existingFeedItem.getServiceName());
+            notesOnServiceEditTextView.setText(existingFeedItem.getServiceNotes());
+            //  serviceTypeSpinnerOptions.setSelection(existingFeedItem.getServiceType());
+            if (existingFeedItem.getUserTagged() != null) {
+                taggingOptionsLayout.setTagPeopleTextView(existingFeedItem.getUserTagged());
+            }
+
+            if (existingFeedItem.getLocationTagged() != null) {
+                taggingOptionsLayout.setTagLocationTextView(existingFeedItem.getLocationTagged());
+            }
+
+            usersTagged = existingFeedItem.getUserTagged();
+            locationTagged = existingFeedItem.getLocationTagged();
+            currentFeedItemId = existingFeedItem.getFeedItemId();
+            if (existingFeedItem.getLatLng() != null) {
+                currentLatLng = new LatLng(existingFeedItem.getLatLng().getLatitude(),
+                        existingFeedItem.getLatLng().getLongitude());
+            }
+        } else {
+            currentFeedItemId = UUID.randomUUID().toString();
+        }
 
         Button saveButton = findViewById(R.id.saveButton);
         Button cancelButton = findViewById(R.id.cancelButton);
@@ -97,8 +124,8 @@ public class CreateServicesActivity extends AppCompatActivity {
         FirebaseUtil.fetchUserInfoFromFirestore(loggedInUserId, new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-                userNameToSaveInFeed=user.getName();
-                userProfileUrlToSaveInFeed=user.getProfileImage();
+                userNameToSaveInFeed = user.getName();
+                userProfileUrlToSaveInFeed = user.getProfileImage();
 
                 Glide.with(CreateServicesActivity.this)
                         .load(user.getProfileImage())
@@ -122,7 +149,7 @@ public class CreateServicesActivity extends AppCompatActivity {
                 }
 
                 createFeedMap();
-                DialogHelper.showProgressDialog("Your post is being saved...",progressDialog,CreateServicesActivity.this);
+                DialogHelper.showProgressDialog("Your post is being saved...", progressDialog, CreateServicesActivity.this);
             }
         });
 
@@ -130,7 +157,7 @@ public class CreateServicesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 showCancelConfirmationDialog();
-                finish();
+                // finish();
             }
         });
     }
@@ -156,7 +183,6 @@ public class CreateServicesActivity extends AppCompatActivity {
     }
 
 
-
     private void createFeedMap() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
@@ -174,16 +200,20 @@ public class CreateServicesActivity extends AppCompatActivity {
         services.put("locationTagged", locationTagged);
         services.put("latLng", currentLatLng);
         services.put("createdAt", createdAt);
-        services.put("username",userNameToSaveInFeed);
-        services.put("userProfileImage",userProfileUrlToSaveInFeed);
-        services.put("type",2);
-        services.put("feedItemId", UUID.randomUUID().toString());
+        services.put("username", userNameToSaveInFeed);
+        services.put("userProfileImage", userProfileUrlToSaveInFeed);
+        services.put("type", 2);
+        services.put("feedItemId", currentFeedItemId);
+        if (existingFeedItem != null) {
+            services.put("commentCount", existingFeedItem.getCommentCount());
+            services.put("likeCount", existingFeedItem.getLikeCount());
+        }
 
-        FirebaseUtil.createCollectionInFirestore(services,FeedCollectionType.SERVICES ,new BaseDataCallback() {
+        FirebaseUtil.createCollectionInFirestore(services, currentFeedItemId, FeedCollectionType.SERVICES, new BaseDataCallback() {
             @Override
             public void onDismiss() {
                 DialogHelper.hideProgressDialog(progressDialog);
-                ActivityHelper.setResult(CreateServicesActivity.this,true);
+                ActivityHelper.setResult(CreateServicesActivity.this, true);
                 finish();
             }
         });
