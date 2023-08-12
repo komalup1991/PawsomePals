@@ -141,6 +141,7 @@ public class GoogleLoginActivity extends LoginActivity {
                     userData.put("email", account.getEmail());
                     userData.put("profileImage", String.valueOf(account.getPhotoUrl()));
                     userData.put("userId", user.getUid());
+                    userData.put("searchName",account.getDisplayName().toLowerCase());
 
                     userDocRef.set(userData)
                             .addOnSuccessListener(aVoid -> {

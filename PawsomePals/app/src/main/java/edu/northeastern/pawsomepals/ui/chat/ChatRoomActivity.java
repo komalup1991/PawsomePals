@@ -578,7 +578,7 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
+//                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
                 } else {
                     runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show());
                 }
