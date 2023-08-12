@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -216,13 +217,19 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
             @Override
             public void run() {
                 List<String> feedIds = new ArrayList<>(FirestoreDataLoader.fetchUserFavFeedIds());
-                FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollections(), feedIds,
-                        new FirestoreDataLoader.FirestoreDataListener() {
-                            @Override
-                            public void onDataLoaded(List<FeedItem> feedItems) {
-                                notifyDatasetChange(feedItems);
-                            }
-                        });
+                if (!(feedIds.size() == 0))
+                {
+                    FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollections(), feedIds,
+                            new FirestoreDataLoader.FirestoreDataListener() {
+                                @Override
+                                public void onDataLoaded(List<FeedItem> feedItems) {
+                                    notifyDatasetChange(feedItems);
+                                }
+                            });
+            }
+                else {
+                    return;
+                }
 
             }
         }).start();
