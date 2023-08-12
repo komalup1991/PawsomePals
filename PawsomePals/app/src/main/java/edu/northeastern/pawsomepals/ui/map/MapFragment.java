@@ -3,27 +3,27 @@ package edu.northeastern.pawsomepals.ui.map;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -60,6 +60,7 @@ import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
+import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, FirestoreDataLoader.FirestoreDataListener {
 
@@ -134,14 +135,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             googleMap.setMyLocationEnabled(true);
         }
         if (selectedFeedItem != null) {
-            if(Double.isNaN(selectedFeedItem.getLatLng().getLatitude())){
-              Toast.makeText(getContext(),"Please check the coordinates",Toast.LENGTH_SHORT).show();
-            }
-            else{
+            if (Double.isNaN(selectedFeedItem.getLatLng().getLatitude())) {
+                Toast.makeText(getContext(), "Please check the coordinates", Toast.LENGTH_SHORT).show();
+            } else {
                 moveMapToCurrentLocation(selectedFeedItem.getLatLng().getLatitude(), selectedFeedItem.getLatLng().getLongitude(), 12);
             }
         }
-        }
+    }
 
 
     private void loadMarkersOnMapAll() {
@@ -170,6 +170,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                 if (googleMap != null) {
                     googleMap.clear();
                     FeedItem firstItem = null;
+                    Marker firstMarker = null;
                     for (FeedItem item : feedItems) {
                         if (item.getLatLng() != null) {
                             if (firstItem == null) {
@@ -178,11 +179,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                             feedItemMap.put(item.getFeedItemId(), item);
                             Marker newMarker = feedMarker(item);
                             newMarker.setTag(item.getFeedItemId());
+                            if (firstMarker == null) {
+                                firstMarker = newMarker;
+                            }
                         }
                     }
 
-                    if (firstItem != null) {
-                        moveMapToCurrentLocation(firstItem.getLatLng().getLatitude(), firstItem.getLatLng().getLongitude(), 12);
+                    if (firstItem != null && selectedFeedItem == null) {
+                        showCustomInfo(firstItem, firstMarker);
+                        moveMapToCurrentLocation(firstItem.getLatLng().getLatitude(), firstItem.getLatLng().getLongitude(), 10);
                     }
                 }
             }
@@ -190,45 +195,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     }
 
     private Marker feedMarker(FeedItem feedItem) {
-        BitmapDescriptor icon = bitmapFromVector(
-                activity.getApplicationContext(),
-                R.drawable.dogpawheart,
-                80);
+        BitmapDescriptor icon = bitmapFromVector(activity.getApplicationContext(), R.drawable.dogpawheart, 80);
 
 
         MarkerOptions marker = new MarkerOptions();
 
         if (feedItem.getType() == 1) {
-            marker.title(((PhotoVideo) feedItem).getCaption())
-                    .icon(icon).snippet(feedItem.getUsername())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
-                            feedItem.getLatLng().getLongitude()));
+            marker.title(((PhotoVideo) feedItem).getCaption()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 2) {
-            marker.title(((Services) feedItem).getServiceName())
-                    .icon(icon).snippet(feedItem.getUsername())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
-                            feedItem.getLatLng().getLongitude()));
+            marker.title(((Services) feedItem).getServiceName()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 3) {
-            marker.title(((Event) feedItem).getEventName())
-                    .icon(icon).snippet(feedItem.getUsername())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
-                            feedItem.getLatLng().getLongitude()));
+            marker.title(((Event) feedItem).getEventName()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 4) {
-            marker.title(((Post) feedItem).getCaption())
-                    .icon(icon).snippet(feedItem.getUsername())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(),
-                            feedItem.getLatLng().getLongitude()));
+            marker.title(((Post) feedItem).getCaption()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         }
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 FeedItem selectedItem = feedItemMap.get(marker.getTag());
-                if (selectedItem != null) {
-                    CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter((AppCompatActivity) requireActivity(), selectedItem);
-                    googleMap.setInfoWindowAdapter(infoWindowAdapter);
-                }
-                marker.showInfoWindow();
+                showCustomInfo(selectedItem, marker);
                 return true;
             }
         });
@@ -236,16 +222,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         return googleMap.addMarker(marker);
     }
 
+    private void showCustomInfo(FeedItem selectedItem, Marker marker) {
+        if (selectedItem != null) {
+            CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter((AppCompatActivity) requireActivity(), selectedItem);
+            googleMap.setInfoWindowAdapter(infoWindowAdapter);
+            googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(@NonNull Marker marker) {
+                    showOptionsDialog(selectedItem, marker);
+//                    Intent intent = new Intent(activity, HomeActivity.class);
+//                    intent.putExtra("feedId", marker.getTag().toString());
+//                    activity.startActivity(intent);
+//                    activity.finish();
+                }
+            });
+        }
+        marker.showInfoWindow();
+    }
+
     private BitmapDescriptor bitmapFromVector(Context context, int vectorResId, int sizeOfMarker) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(
-                context, vectorResId);
-        vectorDrawable.setBounds(
-                0, 0, sizeOfMarker,
-                sizeOfMarker);
-        Bitmap bitmap = Bitmap.createBitmap(
-                sizeOfMarker,
-                sizeOfMarker,
-                Bitmap.Config.ARGB_8888);
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, sizeOfMarker, sizeOfMarker);
+        Bitmap bitmap = Bitmap.createBitmap(sizeOfMarker, sizeOfMarker, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
@@ -267,8 +265,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     }
 
     private void requestLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             getCurrentLocation();
         } else {
             ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
@@ -289,19 +286,54 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
     private void getCurrentLocation() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(activity);
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        fusedLocationClient.getCurrentLocation(new CurrentLocationRequest.Builder()
-                        .setPriority(Priority.PRIORITY_HIGH_ACCURACY).build(), null)
-                .addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        if (location != null) {
-                            moveMapToCurrentLocation(location.getLatitude(), location.getLongitude(), 9);
-                        }
-                    }
-                });
+        fusedLocationClient.getCurrentLocation(new CurrentLocationRequest.Builder().setPriority(Priority.PRIORITY_HIGH_ACCURACY).build(), null).addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    moveMapToCurrentLocation(location.getLatitude(), location.getLongitude(), 9);
+                }
+            }
+        });
     }
+
+    private void showOptionsDialog(FeedItem selectedItem, Marker marker) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle("Choose an Option").setItems(new CharSequence[]{"Open in Google Maps", "View Feed Item"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int which) {
+                if (which == 0) {
+                    // Open in Google Maps option
+                    openLocationInGoogleMaps(selectedItem);
+                } else if (which == 1) {
+                    // View Feed Item option
+                    viewFeedItem(marker);
+                }
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void openLocationInGoogleMaps(FeedItem selectedItem) {
+        LatLng location = new LatLng(selectedItem.getLatLng().getLatitude(), selectedItem.getLatLng().getLongitude());
+        Uri gmmIntentUri = Uri.parse("geo:" + location.latitude + "," + location.longitude);
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(activity.getPackageManager()) != null) {
+            activity.startActivity(mapIntent);
+        } else {
+            Toast.makeText(activity, "Google Maps is not installed.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void viewFeedItem(Marker marker) {
+        Intent intent = new Intent(activity, HomeActivity.class);
+        intent.putExtra("feedId", marker.getTag().toString());
+        activity.startActivity(intent);
+        activity.finish();
+    }
+
 }
