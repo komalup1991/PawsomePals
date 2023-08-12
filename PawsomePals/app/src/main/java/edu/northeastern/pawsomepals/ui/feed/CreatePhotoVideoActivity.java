@@ -157,9 +157,18 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
             if (existingFeedItem.getLocationTagged() != null) {
                 taggingOptionsLayout.setTagLocationTextView(existingFeedItem.getLocationTagged());
             }
+            usersTagged = existingFeedItem.getUserTagged();
+            locationTagged = existingFeedItem.getLocationTagged();
+            if (existingFeedItem.getLatLng() != null) {
+                currentLatLng = new LatLng(existingFeedItem.getLatLng().getLatitude(),
+                        existingFeedItem.getLatLng().getLongitude());
+            }
 
             currentFeedItemId = existingFeedItem.getFeedItemId();
-        } else {
+        }
+
+
+        else {
             currentFeedItemId = UUID.randomUUID().toString();
         }
 

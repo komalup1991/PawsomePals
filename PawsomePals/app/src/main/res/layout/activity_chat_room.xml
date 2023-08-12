@@ -17,11 +17,12 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/image_cardview"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
         android:layout_below="@+id/chatRoomToolBar"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="100dp"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="50dp"
         android:visibility="invisible"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="8dp"
@@ -37,8 +38,9 @@
 
         <ImageView
             android:id="@+id/image_view_container"
-            android:layout_width="300dp"
-            android:layout_height="300dp" />
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            android:layout_gravity="center" />
     </androidx.cardview.widget.CardView>
 
 

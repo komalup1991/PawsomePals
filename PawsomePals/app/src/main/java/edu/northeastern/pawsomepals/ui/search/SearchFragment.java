@@ -184,6 +184,9 @@ public class SearchFragment extends Fragment {
         dogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dogBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                userBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                recipeBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
                 selectedSearchType = "dogs";
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
@@ -197,6 +200,9 @@ public class SearchFragment extends Fragment {
         userBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dogBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                userBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                recipeBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
                 selectedSearchType = "users";
                 searchRecyclerView.setAdapter(searchUserAdapter);
 
@@ -207,6 +213,9 @@ public class SearchFragment extends Fragment {
         recipeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                dogBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                userBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                recipeBtn.setBackgroundColor(getResources().getColor(R.color.black));
                 selectedSearchType = "recipes";
                 searchRecyclerView.setAdapter(searchRecipeAdapter);
 
@@ -269,8 +278,10 @@ public class SearchFragment extends Fragment {
         Query query;
 
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").
-                    whereGreaterThanOrEqualTo("name", inputSearch);
+            query = db.collection("dogs").orderBy("name")
+                    .startAt(inputSearch.toLowerCase())
+                    .endAt(inputSearch.toLowerCase()+ "\uf8ff")
+                    .limit(10);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -281,7 +292,7 @@ public class SearchFragment extends Fragment {
                             Dogs dog1 = documentSnapshot.toObject(Dogs.class);
                             searchDogList.add(dog1);
                         }
-                        //Log.d("list",searchDogList.get(0).toString());
+
                         searchDogAdapter.setDogs(searchDogList);
                         searchDogAdapter.notifyDataSetChanged();
                     }
@@ -290,7 +301,10 @@ public class SearchFragment extends Fragment {
 
         } else if (selectedSearchType.equals("users")) {
 
-             query = db.collection("user").whereGreaterThanOrEqualTo("name", inputSearch);
+             query = db.collection("user").orderBy("name")
+                     .startAt(inputSearch.toLowerCase())
+                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
+                     .limit(10);
 
              query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                  @Override
@@ -308,7 +322,10 @@ public class SearchFragment extends Fragment {
              });
         } else if (selectedSearchType.equals("recipes")) {
 
-            query = db.collection("recipes").whereGreaterThanOrEqualTo("title", inputSearch);
+            query = db.collection("recipes").orderBy("title")
+                    .startAt(inputSearch.toLowerCase())
+                    .endAt(inputSearch.toLowerCase()+ "\uf8ff")
+                    .limit(10);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override

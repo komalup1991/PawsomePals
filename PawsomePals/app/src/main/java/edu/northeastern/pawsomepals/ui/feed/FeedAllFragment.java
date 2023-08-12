@@ -57,7 +57,7 @@ import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
-public class FeedAllFragment extends Fragment implements ActivityResultCallback<ActivityResult> {
+public class FeedAllFragment extends Fragment {
     private RecyclerView feedsRecyclerView;
     private final List<FeedItem> feedItemList = new ArrayList<>();
     private final List<Users> userList = new ArrayList<>();
@@ -66,17 +66,12 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     private FeedFragmentViewType feedFragmentViewType;
     private String feedIdFromDeepLink;
     private TextView pullToRefreshTextView;
-    private ActivityResultLauncher<Intent> activityResultLauncher;
     private ProgressBar loadingSpinner;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_feed_all, container, false);
-        activityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                this // Use the current fragment as the callback
-        );
         swipeRefreshLayout = rootView.findViewById(R.id.swipeRefreshLayout);
         return rootView;
     }
@@ -363,66 +358,18 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         }
     }
 
-//    private void updateFeedItemListOnActivitySuccess(FeedItem item) {
-//
-//        if (!feedItemList.contains(item)) {
-//            int index = 0;
-//            if (!feedItemList.isEmpty()) {
-//                index = 1; // account for header
-//            }
-//            feedItemList.add(index, item);
-//            feedAdapter.notifyItemChanged(index);
-//            Log.d("yoo", "item = " + item.getFeedItemId());
-//        }}
-
     private void scrollToFeedItem(String feedId) {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i < feedItemList.size(); i++) {
-                    FeedItem feedItem = feedItemList.get(i);
-                    if (feedId.equals(feedItem.getFeedItemId())) {
-                        // Scroll to the specific feed item
-                        int position = i;
-                        feedsRecyclerView.scrollToPosition(position);
-                        break;
-                    }
-                }
-            }
-        }, 500);
-    }
-
-//    void function() {
-//        ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-//                new ActivityResultContracts.StartActivityForResult(),
-//                new ActivityResultCallback<ActivityResult>() {
-//                    @Override
-//                    public void onActivityResult(ActivityResult result) {
-//                        if (result.getResultCode() == Activity.RESULT_OK) {
-//                            // There are no request codes
-//                            Intent data = result.getData();
-//
-//                        }
-//                    }
-//                });
-//    }
-
-
-    @Override
-    public void onActivityResult(ActivityResult result) {
-        int resultCode = result.getResultCode();
-        Log.d("yoo", "result.getResultCode() " + result.getResultCode());
-        if (resultCode == Activity.RESULT_OK) {
-            int creationStatus = result.getData().getIntExtra(ActivityHelper.CREATION_STATUS, 0);
-            if (creationStatus == ActivityHelper.SUCCESS_CODE) {
-                Log.d("yoo", "creationStatus " + creationStatus);
-                Log.d("yoo", "ActivityHelper.SUCCESS_CODE " + ActivityHelper.SUCCESS_CODE);
-                // Handle successful post creation
-                // For example, you can refresh the feed
-//                refreshFeeds();
-                //   updateFeedItemListOnActivitySuccess (item);
+        int position = 0;
+        for (int i = 0; i < feedItemList.size(); i++) {
+            FeedItem feedItem = feedItemList.get(i);
+            if (feedId.equals(feedItem.getFeedItemId())) {
+                position = i;
+                break;
             }
         }
+
+        feedIdFromDeepLink = null;
+        feedsRecyclerView.scrollToPosition(position);
     }
 
     private void showLoadingSpinner() {
