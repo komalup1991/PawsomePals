@@ -128,6 +128,12 @@ public class SearchFragment extends Fragment {
         Button recipeBtn = view.findViewById(R.id.recipe_btn);
         Button historyBtn = view.findViewById(R.id.history_button);
 
+        selectedSearchType = "dogs";
+        searchRecyclerView.setAdapter(searchDogAdapter);
+        dogBtn.setBackgroundColor(getResources().getColor(R.color.white));
+        dogBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+
+
         AutoCompleteTextView autoCompleteTextView = view.findViewById(R.id.search);
         autoCompleteTextView.requestFocus();
 
@@ -144,6 +150,7 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedQuery = autoCompleteAdapter.getItem(position);
                 searchInput.setText(selectedQuery);
+                cardView.setVisibility(View.GONE);
                 performSearch(selectedSearchType);
             }
         });
@@ -171,10 +178,6 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 cardView.setVisibility(View.GONE);
-                if (selectedSearchType.isEmpty()) {
-                    showToast("Please select a search type");
-                    return;
-                }
 
                 performSearch(selectedSearchType);
                 saveSearchHistory(searchInput.getText().toString());
@@ -184,9 +187,12 @@ public class SearchFragment extends Fragment {
         dogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dogBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                dogBtn.setBackgroundColor(getResources().getColor(R.color.white));
                 userBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
                 recipeBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                dogBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+                userBtn.setTextColor(getResources().getColor(R.color.white));
+                recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "dogs";
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
@@ -201,8 +207,11 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 dogBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-                userBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                userBtn.setBackgroundColor(getResources().getColor(R.color.white));
                 recipeBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                userBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+                dogBtn.setTextColor(getResources().getColor(R.color.white));
+                recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "users";
                 searchRecyclerView.setAdapter(searchUserAdapter);
 
@@ -215,7 +224,10 @@ public class SearchFragment extends Fragment {
             public void onClick(View view) {
                 dogBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
                 userBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-                recipeBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                recipeBtn.setBackgroundColor(getResources().getColor(R.color.white));
+                recipeBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+                dogBtn.setTextColor(getResources().getColor(R.color.white));
+                userBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "recipes";
                 searchRecyclerView.setAdapter(searchRecipeAdapter);
 
@@ -274,11 +286,16 @@ public class SearchFragment extends Fragment {
 
     private void performSearch(String searchType) {
         String inputSearch = searchInput.getText().toString().trim();
+        if(inputSearch.isEmpty()){
+            showToast("Please enter a valid search");
+        }
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query;
 
+
+
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").whereGreaterThanOrEqualTo("name",inputSearch)
+            query = db.collection("dogs").whereEqualTo("name",inputSearch)
                     .orderBy("name")
                     .startAt(inputSearch.toUpperCase())
                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
