@@ -6,6 +6,8 @@ import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -73,6 +75,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
             throw new RuntimeException(e);
         }
 
+        setAnimation(holder.itemView, position);
     }
 
     private void isAnyItemExpanded(int position) {
@@ -111,6 +114,12 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
     public void setBreedDetails(List<BreedDetails> breedDetails) {
         this.breedDetails = breedDetails;
 
+    }
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+        viewToAnimate.startAnimation(slideIn);
     }
 
     public class ProfileAllDogBreedsViewHolder extends RecyclerView.ViewHolder {

@@ -7,6 +7,8 @@ import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -122,8 +124,17 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
+
+            setAnimation(holder.itemView, position);
         }
     }
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+        viewToAnimate.startAnimation(slideIn);
+    }
+
 
     private void isAnyItemExpanded(int position) {
         int temp = -1;
