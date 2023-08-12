@@ -61,12 +61,16 @@ public class PostFeedViewHolder extends RecyclerView.ViewHolder {
 
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
             userTaggedTextView.setText(userTagged);
+            userTaggedImageView.setVisibility(View.VISIBLE);
+            userTaggedTextView.setVisibility(View.VISIBLE);
         } else {
             userTaggedImageView.setVisibility(View.GONE);
             userTaggedTextView.setVisibility(View.GONE);
         }
 
         if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
+            locationTaggedTextView.setVisibility(View.VISIBLE);
+            locationTaggedImageView.setVisibility(View.VISIBLE);
             locationTaggedTextView.setText(locationTagged);
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override

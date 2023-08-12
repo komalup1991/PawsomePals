@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -57,7 +58,9 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder {
         String userTagged = services.getUserTagged();
         String locationTagged = services.getLocationTagged();
 
-        if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
+        if (userTagged != null && !userTagged.trim().isEmpty()) {
+            userTaggedImageView.setVisibility(View.VISIBLE);
+            userTaggedTextView.setVisibility(View.VISIBLE);
             userTaggedTextView.setText(userTagged);
         } else {
             userTaggedImageView.setVisibility(View.GONE);
@@ -73,6 +76,8 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder {
                     onItemActionListener.onLocationClick(services);
                 }
             });
+            locationTaggedTextView.setVisibility(View.VISIBLE);
+            locationTaggedImageView.setVisibility(View.VISIBLE);
         } else {
             locationTaggedTextView.setVisibility(View.GONE);
             locationTaggedImageView.setVisibility(View.GONE);

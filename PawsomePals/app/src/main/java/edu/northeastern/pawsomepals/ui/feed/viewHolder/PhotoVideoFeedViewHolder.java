@@ -56,6 +56,8 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         String userTagged = photoVideo.getUserTagged();
         String locationTagged = photoVideo.getLocationTagged();
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
+            userTaggedImageView.setVisibility(View.VISIBLE);
+            userTaggedTextView.setVisibility(View.VISIBLE);
             userTaggedTextView.setText(userTagged);
         } else {
             userTaggedImageView.setVisibility(View.GONE);
@@ -63,6 +65,8 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
+            locationTaggedTextView.setVisibility(View.VISIBLE);
+            locationTaggedTextView.setVisibility(View.VISIBLE);
             locationTaggedTextView.setText(locationTagged);
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override

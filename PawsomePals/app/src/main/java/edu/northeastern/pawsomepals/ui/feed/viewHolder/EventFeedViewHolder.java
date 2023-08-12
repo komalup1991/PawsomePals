@@ -75,6 +75,8 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         eventNameTextView.setText(eventName);
 
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
+            userTaggedImageView.setVisibility(View.VISIBLE);
+            userTaggedTextView.setVisibility(View.VISIBLE);
             userTaggedTextView.setText(userTagged);
         } else {
             userTaggedTextView.setVisibility(View.GONE);
@@ -82,6 +84,8 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
+            locationTaggedTextView.setVisibility(View.VISIBLE);
+            locationTaggedTextView.setVisibility(View.VISIBLE);
             locationTaggedTextView.setText(locationTagged);
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
