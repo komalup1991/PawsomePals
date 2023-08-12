@@ -13,6 +13,8 @@ public class BreedDetails {
     private String reference_image_id;
     private BreedImageDetails image;
 
+    private Boolean isExpandable;
+
     public BreedDetails(BreedWeightDetails weight, BreedHeightDetails height, String id, String name, String bred_for, String breed_group, String life_span, String temperament, String origin, String reference_image_id, BreedImageDetails image) {
         this.weight = weight;
         this.height = height;
@@ -25,6 +27,15 @@ public class BreedDetails {
         this.origin = origin;
         this.reference_image_id = reference_image_id;
         this.image = image;
+        this.isExpandable = false;
+    }
+
+    public Boolean getExpandable() {
+        return isExpandable;
+    }
+
+    public void setExpandable(Boolean expandable) {
+        isExpandable = expandable;
     }
 
     public BreedWeightDetails getWeight() {

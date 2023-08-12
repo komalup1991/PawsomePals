@@ -33,10 +33,12 @@
             android:exported="false" />
         <activity
             android:name=".ui.profile.NewUserProfileActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.profile.FollowersFollowingActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.chat.ChatSearchChatroomActivity"
             android:exported="false" />
@@ -59,34 +61,45 @@
             android:exported="false" />
         <activity
             android:name=".ui.login.ForgotPassword"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.profile.UserProfileActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.profile.NewDogProfileActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.profile.EditUserProfileActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
 
             android:name=".ui.search.DogDetailActivity"
             android:label="Dog Detail Activity">
         </activity>
         <activity
+            android:name=".ui.profile.DogBreedActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.profile.EditDogUserActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.chat.EditChatRoomInfoActivity"
             android:exported="false" />
         <activity
             android:name=".ui.login.GoogleLoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.login.SignUpActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.chat.CreateNewChatActivity"
             android:exported="false" />
@@ -96,7 +109,8 @@
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ui.chat.ChatRoomActivity"
             android:exported="false" />
