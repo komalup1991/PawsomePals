@@ -19,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
@@ -82,6 +83,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
             try {
                 holder.bind(dogProfile);
 
+
                 if (isUserProfile) {
                     holder.editButton.setOnClickListener(v -> {
                         Intent intent = new Intent(context, EditDogUserActivity.class);
@@ -101,25 +103,39 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
                     });
                 }
 
+                boolean isExpandable = dogProfile.getExpandable();
+
+                holder.expandableLayout.setVisibility(isExpandable ? View.VISIBLE : View.GONE);
 
                 holder.layoutDogInfo.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        if(holder.expandableLayout.getVisibility() == View.GONE)
-                        {
-                            TransitionManager.beginDelayedTransition(holder.cardView, new AutoTransition());
-                            holder.expandableLayout.setVisibility(View.VISIBLE);
-                        }
-                        else {
-                            TransitionManager.beginDelayedTransition(holder.cardView, new AutoTransition());
-                            holder.expandableLayout.setVisibility(View.GONE);
-                        }
+
+
+                        isAnyItemExpanded(position);
+                        //TransitionManager.beginDelayedTransition(holder.materialCardView, new AutoTransition());
+                        dogProfile.setExpandable(!dogProfile.getExpandable());
+                        notifyItemChanged(position);
                     }
                 });
 
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private void isAnyItemExpanded(int position) {
+        int temp = -1;
+        for (int i = 0; i < dogProfiles.size(); i++) {
+            if (dogProfiles.get(i).getExpandable()) {
+                temp = i;
+                break;
+            }
+        }
+        if (temp >= 0 && temp != position) {
+            dogProfiles.get(temp).setExpandable(false);
+            notifyItemChanged(temp);
         }
     }
 
@@ -158,7 +174,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
         private TextView textDogDobValue;
         private TextView textDogGenderValue;
         private TextView textDogSizeValue;
-        private CardView cardView;
+        private MaterialCardView materialCardView;
         public DogProfileViewHolder(@NonNull View itemView) {
             super(itemView);
             imageDog = itemView.findViewById(R.id.imageDog);
@@ -173,7 +189,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
             textDogGenderValue = itemView.findViewById(R.id.textDogGenderValue);
             textDogSizeValue = itemView.findViewById(R.id.textDogSizeValue);
             expandableLayout = itemView.findViewById(R.id.expandableLayout);
-            cardView = itemView.findViewById(R.id.cardView);
+            materialCardView = itemView.findViewById(R.id.materialCardView);
         }
 
         public void bind(Dogs dogProfile) throws ParseException {

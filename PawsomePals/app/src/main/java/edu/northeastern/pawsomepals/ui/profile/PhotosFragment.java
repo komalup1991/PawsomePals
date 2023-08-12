@@ -106,7 +106,7 @@ public class PhotosFragment extends Fragment {
                         textNoPhotoProfiles.setVisibility(View.GONE);
                     } else {
                         recyclerViewPhotos.setVisibility(View.GONE);
-                        textNoPhotoProfiles.setText("No recipes available");
+                        textNoPhotoProfiles.setText("No photos available");
                         textNoPhotoProfiles.setVisibility(View.VISIBLE);
                     }
                     profilePhotoAdapter.notifyDataSetChanged();

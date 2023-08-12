@@ -102,6 +102,7 @@ public class DogsFragment extends Fragment {
                         Dogs dogProfile = document.toObject(Dogs.class);
                         dogProfile.setDogId(document.getId());
                         dogProfile.setIsDeleted(false);
+                        dogProfile.setExpandable(false);
                         dogUserProfiles.add(dogProfile);
 
                     }
