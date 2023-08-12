@@ -31,6 +31,11 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -55,6 +60,7 @@ import java.util.Map;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
+import edu.northeastern.pawsomepals.models.FeedItemWithImage;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Services;
@@ -186,7 +192,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                     }
 
                     if (firstItem != null && selectedFeedItem == null) {
-                        showCustomInfo(firstItem, firstMarker);
+                        showCustomInfoWithImageFetch(firstItem, firstMarker);
                         moveMapToCurrentLocation(firstItem.getLatLng().getLatitude(), firstItem.getLatLng().getLongitude(), 10);
                     }
                 }
@@ -214,7 +220,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
             @Override
             public boolean onMarkerClick(Marker marker) {
                 FeedItem selectedItem = feedItemMap.get(marker.getTag());
-                showCustomInfo(selectedItem, marker);
+                if (selectedItem instanceof FeedItemWithImage) {
+                    showCustomInfoWithImageFetch(selectedItem, marker);
+                } else {
+                    showCustomInfo(selectedItem, marker, null);
+                }
                 return true;
             }
         });
@@ -222,9 +232,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         return googleMap.addMarker(marker);
     }
 
-    private void showCustomInfo(FeedItem selectedItem, Marker marker) {
+    private void showCustomInfoWithImageFetch(FeedItem feedItem, Marker marker) {
+        if (feedItem instanceof FeedItemWithImage) {
+            Glide.with(mapView).load(((FeedItemWithImage) feedItem).getImg()).addListener(new RequestListener<Drawable>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    showCustomInfo(feedItem, marker, resource);
+                    return true;
+                }
+            }).preload();
+        } else {
+            showCustomInfo(feedItem, marker, null);
+        }
+    }
+
+    private void showCustomInfo(FeedItem selectedItem, Marker marker, Drawable resource) {
         if (selectedItem != null) {
-            CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter((AppCompatActivity) requireActivity(), selectedItem);
+            CustomInfoWindowAdapter infoWindowAdapter = new CustomInfoWindowAdapter((AppCompatActivity) requireActivity(), selectedItem, resource);
             googleMap.setInfoWindowAdapter(infoWindowAdapter);
             googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                 @Override
