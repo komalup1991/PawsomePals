@@ -15,7 +15,6 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="Dog Detail" />
 
-    <!-- User Details CardView (Below Image) -->
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageProfile"
