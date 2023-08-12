@@ -3,7 +3,6 @@ package edu.northeastern.pawsomepals.ui.map;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -17,6 +16,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -205,15 +205,28 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
 
         MarkerOptions marker = new MarkerOptions();
+        //String snippet = username + "\n" + "Location: " + latLng.toString(); // Customize this formatting as needed
 
         if (feedItem.getType() == 1) {
-            marker.title(((PhotoVideo) feedItem).getCaption()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+            marker.title(((PhotoVideo) feedItem).getCaption())
+                    .icon(icon)
+                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 2) {
-            marker.title(((Services) feedItem).getServiceName()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+            marker.title(((Services) feedItem).getServiceName())
+                    .icon(icon)
+                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 3) {
-            marker.title(((Event) feedItem).getEventName()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+            marker.title(((Event) feedItem).getEventName())
+                    .icon(icon)
+                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 4) {
-            marker.title(((Post) feedItem).getCaption()).icon(icon).snippet(feedItem.getUsername()).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+            marker.title(((Post) feedItem).getCaption())
+                    .icon(icon)
+                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         }
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -259,10 +272,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                 @Override
                 public void onInfoWindowClick(@NonNull Marker marker) {
                     showOptionsDialog(selectedItem, marker);
-//                    Intent intent = new Intent(activity, HomeActivity.class);
-//                    intent.putExtra("feedId", marker.getTag().toString());
-//                    activity.startActivity(intent);
-//                    activity.finish();
                 }
             });
         }
@@ -330,16 +339,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
     private void showOptionsDialog(FeedItem selectedItem, Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("Choose an Option").setItems(new CharSequence[]{"Open in Google Maps", "View Feed Item"}, new DialogInterface.OnClickListener() {
+
+        View customView = LayoutInflater.from(activity).inflate(R.layout.custom_dialog_map, null);
+        builder.setView(customView);
+
+        Button openMapsButton = customView.findViewById(R.id.open_maps_button);
+        Button viewItemButton = customView.findViewById(R.id.view_item_button);
+
+        openMapsButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int which) {
-                if (which == 0) {
-                    // Open in Google Maps option
-                    openLocationInGoogleMaps(selectedItem);
-                } else if (which == 1) {
-                    // View Feed Item option
-                    viewFeedItem(marker);
-                }
+            public void onClick(View v) {
+                openLocationInGoogleMaps(selectedItem);
+            }
+        });
+        viewItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewFeedItem(marker);
             }
         });
         AlertDialog dialog = builder.create();

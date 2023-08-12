@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -73,6 +75,8 @@ public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<Profil
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
+
+            setAnimation(holder.itemView, position);
         }
     }
 
@@ -99,7 +103,11 @@ public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<Profil
         this.userProfiles = userProfiles;
 
     }
-
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
+        viewToAnimate.startAnimation(slideIn);
+    }
 
 
     public class ProfileFollowingFollowerViewHolder extends RecyclerView.ViewHolder {
