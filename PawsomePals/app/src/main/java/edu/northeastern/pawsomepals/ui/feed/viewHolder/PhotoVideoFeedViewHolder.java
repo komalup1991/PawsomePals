@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -14,6 +15,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
@@ -24,7 +26,7 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
     TextView photoVideoCaptionTextView;
     ImageView photoVideoImageView;
     TextView userTaggedTextView;
-    ImageView userTaggedImageView,locationTaggedImageView;
+    ImageView userTaggedImageView,locationTaggedImageView,moreOptionImageView;
     TextView locationTaggedTextView;
     FeedActionsLayout feedActionsLayout;
 
@@ -34,15 +36,17 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         usernameTextView = itemView.findViewById(R.id.usernameTextView);
         timestampTextView = itemView.findViewById(R.id.timestampTextView);
         photoVideoCaptionTextView = itemView.findViewById(R.id.photoVideoCaptionTextView);
-        photoVideoImageView = itemView.findViewById(R.id.photoVideoImageView);
+        photoVideoImageView = itemView.findViewById(R.id.eventImageView);
         userTaggedTextView = itemView.findViewById(R.id.userTaggedTextView);
         userTaggedImageView= itemView.findViewById(R.id.userTaggedImageView);
         locationTaggedTextView = itemView.findViewById(R.id.locationTaggedTextView);
         locationTaggedImageView = itemView.findViewById(R.id.locationTaggedImageView);
         feedActionsLayout = itemView.findViewById(R.id.feed_action);
+        moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
+
     }
 
-    public void bindData(Activity activity, PhotoVideo photoVideo, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, PhotoVideo photoVideo, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, photoVideo);
         Glide.with(userProfilePic.getContext())
                 .load(photoVideo.getUserProfileImage())
@@ -52,6 +56,8 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         String userTagged = photoVideo.getUserTagged();
         String locationTagged = photoVideo.getLocationTagged();
         if (userTagged != null && !userTagged.isEmpty() && !(userTagged.trim().equals("null"))) {
+            userTaggedImageView.setVisibility(View.VISIBLE);
+            userTaggedTextView.setVisibility(View.VISIBLE);
             userTaggedTextView.setText(userTagged);
         } else {
             userTaggedImageView.setVisibility(View.GONE);
@@ -59,6 +65,8 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
         }
 
         if (locationTagged != null && !locationTagged.isEmpty() && !(locationTagged.trim().equals("null"))) {
+            locationTaggedTextView.setVisibility(View.VISIBLE);
+            locationTaggedTextView.setVisibility(View.VISIBLE);
             locationTaggedTextView.setText(locationTagged);
             locationTaggedTextView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,6 +96,12 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onUserClick(photoVideo.getCreatedBy());
+            }
+        });
+        moreOptionImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showMoreOptionsMenu(activity, photoVideo, view);
             }
         });
     }

@@ -12,13 +12,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultCaller;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -36,13 +35,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.FeedAdapter;
@@ -70,6 +67,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     private String feedIdFromDeepLink;
     private TextView pullToRefreshTextView;
     private ActivityResultLauncher<Intent> activityResultLauncher;
+    private ProgressBar loadingSpinner;
 
     @Nullable
     @Override
@@ -93,8 +91,15 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
         pullToRefreshTextView = view.findViewById(R.id.pullToRefreshTextView);
         LinearLayoutManager verticalLayoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false);
         feedsRecyclerView.setLayoutManager(verticalLayoutManager);
+        loadingSpinner = view.findViewById(R.id.loading_spinner);
 
-        feedIdFromDeepLink = getActivity().getIntent().getStringExtra("feedId");
+        // Simulate a delay to show loading spinner
+        showLoadingSpinner();
+
+        if (getActivity() != null) {
+            feedIdFromDeepLink = requireActivity().getIntent().getStringExtra("feedId");
+        }
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -334,6 +339,7 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
             @Override
             public void run() {
                 feedAdapter.notifyDataSetChanged();
+                hideLoadingSpinner();
                 if (feedIdFromDeepLink != null) {
                     scrollToFeedItem(feedIdFromDeepLink);
                 }
@@ -342,25 +348,17 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     }
 
     private void updateFeedItemList(FeedItem item) {
-
-        if (!feedItemList.contains(item)) {
-//            int index = 0;
-//            if (!feedItemList.isEmpty()) {
-//                index = 1; // account for header
-//            }
-//            feedItemList.add(index, item);
-//            feedAdapter.notifyItemChanged(index);
-//            Log.d("yoo", "item = " + item.getFeedItemId());
-        } else {
-            for (int i = 0; i < feedItemList.size(); i++) {
-                if (Objects.equals(feedItemList.get(i).getFeedItemId(), item.getFeedItemId())) {
-                    if (feedItemList.get(i).getCommentCount() != item.getCommentCount()) {
-                        feedItemList.get(i).setCommentCount(item.getCommentCount());
-                        Log.d("yoo", "item else = " + item.getFeedItemId());
-                        feedAdapter.notifyItemChanged(i);
-                    }
-                    break;
+        for (int i = 0; i < feedItemList.size(); i++) {
+            if (Objects.equals(feedItemList.get(i).getFeedItemId(), item.getFeedItemId())) {
+                if (!feedItemList.get(i).equals(item)) {
+                    FeedItem oldItem = feedItemList.get(i);
+                    item.setFavorite(oldItem.isFavorite());
+                    item.setLiked(oldItem.isLiked());
+                    feedItemList.set(i, item);
+                    feedAdapter.notifyItemChanged(i);
+                    Log.d("komal-up", "notifyItemChanged");
                 }
+                break;
             }
         }
     }
@@ -413,18 +411,29 @@ public class FeedAllFragment extends Fragment implements ActivityResultCallback<
     @Override
     public void onActivityResult(ActivityResult result) {
         int resultCode = result.getResultCode();
-        Log.d("yoo","result.getResultCode() "+result.getResultCode());
+        Log.d("yoo", "result.getResultCode() " + result.getResultCode());
         if (resultCode == Activity.RESULT_OK) {
             int creationStatus = result.getData().getIntExtra(ActivityHelper.CREATION_STATUS, 0);
             if (creationStatus == ActivityHelper.SUCCESS_CODE) {
-                Log.d("yoo","creationStatus "+creationStatus);
-                Log.d("yoo","ActivityHelper.SUCCESS_CODE "+ActivityHelper.SUCCESS_CODE);
+                Log.d("yoo", "creationStatus " + creationStatus);
+                Log.d("yoo", "ActivityHelper.SUCCESS_CODE " + ActivityHelper.SUCCESS_CODE);
                 // Handle successful post creation
                 // For example, you can refresh the feed
-                refreshFeeds();
-             //   updateFeedItemListOnActivitySuccess (item);
+//                refreshFeeds();
+                //   updateFeedItemListOnActivitySuccess (item);
             }
-    }}
+        }
+    }
+
+    private void showLoadingSpinner() {
+        loadingSpinner.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoadingSpinner() {
+        if (loadingSpinner != null) {
+            loadingSpinner.setVisibility(View.GONE);
+        }
+    }
 }
 
 

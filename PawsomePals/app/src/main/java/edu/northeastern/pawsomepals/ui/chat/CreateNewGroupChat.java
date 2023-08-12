@@ -3,10 +3,10 @@ package edu.northeastern.pawsomepals.ui.chat;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.adapters.ChatCreateGroupUserImgAdapter;
 import edu.northeastern.pawsomepals.adapters.ChatGroupUserRecyclerAdapter;
 import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Users;
@@ -38,9 +39,12 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private ImageButton searchButton;
     private ImageButton backButton;
     private RecyclerView usersRecyclerview;
-    private ChatGroupUserRecyclerAdapter adapter;
+    private RecyclerView groupUserImgsRecyclerview;
+    private ChatGroupUserRecyclerAdapter userAdapter;
+    private ChatCreateGroupUserImgAdapter imgAdapter;
     private FirestoreRecyclerOptions<Users> options;
     private List<Users> userList;
+    private List<String> imgList;
     private Users currentUser;
     private Button createNewChat;
     private String groupName;
@@ -52,10 +56,12 @@ public class CreateNewGroupChat extends AppCompatActivity {
         setContentView(R.layout.activity_create_new_chat);
 
         userList = new ArrayList<>();
+        imgList = new ArrayList<>();
         searchInput = findViewById(R.id.chat_search_username);
         searchButton = findViewById(R.id.chat_search_user_btn);
         backButton = findViewById(R.id.chat_user_back_button);
         usersRecyclerview = findViewById(R.id.chat_search_user_recyclerView);
+        groupUserImgsRecyclerview = findViewById(R.id.create_group_imgs_recyclerview);
         createNewChat = findViewById(R.id.finish_select_button);
 
         backButton.setOnClickListener(v -> onBackPressed());
@@ -68,6 +74,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 setupUsersRecyclerView(searchInput.getText().toString());
+                searchInput.setHint("");
             }
 
             @Override
@@ -91,6 +98,8 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 }
             }
         });
+        setupUsersRecyclerView(searchInput.getText().toString());
+        setupCreateGroupImgsRecyclerView();
     }
 
     private void setupUsersRecyclerView(String searchTerm) {
@@ -99,19 +108,44 @@ public class CreateNewGroupChat extends AppCompatActivity {
 
         options = new FirestoreRecyclerOptions.Builder<Users>()
                 .setQuery(query, Users.class).build();
-        adapter = new ChatGroupUserRecyclerAdapter(options, getApplicationContext());
+
+        userAdapter = new ChatGroupUserRecyclerAdapter(options, getApplicationContext());
+        userAdapter.setOnItemClickListener(new ChatGroupUserRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Users selectedUser = options.getSnapshots().get(position);
+                if(!imgList.contains(selectedUser.getProfileImage())){
+                userList.add(selectedUser);
+                imgList.add(selectedUser.getProfileImage());
+                imgAdapter.updateData(imgList);}else{
+                    Toast.makeText(getApplicationContext(),"You have selected this user",Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         usersRecyclerview.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        usersRecyclerview.setAdapter(adapter);
-        adapter.startListening();
+        usersRecyclerview.setAdapter(userAdapter);
+        userAdapter.startListening();
+    }
+
+    private void setupCreateGroupImgsRecyclerView() {
+        imgAdapter = new ChatCreateGroupUserImgAdapter(getApplicationContext(),imgList);
+        imgAdapter.setOnItemClickListener(new ChatCreateGroupUserImgAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Users selectedUser = userList.get(position);
+                userList.remove(position);
+                imgList.remove(position);
+                imgAdapter.updateData(imgList);
+            }
+        });
+        LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
+        manager.setOrientation(RecyclerView.HORIZONTAL);
+        groupUserImgsRecyclerview.setLayoutManager(manager);
+        groupUserImgsRecyclerview.setAdapter(imgAdapter);
+        imgAdapter.notifyDataSetChanged();
     }
 
     private void createGroupChat() {
-        for (Users model : options.getSnapshots()) {
-            if (model.isChatSelected()) {
-                userList.add(model);
-            }
-        }
-
         if (userList.size() > 2 && userList.size() <= 5) {
             createDialogAndCreateIntent();
         } else if (userList.size() == 2) {

@@ -2,9 +2,8 @@ package edu.northeastern.pawsomepals.models;
 
 import androidx.annotation.Nullable;
 
-public class Event extends FeedItem {
+public class Event extends FeedItemWithImage {
     private String eventName;
-    private String img;
     private String eventDate;
     private String eventTime;
     private String eventDetails;
@@ -12,7 +11,21 @@ public class Event extends FeedItem {
     public Event() {
     }
 
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
 
+    public void setEventDate(String eventDate) {
+        this.eventDate = eventDate;
+    }
+
+    public void setEventTime(String eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public void setEventDetails(String eventDetails) {
+        this.eventDetails = eventDetails;
+    }
 
     @Override
     public int getType() {
@@ -31,28 +44,8 @@ public class Event extends FeedItem {
         return eventDate;
     }
 
-    public String getImg() {
-        return img;
-    }
-
     public String getEventName() {
         return eventName;
     }
-    @Override
-    public int hashCode() {
-        return getFeedItemId().hashCode();
-    }
 
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (!(obj instanceof Event otherEvent)) {
-            return false;
-        }
-
-        if (otherEvent.getFeedItemId() == null || this.getFeedItemId() == null) {
-            return false;
-        }
-
-        return this.getFeedItemId().equals(otherEvent.getFeedItemId());
-    }
 }

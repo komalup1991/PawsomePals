@@ -4,10 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,10 +35,15 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.CommentAdapter;
 import edu.northeastern.pawsomepals.adapters.LikeAdapter;
 import edu.northeastern.pawsomepals.models.Comment;
+import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Like;
+import edu.northeastern.pawsomepals.models.Recipe;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFeedFragment;
+import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
+import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
-public class LikeActivity extends AppCompatActivity {
+public class LikeActivity extends AppCompatActivity implements OnItemActionListener {
     private ImageView userImageProfile;
     private RecyclerView likesRecyclerView;
     private LikeAdapter likeAdapter;
@@ -44,6 +52,8 @@ public class LikeActivity extends AppCompatActivity {
     private String postType;
     private Object createdBy;
     private List<Like> likeList;
+    private FirebaseFirestore firebaseFirestore;
+
 
 
     @Override
@@ -76,7 +86,7 @@ public class LikeActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         likesRecyclerView.setLayoutManager(linearLayoutManager);
         likeList = new ArrayList<>();
-        likeAdapter = new LikeAdapter(this,likeList,feedItemId);
+        likeAdapter = new LikeAdapter(this,likeList,feedItemId,this);
         likesRecyclerView.setAdapter(likeAdapter);
     }
 
@@ -120,7 +130,36 @@ public class LikeActivity extends AppCompatActivity {
 
 
 
+                    @Override
+    public void onRecipeClick(Recipe recipe) {
+
+    }
+
+    @Override
+    public void onUserClick(String userId) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("profileId", userId);
+        setResult(RESULT_OK, resultIntent);
+
+        SharedPreferences sharedPreferences = this.getSharedPreferences("ProfileId", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("profileId", userId);
+        editor.apply();
+
+        finish();
 
 
+//        profileFragment.setArguments(args);
+//        FragmentTransaction transaction = LikeActivity.this.getSupportFragmentManager().beginTransaction();
+//        transaction.replace(R.id.fragment_container_view, profileFragment);
+//        transaction.addToBackStack(null);
+//        transaction.commit();
 
+
+    }
+
+    @Override
+    public void onLocationClick(FeedItem feedItem) {
+
+    }
 }

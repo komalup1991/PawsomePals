@@ -1,11 +1,7 @@
 package edu.northeastern.pawsomepals.adapters;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,13 +18,11 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.ChatStyle;
-import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
 import edu.northeastern.pawsomepals.ui.chat.ChatRoomActivity;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -44,10 +36,16 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 
     private Context context;
     private ChatFragment.ProfilePicClickListener listener;
-    public RecentChatRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatRoomModel> options, Context context, ChatFragment.ProfilePicClickListener listener) {
+    private DataUpdateListener dataUpdateListener;
+    public interface DataUpdateListener {
+        void onDataUpdated();
+    }
+
+    public RecentChatRecyclerAdapter(@NonNull FirestoreRecyclerOptions<ChatRoomModel> options, Context context, ChatFragment.ProfilePicClickListener listener,DataUpdateListener dataUpdateListener) {
         super(options);
         this.context = context;
         this.listener = listener;
+        this.dataUpdateListener = dataUpdateListener;
     }
 
     @Override
@@ -93,6 +91,7 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
                         }
                     });
                 }
+
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -159,7 +158,9 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
 //                }
 //            });
         }
+
     }
+
     @NonNull
     @Override
     public ChatRoomModelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -170,6 +171,11 @@ public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoom
     @Override
     public void onDataChanged() {
         super.onDataChanged();
+        startListening();
+
+        if(dataUpdateListener != null) {
+            dataUpdateListener.onDataUpdated();
+        }
     }
 
     class ChatRoomModelViewHolder extends RecyclerView.ViewHolder {

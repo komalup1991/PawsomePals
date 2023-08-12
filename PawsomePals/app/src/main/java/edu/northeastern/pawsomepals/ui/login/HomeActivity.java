@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -99,6 +100,14 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
                 return true;
             }
         });
+        Intent intent = getIntent();
+        String fragmentToOpen = intent.getStringExtra("fragment");
+        if (fragmentToOpen != null && fragmentToOpen.equals("ChatFragment")){
+            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            notificationManager.cancel(0);
+            Fragment fragment = getFragmentBasedOnId(R.id.chat);
+            replaceFragment(fragment,R.id.chat);
+        }
 
         if (savedInstanceState == null) {
             currentSelectedItemIndex = R.id.feed;

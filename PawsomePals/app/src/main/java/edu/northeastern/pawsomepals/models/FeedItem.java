@@ -1,8 +1,7 @@
 package edu.northeastern.pawsomepals.models;
 
-import androidx.annotation.Nullable;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 public abstract class FeedItem implements Serializable {
 
@@ -23,13 +22,14 @@ public abstract class FeedItem implements Serializable {
     private String feedItemId;
     private long commentCount;
     private long likeCount;
-
     private boolean isFavorite;
     private boolean isLiked;
 
     private LatLng latLng;
 
     private String displayTime;
+
+    private int type;
 
     public FeedItem() {
     }
@@ -44,6 +44,7 @@ public abstract class FeedItem implements Serializable {
         this.commentCount = commentCount;
         this.likeCount = likeCount;
     }
+
 
     public String getUserProfileImage() {
         return userProfileImage;
@@ -140,20 +141,41 @@ public abstract class FeedItem implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        return getFeedItemId().hashCode();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FeedItem feedItem = (FeedItem) o;
+        return commentCount == feedItem.commentCount && likeCount == feedItem.likeCount
+                && isFavorite == feedItem.isFavorite && isLiked == feedItem.isLiked
+                && type == feedItem.type && username.equals(feedItem.username)
+                && userProfileImage.equals(feedItem.userProfileImage)
+                && createdAt.equals(feedItem.createdAt)
+                && Objects.equals(userTagged, feedItem.userTagged)
+                && Objects.equals(locationTagged, feedItem.locationTagged)
+                && createdBy.equals(feedItem.createdBy)
+                && feedItemId.equals(feedItem.feedItemId)
+                && Objects.equals(latLng, feedItem.latLng)
+                && Objects.equals(displayTime, feedItem.displayTime);
     }
 
     @Override
-    public boolean equals(@Nullable Object obj) {
-        if (!(obj instanceof FeedItem otherFeedItem)) {
-            return false;
-        }
+    public int hashCode() {
+        return Objects.hash(username, userProfileImage, createdAt, userTagged, locationTagged, createdBy, feedItemId, commentCount, likeCount, isFavorite, isLiked, latLng, displayTime, type);
+    }
 
-        if (otherFeedItem.getFeedItemId() == null || this.getFeedItemId() == null) {
-            return false;
-        }
+    public void setType(int type) {
+        this.type = type;
+    }
 
-        return this.getFeedItemId().equals(otherFeedItem.getFeedItemId());
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public void setUserTagged(String userTagged) {
+        this.userTagged = userTagged;
+    }
+
+    public void setLocationTagged(String locationTagged) {
+        this.locationTagged = locationTagged;
     }
 }
