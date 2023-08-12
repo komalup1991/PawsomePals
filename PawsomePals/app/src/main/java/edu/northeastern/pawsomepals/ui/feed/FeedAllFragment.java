@@ -219,7 +219,7 @@ public class FeedAllFragment extends Fragment {
                 List<String> feedIds = new ArrayList<>(FirestoreDataLoader.fetchUserFavFeedIds());
                 if (!(feedIds.size() == 0))
                 {
-                    FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollections(), feedIds,
+                    FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollectionsWithRecipes(), feedIds,
                             new FirestoreDataLoader.FirestoreDataListener() {
                                 @Override
                                 public void onDataLoaded(List<FeedItem> feedItems) {
@@ -228,7 +228,7 @@ public class FeedAllFragment extends Fragment {
                             });
             }
                 else {
-                    return;
+                    notifyDatasetChange(new ArrayList<>());
                 }
 
             }
