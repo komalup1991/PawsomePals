@@ -278,8 +278,9 @@ public class SearchFragment extends Fragment {
         Query query;
 
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").orderBy("name")
-                    .startAt(inputSearch.toLowerCase())
+            query = db.collection("dogs").whereGreaterThanOrEqualTo("name",inputSearch)
+                    .orderBy("name")
+                    .startAt(inputSearch.toUpperCase())
                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
                     .limit(10);
 
@@ -301,8 +302,9 @@ public class SearchFragment extends Fragment {
 
         } else if (selectedSearchType.equals("users")) {
 
-             query = db.collection("user").orderBy("name")
-                     .startAt(inputSearch.toLowerCase())
+             query = db.collection("user").whereGreaterThanOrEqualTo("name",inputSearch)
+                     .orderBy("name")
+                     .startAt(inputSearch.toUpperCase())
                      .endAt(inputSearch.toLowerCase()+ "\uf8ff")
                      .limit(10);
 
@@ -322,8 +324,9 @@ public class SearchFragment extends Fragment {
              });
         } else if (selectedSearchType.equals("recipes")) {
 
-            query = db.collection("recipes").orderBy("title")
-                    .startAt(inputSearch.toLowerCase())
+            query = db.collection("recipes").whereGreaterThanOrEqualTo("title",inputSearch)
+                    .orderBy("title")
+                    .startAt(inputSearch.toUpperCase())
                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
                     .limit(10);
 
@@ -403,22 +406,22 @@ public class SearchFragment extends Fragment {
         if (selectedSearchType.equals("dogs")) {
             suggestionsQuery = db.collection("dogs")
                     .orderBy("name")
-                    .startAt(input)
-                    .endAt(input + "\uf8ff")
+                    .startAt(input.toUpperCase())
+                    .endAt(input.toLowerCase() + "\uf8ff")
                     .limit(10);
 
         } else if (selectedSearchType.equals("users")) {
             suggestionsQuery = db.collection("user")
                     .orderBy("name")
-                    .startAt(input)
-                    .endAt(input + "\uf8ff")
+                    .startAt(input.toUpperCase())
+                    .endAt(input.toLowerCase() + "\uf8ff")
                     .limit(10);
 
         } else if (selectedSearchType.equals("recipes")) {
             suggestionsQuery = db.collection("recipes")
                     .orderBy("title")
-                    .startAt(input)
-                    .endAt(input + "\uf8ff")
+                    .startAt(input.toUpperCase())
+                    .endAt(input.toLowerCase() + "\uf8ff")
                     .limit(10);
 
         } else {
