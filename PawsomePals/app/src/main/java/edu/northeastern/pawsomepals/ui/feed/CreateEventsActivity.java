@@ -49,12 +49,8 @@ import java.util.UUID;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
-import edu.northeastern.pawsomepals.models.FeedItem;
-import edu.northeastern.pawsomepals.models.PhotoVideo;
-import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;
-import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -142,6 +138,9 @@ public class CreateEventsActivity extends AppCompatActivity {
             if (existingFeedItem.getEventDate() != null) {
                 setEventDateTextView.setText(existingFeedItem.getEventDate());
             }
+            usersTagged = existingFeedItem.getUserTagged();
+            locationTagged = existingFeedItem.getLocationTagged();
+
 
             if (existingFeedItem.getUserTagged() != null) {
                 taggingOptionsLayout.setTagPeopleTextView(existingFeedItem.getUserTagged());
@@ -150,6 +149,12 @@ public class CreateEventsActivity extends AppCompatActivity {
             if (existingFeedItem.getLocationTagged() != null) {
                 taggingOptionsLayout.setTagLocationTextView(existingFeedItem.getLocationTagged());
             }
+
+            if (existingFeedItem.getLatLng() != null) {
+                currentLatLng = new LatLng(existingFeedItem.getLatLng().getLatitude(),
+                        existingFeedItem.getLatLng().getLongitude());
+            }
+
 
             imageUri = Uri.parse(existingFeedItem.getImg());
             currentFeedItemId = existingFeedItem.getFeedItemId();
@@ -402,7 +407,6 @@ public class CreateEventsActivity extends AppCompatActivity {
                 })
                 .show();
     }
-
 
 
     private void showEditImageDialog() {
