@@ -95,7 +95,7 @@ public class ProfileFragment extends Fragment {
     private LinearLayout followingLayout;
     private LinearLayout followersLayout;
     private LinearLayout postsLayout;
-private ImageButton favImageButton;
+    private ImageButton favImageButton;
     private String profileIdArg;
 
     @Nullable
@@ -187,6 +187,18 @@ private ImageButton favImageButton;
             }
         });
 
+        // Call the method to display name and image of the user
+        getUserInfo(profileId);
+
+        // Call the method to start listening for changes in the following count
+        getFollowingCount(profileId);
+
+        // Call the method to start listening for changes in the followers count
+        getFollowersCount(profileId);
+
+        // Call the method to start listening for changes in the posts count
+        getPostsCount(profileId);
+
         fabAddDogProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -215,39 +227,51 @@ private ImageButton favImageButton;
         followingLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
-                intent.putExtra("profileId", profileId);
-                intent.putExtra("clickedValue", "following");
-                getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
+                if (!followingCount.getText().equals("0")) {
+                    Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
+                    intent.putExtra("profileId", profileId);
+                    intent.putExtra("clickedValue", "following");
+                    getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
+                } else {
+                    Toast.makeText(getContext(), "Following no users", Toast.LENGTH_SHORT);
+                }
             }
         });
 
         followersLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
-                intent.putExtra("profileId", profileId);
-                intent.putExtra("clickedValue", "followers");
-                getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
+                if (!followersCount.getText().equals("0")) {
+                    Intent intent = new Intent(getContext(), FollowersFollowingActivity.class);
+                    intent.putExtra("profileId", profileId);
+                    intent.putExtra("clickedValue", "followers");
+                    getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
+                } else {
+                    Toast.makeText(getContext(), "No followers", Toast.LENGTH_SHORT);
+                }
             }
         });
 
         postsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileFeedFragment feedFragment = new ProfileFeedFragment();
-                Bundle args = new Bundle();
+                if (!postsCount.getText().equals("0")) {
+                    ProfileFeedFragment feedFragment = new ProfileFeedFragment();
+                    Bundle args = new Bundle();
 
-                args.putString("profileId", profileId);
-                args.putString("tabText", "Posts");
-                args.putSerializable("feed_view_type", FeedFragmentViewType.POST);
-                feedFragment.setArguments(args);
+                    args.putString("profileId", profileId);
+                    args.putString("tabText", "Posts");
+                    args.putSerializable("feed_view_type", FeedFragmentViewType.POST);
+                    feedFragment.setArguments(args);
 
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container_view, feedFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-           }
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container_view, feedFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                } else {
+                    Toast.makeText(getContext(), "No posts", Toast.LENGTH_SHORT);
+                }
+            }
         });
 
         favImageButton.setOnClickListener(new View.OnClickListener() {
@@ -267,18 +291,6 @@ private ImageButton favImageButton;
                 transaction.commit();
             }
         });
-
-        // Call the method to display name and image of the user
-        getUserInfo(profileId);
-
-        // Call the method to start listening for changes in the following count
-        getFollowingCount(profileId);
-
-        // Call the method to start listening for changes in the followers count
-        getFollowersCount(profileId);
-
-        // Call the method to start listening for changes in the posts count
-        getPostsCount(profileId);
 
 
         progressBar.setVisibility(View.GONE);
