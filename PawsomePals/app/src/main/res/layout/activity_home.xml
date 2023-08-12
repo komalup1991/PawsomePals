@@ -14,32 +14,10 @@
         app:layout_scrollFlags="scroll|enterAlways"
         app:titleTextColor="@color/white"
         style="@style/AppToolbar"
+        android:theme="@style/AppToolbarTheme"
+        android:background="@color/primaryColor"
         >
-        <ImageView
-            android:id="@+id/logoutImageView"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp"
-            android:src="@drawable/baseline_logout_24"
-            app:itemIconTint="@color/tab_item_foreground"
-            app:itemTextColor="@color/tab_item_foreground" />
 
-        <ImageView
-            android:id="@+id/dogBreeds"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:clickable="true"
-            android:focusable="true"
-            android:visibility="gone"
-            android:padding="8dp"
-            android:src="@drawable/dog_icon"
-            app:itemIconTint="@color/tab_item_foreground"
-            app:itemTextColor="@color/tab_item_foreground"
-            app:tint="@color/white" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.fragment.app.FragmentContainerView
