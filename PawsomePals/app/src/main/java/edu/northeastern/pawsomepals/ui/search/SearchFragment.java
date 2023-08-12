@@ -295,7 +295,7 @@ public class SearchFragment extends Fragment {
 
 
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").whereEqualTo("name",inputSearch)
+            query = db.collection("dogs").whereGreaterThanOrEqualTo("name",inputSearch)
                     .orderBy("name")
                     .startAt(inputSearch.toUpperCase())
                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
