@@ -188,7 +188,6 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
             {
                 breedDesc.append("Breed Group: ");
                 breedDesc.append(breedDetail.getBreed_group());
-                breedDesc.append(" \n \n");
             }
 
             breedDescription.setText(breedDesc);
