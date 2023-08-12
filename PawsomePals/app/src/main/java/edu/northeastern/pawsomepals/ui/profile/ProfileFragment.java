@@ -233,7 +233,7 @@ public class ProfileFragment extends Fragment {
                     intent.putExtra("clickedValue", "following");
                     getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
                 } else {
-                    Toast.makeText(getContext(), "Following no users", Toast.LENGTH_SHORT);
+                    Toast.makeText(requireContext(), "Following no users", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -247,7 +247,7 @@ public class ProfileFragment extends Fragment {
                     intent.putExtra("clickedValue", "followers");
                     getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
                 } else {
-                    Toast.makeText(getContext(), "No followers", Toast.LENGTH_SHORT);
+                    Toast.makeText(requireContext(), "No followers", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -269,7 +269,7 @@ public class ProfileFragment extends Fragment {
                     transaction.addToBackStack(null);
                     transaction.commit();
                 } else {
-                    Toast.makeText(getContext(), "No posts", Toast.LENGTH_SHORT);
+                    Toast.makeText(requireContext(), "No posts", Toast.LENGTH_SHORT).show();
                 }
             }
         });
