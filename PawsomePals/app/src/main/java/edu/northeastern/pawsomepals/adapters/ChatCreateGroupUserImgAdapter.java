@@ -59,7 +59,6 @@ public class ChatCreateGroupUserImgAdapter extends RecyclerView.Adapter<ChatCrea
             @Override
             public void onClick(View view) {
                 final int position = holder.getAdapterPosition();
-
                 if (mListener != null) {
                     mListener.onItemClick(position);
                 }
