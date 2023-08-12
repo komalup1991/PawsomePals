@@ -8,6 +8,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
@@ -33,6 +36,7 @@ public class RecipeHorizontalFeedViewHolder extends RecyclerView.ViewHolder {
         username.setText(recipe.getUsername());
         Glide.with(itemView.getContext())
                 .load(recipe.getImg())
+                .transform(new CenterCrop(), new RoundedCorners(23))
                 .into(recipeImage);
         Glide.with(itemView.getContext())
                 .load(recipe.getUserProfileImage())

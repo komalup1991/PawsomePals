@@ -1,9 +1,8 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
-import android.app.Activity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +14,7 @@ import com.bumptech.glide.Glide;
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
@@ -48,7 +48,7 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder {
         moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
-    public void bindData(AppCompatActivity activity, Services services, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, Services services, FeedFragmentViewType feedFragmentViewType, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, services);
         Glide.with(userProfilePic.getContext())
                 .load(services.getUserProfileImage())
@@ -101,10 +101,15 @@ public class ServicesFeedViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        PopupMenu popupMenu = DialogHelper.getPopupMenu(activity, moreOptionImageView, services, feedFragmentViewType);
+        if (!popupMenu.getMenu().hasVisibleItems()) {
+            moreOptionImageView.setVisibility(View.GONE);
+        }
+
         moreOptionImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showMoreOptionsMenu(activity, services, view);
+                popupMenu.show();
             }
         });
     }

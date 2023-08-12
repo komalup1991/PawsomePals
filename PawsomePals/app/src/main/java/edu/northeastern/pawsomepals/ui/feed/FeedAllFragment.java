@@ -112,7 +112,7 @@ public class FeedAllFragment extends Fragment {
                 }
             });
         }
-        feedAdapter = new FeedAdapter(feedItemList, requireContext(), new OnItemActionListener() {
+        feedAdapter = new FeedAdapter(feedItemList, requireContext(), feedFragmentViewType, new OnItemActionListener() {
             @Override
             public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);

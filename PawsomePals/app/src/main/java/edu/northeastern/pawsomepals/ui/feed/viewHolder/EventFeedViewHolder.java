@@ -1,10 +1,9 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 
-import android.app.Activity;
-import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,12 +14,11 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.google.common.eventbus.EventBus;
-import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
@@ -57,7 +55,7 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
         moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
-    public void bindData(AppCompatActivity activity, Event event, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, Event event, FeedFragmentViewType feedFragmentViewType, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, event);
         Glide.with(userProfilePic.getContext())
                 .load(event.getUserProfileImage())
@@ -140,14 +138,15 @@ public class EventFeedViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        setupMoreButton(event, activity);
-    }
+        PopupMenu popupMenu = DialogHelper.getPopupMenu(activity, moreOptionImageView, event, feedFragmentViewType);
+        if (!popupMenu.getMenu().hasVisibleItems()) {
+            moreOptionImageView.setVisibility(View.GONE);
+        }
 
-    private void setupMoreButton(Event event, AppCompatActivity activity) {
         moreOptionImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showMoreOptionsMenu(activity, event, view);
+                popupMenu.show();
             }
         });
     }
