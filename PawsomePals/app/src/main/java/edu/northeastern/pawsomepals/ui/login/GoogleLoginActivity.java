@@ -124,7 +124,7 @@ public class GoogleLoginActivity extends LoginActivity {
 
     private void updateUI(FirebaseUser user) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(GoogleLoginActivity.this);
-        String userUID = account.getId(); // Get user's unique identifier (UID)
+        String userUID = user.getUid(); // Get user's unique identifier (UID)
 
         // Query Firestore to check if a document with the UID exists
         FirebaseFirestore db = FirebaseFirestore.getInstance();
