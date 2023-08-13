@@ -25,6 +25,7 @@ import com.google.firebase.storage.UploadTask;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -71,11 +72,16 @@ public class ChatFirebaseUtil {
     public static void passGroupChatModelAsIntent(Intent intent, List<Users> users, String groupName) {
         StringBuilder idBuilder = new StringBuilder();
         StringBuilder nameBuilder = new StringBuilder();
-
+        Collections.sort(users, new Comparator<Users>() {
+            @Override
+            public int compare(Users u1, Users u2) {
+                return u1.getName().compareTo(u2.getName());
+            }
+        });
         for (Users user : users) {
             if (user != null) {
                 idBuilder.append(user.getUserId() + " ");
-                nameBuilder.append(user.getName().toLowerCase() +" ");
+                nameBuilder.append(user.getName().toLowerCase() +",");
             }
         }
         intent.putExtra("name", groupName);
@@ -176,7 +182,7 @@ public class ChatFirebaseUtil {
         String ids = intent.getStringExtra("ids");
         String names = intent.getStringExtra("groupUserNames");
         List idList = Arrays.asList(ids.split(" "));
-        List nameList = Arrays.asList(names.split(" "));
+        List nameList = Arrays.asList(names.split(","));
         return new GroupChatModel(idList, nameList,groupName);
     }
 
@@ -196,9 +202,16 @@ public class ChatFirebaseUtil {
         StringBuilder imgBuilder = new StringBuilder();
         StringBuilder nameBuilder = new StringBuilder();
 
+        Collections.sort(groupUsers, new Comparator<Users>() {
+            @Override
+            public int compare(Users u1, Users u2) {
+                return u1.getName().compareTo(u2.getName());
+            }
+        });
+
         for(Users user:groupUsers){
             imgBuilder.append(user.getProfileImage()+" ");
-            nameBuilder.append(user.getName()+" ");
+            nameBuilder.append(user.getName()+",");
         }
         intent.putExtra("userImgs",imgBuilder.toString());
         intent.putExtra("groupUserNames",nameBuilder.toString());

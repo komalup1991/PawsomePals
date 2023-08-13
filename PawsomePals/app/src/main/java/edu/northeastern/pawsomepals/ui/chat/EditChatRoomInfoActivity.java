@@ -42,7 +42,7 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
     private List<String> usersNames;
     private List<Users> groupUsers;
     private List<ChatUserCardViewModel> userCardViewModels;
-    private String membersNamesTxt;
+//    private String membersNamesTxt;
     private ImageButton backBtn;
     private TextView groupName, groupNotice, membersNames;
     private EditText editTextField;
@@ -61,10 +61,10 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         groupChatModel = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
         groupName.setText(groupChatModel.getGroupName());
 
-        membersNamesTxt = ChatFirebaseUtil.getGroupUsersNamesAsIntent(getIntent());
+//        membersNamesTxt = ChatFirebaseUtil.getGroupUsersNamesAsIntent(getIntent());
 //        membersNames.setText(membersNamesTxt);
         usersImgs = Arrays.asList(ChatFirebaseUtil.getGroupMemberImgsFromChatRoom(getIntent()).split(" "));
-        usersNames = Arrays.asList(ChatFirebaseUtil.getGroupMemberNameFromChatRoom(getIntent()).split(" "));
+        usersNames = Arrays.asList(ChatFirebaseUtil.getGroupMemberNameFromChatRoom(getIntent()).split(","));
         for (int i = 0; i < usersImgs.size();i++){
             userCardViewModels.add(new ChatUserCardViewModel(groupChatModel.getGroupMembers().get(i),usersImgs.get(i),usersNames.get(i)));
         }
@@ -134,13 +134,13 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         membersRecyclerView = findViewById(R.id.group_member_card_views);
     }
 
-    private String getUserNames(List<Users> users){
-        StringBuilder builder = new StringBuilder();
-        for(Users theUser:groupUsers){
-            builder.append(theUser.getName()+"  ");
-        }
-        return membersNamesTxt = builder.toString();
-    }
+//    private String getUserNames(List<Users> users){
+//        StringBuilder builder = new StringBuilder();
+//        for(Users theUser:groupUsers){
+//            builder.append(theUser.getName()+"  ");
+//        }
+//        return membersNamesTxt = builder.toString();
+//    }
     private void createDialog() {
         editTextField = new EditText(this.getApplicationContext());
 
