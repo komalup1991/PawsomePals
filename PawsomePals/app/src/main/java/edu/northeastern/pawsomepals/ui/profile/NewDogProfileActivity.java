@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -26,8 +28,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentTransaction;
@@ -58,6 +62,7 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class NewDogProfileActivity extends AppCompatActivity {
 
@@ -94,7 +99,7 @@ public class NewDogProfileActivity extends AppCompatActivity {
     private ArrayAdapter<String> breedAdapter;
     private ArrayAdapter<String> mixedBreedAdapter;
     private String redirectTo;
-
+    private Dialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,6 +115,13 @@ public class NewDogProfileActivity extends AppCompatActivity {
         currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             userId = currentUser.getUid();
+        }
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle("Create Pal's Profile");
         }
 
         spinnerDogBreed = findViewById(R.id.spinnerDogBreed);
@@ -404,7 +416,7 @@ public class NewDogProfileActivity extends AppCompatActivity {
             return;
         }
 
-        progressBar.setVisibility(View.VISIBLE);
+        DialogHelper.showProgressDialog("Profile is getting created...", progressDialog, NewDogProfileActivity.this);
 
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageName = "dog_image_" + timestamp + ".jpg";
@@ -440,7 +452,7 @@ public class NewDogProfileActivity extends AppCompatActivity {
                         .document(dogProfileId)
                         .set(dogData) // Use .set() to create or update the document
                         .addOnSuccessListener(aVoid -> {
-                            progressBar.setVisibility(View.GONE);
+                            DialogHelper.hideProgressDialog(progressDialog);
                             Toast.makeText(NewDogProfileActivity.this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
 
                             if (redirectTo.equals("Home")) {
@@ -452,18 +464,18 @@ public class NewDogProfileActivity extends AppCompatActivity {
 
                         })
                         .addOnFailureListener(e -> {
-                            progressBar.setVisibility(View.GONE);
+                            DialogHelper.hideProgressDialog(progressDialog);
                             Log.e("yoo", "Error adding document", e);
                             Toast.makeText(NewDogProfileActivity.this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
                         });
             } else {
-                progressBar.setVisibility(View.GONE);
+                DialogHelper.hideProgressDialog(progressDialog);
                 Toast.makeText(this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                progressBar.setVisibility(View.GONE);
+                DialogHelper.hideProgressDialog(progressDialog);
                 Toast.makeText(NewDogProfileActivity.this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });

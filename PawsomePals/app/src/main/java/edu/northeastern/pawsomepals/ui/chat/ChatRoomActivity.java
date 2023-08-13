@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -82,6 +83,7 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.login.MainActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
@@ -103,9 +105,9 @@ public class ChatRoomActivity extends AppCompatActivity {
 
     private EditText messageInput;
     private ImageButton sendMessageBtn;
-    private ImageButton functionBtn,imgDisMissBtn,preview_dismiss_button,preview_location_dismiss_button,backBtn;
+    private ImageButton functionBtn, imgDisMissBtn, preview_dismiss_button, preview_location_dismiss_button, backBtn;
     private ImageButton infoBtn;
-    private ImageView img_preview,image_view_container;
+    private ImageView img_preview, image_view_container;
     private CardView img_cardview;
     private TextView imgPreviewTextView, locationPreviewTextView;
     private TextView chatRoomName;
@@ -115,7 +117,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private List<Users> otherGroupUsers;
     private List<Users> groupUsers;
     private List<String> groupUsersNames;
-    private ConstraintLayout chat_image_preview_container,chat_location_preview_container;
+    private ConstraintLayout chat_image_preview_container, chat_location_preview_container;
 
     private Users currentUser, otherUser;
     private FrameLayout profileShowBackground;
@@ -156,7 +158,21 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("hello", ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent()) + "");
+                if (ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent())) {
+                    ChatFragment chatFragment = new ChatFragment();
+                    FragmentTransaction transaction = ChatRoomActivity.this.getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.chatRoomContainer, chatFragment);
+                    transaction.commit();
+
+                } else {
+                    onBackPressed();
+                }
+            }
+        });
         imgDisMissBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -201,7 +217,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                 Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
                 //check
                 ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers, chatRoomName.getText().toString());
-                ChatFirebaseUtil.passMembersCardViewsDataAsIntent(intent,groupUsers);
+                ChatFirebaseUtil.passMembersCardViewsDataAsIntent(intent, groupUsers);
                 StringBuilder builder = new StringBuilder();
                 startActivity(intent);
             });
@@ -248,7 +264,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void uploadLocation(ChatLocationModel location) {
         ChatMessageModel chatMessageModel;
         if (location != null) {
-            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), null, location);
+            chatMessageModel = new ChatMessageModel("<location>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(), Timestamp.now(), currentUser.getName(), null, location);
             chatMessageModel.setPicture(false);
             chatMessageModel.setPlace(true);
             ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
@@ -410,24 +426,28 @@ public class ChatRoomActivity extends AppCompatActivity {
     }
 
     private void sendMessageToUser(String message) {
-        ChatMessageModel chatMessageModel;
-        chatRoomModel.setLastMessageTimestamp(Timestamp.now());
-        chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
-        chatRoomModel.setLastMessage(message);
-        ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
-
         if (fileUri == null && location == null) {
-            chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), null, null);
-            chatMessageModel.setPicture(false);
-            chatMessageModel.setPlace(false);
+            if (message.equals("")) {
+                Toast.makeText(getApplicationContext(), "Please enter something before send.", Toast.LENGTH_SHORT).show();
+            } else {
+                ChatMessageModel chatMessageModel;
+                chatRoomModel.setLastMessageTimestamp(Timestamp.now());
+                chatRoomModel.setLastMessageSenderId(ChatFirebaseUtil.currentUserId());
+                chatRoomModel.setLastMessage(message);
+                ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
 
-            ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            messageInput.setText("");
-                            sendNotification(message);
-                        }
-                    });
+                chatMessageModel = new ChatMessageModel(message, ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(), Timestamp.now(), currentUser.getName(), null, null);
+                chatMessageModel.setPicture(false);
+                chatMessageModel.setPlace(false);
+
+                ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                messageInput.setText("");
+                                sendNotification(message);
+                            }
+                        });
+            }
         } else {
 
         }
@@ -560,7 +580,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private void callApi(JSONObject jasonObject) {
         MediaType JSON = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
-        String playload= jasonObject.toString();
+        String playload = jasonObject.toString();
 
         String url = "https://fcm.googleapis.com/fcm/send";
         RequestBody body = RequestBody.create(playload, JSON);
@@ -578,9 +598,9 @@ public class ChatRoomActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
+//                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Data fetched successfully.", Toast.LENGTH_SHORT).show());
                 } else {
-                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show());
+//                    runOnUiThread(() -> Toast.makeText(ChatRoomActivity.this, "Error fetching data.", Toast.LENGTH_SHORT).show());
                 }
             }
         });
@@ -719,7 +739,7 @@ public class ChatRoomActivity extends AppCompatActivity {
 
                 chat_image_preview_container.setVisibility(View.INVISIBLE);
 
-                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(),Timestamp.now(), currentUser.getName(), url, null);
+                chatMessageModel = new ChatMessageModel("<Image>", ChatFirebaseUtil.currentUserId(), currentUser.getProfileImage(), Timestamp.now(), currentUser.getName(), url, null);
                 chatMessageModel.setPicture(true);
                 chatMessageModel.setPlace(false);
                 ChatFirebaseUtil.getChatroomMessageReference(chatRoomId).add(chatMessageModel)
