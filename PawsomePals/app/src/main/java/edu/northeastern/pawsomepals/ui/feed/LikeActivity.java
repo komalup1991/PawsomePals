@@ -40,6 +40,7 @@ import edu.northeastern.pawsomepals.models.Like;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFeedFragment;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
+import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
@@ -147,19 +148,15 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
         editor.apply();
 
         finish();
-
-
-//        profileFragment.setArguments(args);
-//        FragmentTransaction transaction = LikeActivity.this.getSupportFragmentManager().beginTransaction();
-//        transaction.replace(R.id.fragment_container_view, profileFragment);
-//        transaction.addToBackStack(null);
-//        transaction.commit();
-
-
     }
 
     @Override
     public void onLocationClick(FeedItem feedItem) {
+
+    }
+
+    @Override
+    public void onFeedFilterSpinnerClick(int feedfilter) {
 
     }
 }

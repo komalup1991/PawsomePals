@@ -105,4 +105,10 @@
 
     <string name="create_group_name">Create a group name</string>
 
+        <string-array name="filter_options_array">
+            <item>By Popularity</item>
+            <item>By Date</item>
+        </string-array>
+
+
 </resources>

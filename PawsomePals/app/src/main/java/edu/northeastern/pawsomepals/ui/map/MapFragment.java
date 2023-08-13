@@ -70,6 +70,7 @@ import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
+import edu.northeastern.pawsomepals.utils.FeedFilter;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, FirestoreDataLoader.FirestoreDataListener {
 
@@ -160,11 +161,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     private void loadMarkersOnMap(String feedCollectionType) {
         if (feedCollectionType == null) {
             // Set a listener to handle radio button selection changes
-            FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(), this);
+            FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(), FeedFilter.RECENT, this);
         } else {
             FirestoreDataLoader.loadDataFromCollections(new ArrayList<>() {{
                 add(FirebaseFirestore.getInstance().collection(feedCollectionType));
-            }}, this);
+            }}, FeedFilter.RECENT, this);
         }
     }
 

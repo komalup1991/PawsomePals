@@ -31,6 +31,11 @@ public abstract class FeedItem implements Serializable {
 
     private int type;
 
+    /**
+     * weighted score of like (60%) + comment (40%)
+     */
+    private double rankingWeight;
+
     public FeedItem() {
     }
 
@@ -177,5 +182,13 @@ public abstract class FeedItem implements Serializable {
 
     public void setLocationTagged(String locationTagged) {
         this.locationTagged = locationTagged;
+    }
+
+    public double getRankingWeight() {
+        return rankingWeight;
+    }
+
+    public void setRankingWeight(double rankingWeight) {
+        this.rankingWeight = rankingWeight;
     }
 }
