@@ -58,12 +58,10 @@ public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users
     @Override
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull Users model) {
         if (!checkedUserList.isEmpty()) {
-            for (String userId : checkedUserList) {
-                if (model.getUserId().equals(userId)) {
-                    holder.addCheckBox.setChecked(true);
-                } else {
-                    holder.addCheckBox.setChecked(false);
-                }
+            if (checkedUserList.contains(model.getUserId())){
+                holder.addCheckBox.setChecked(true);
+            }else{
+                holder.addCheckBox.setChecked(false);
             }
         }
         holder.userNameText.setText(model.getName());

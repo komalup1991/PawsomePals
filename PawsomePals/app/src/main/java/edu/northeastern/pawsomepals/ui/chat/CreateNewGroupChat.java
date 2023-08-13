@@ -100,9 +100,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
                 currentUser = task.getResult().toObject(Users.class);
-                if (!userList.contains(currentUser)) {
-                    userList.add(currentUser);
-                }
             }
         });
         setupUsersRecyclerView(searchInput.getText().toString());
@@ -149,7 +146,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
                                 .filter(a -> a.equals(selectedUser.getProfileImage()))
                                 .findFirst();
                         findFirst.ifPresent(img -> {
-                            userList.remove(img);
+                            userList.remove(imgList.indexOf(img));
                             imgList.remove(img);
                         });
                         imgAdapter.updateData(imgList);
@@ -198,7 +195,7 @@ public class CreateNewGroupChat extends AppCompatActivity {
         } else if (imgList.size() == 2) {
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passCurrentUserNameAsIntent(intent, currentUser.getName());
-            ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(1));
+            ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(0));
             ChatFirebaseUtil.passChatStyleFromIntent(intent, ChatStyle.ONEONONE);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             getApplicationContext().startActivity(intent);
@@ -208,8 +205,11 @@ public class CreateNewGroupChat extends AppCompatActivity {
     }
 
     private void createDialogAndCreateIntent() {
+        if (!userList.contains(currentUser)) {
+            userList.add(currentUser);
+        }
         editTextField = new EditText(this.getApplicationContext());
-
+        Log.i("groupUsers",userList.toString()+"users");
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Create A Group Name")
                 .setView(editTextField)
