@@ -1,5 +1,6 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -42,13 +44,14 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
     private List<String> usersNames;
     private List<Users> groupUsers;
     private List<ChatUserCardViewModel> userCardViewModels;
-//    private String membersNamesTxt;
+    //    private String membersNamesTxt;
     private ImageButton backBtn;
     private TextView groupName, groupNotice, membersNames;
     private EditText editTextField;
     private String newGroupName;
     private RecyclerView membersRecyclerView;
     private ChatGroupMemberViewsAdapter adapter;
+    private boolean isChatroomEdited;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,18 +60,17 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
 
         groupUsers = new ArrayList<>();
         userCardViewModels = new ArrayList<>();
+        isChatroomEdited = false;
         initialView();
         groupChatModel = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
         groupName.setText(groupChatModel.getGroupName());
 
-//        membersNamesTxt = ChatFirebaseUtil.getGroupUsersNamesAsIntent(getIntent());
-//        membersNames.setText(membersNamesTxt);
         usersImgs = Arrays.asList(ChatFirebaseUtil.getGroupMemberImgsFromChatRoom(getIntent()).split(" "));
         usersNames = Arrays.asList(ChatFirebaseUtil.getGroupMemberNameFromChatRoom(getIntent()).split(","));
-        for (int i = 0; i < usersImgs.size();i++){
-            userCardViewModels.add(new ChatUserCardViewModel(groupChatModel.getGroupMembers().get(i),usersImgs.get(i),usersNames.get(i)));
+        for (int i = 0; i < usersImgs.size(); i++) {
+            userCardViewModels.add(new ChatUserCardViewModel(groupChatModel.getGroupMembers().get(i), usersImgs.get(i), usersNames.get(i)));
         }
-        adapter = new ChatGroupMemberViewsAdapter(this,userCardViewModels, new ChatFragment.ProfilePicClickListener() {
+        adapter = new ChatGroupMemberViewsAdapter(this, userCardViewModels, new ChatFragment.ProfilePicClickListener() {
             @Override
             public void onItemClicked(String userIDValue) {
                 navigateToProfileFragment(userIDValue);
@@ -79,10 +81,29 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         membersRecyclerView.setLayoutManager(linearLayoutManager);
         membersRecyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(groupChatModel.getGroupMembers());
+        for (DocumentReference reference : references) {
+            reference.get().addOnSuccessListener(snapshot -> {
+                Users user = snapshot.toObject(Users.class);
+                if (user != null) {
+                    groupUsers.add(user);
+                }
+            });
+        }
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onBackPressed();
+
+                if (isChatroomEdited) {
+                    Log.i("edie",groupUsers.toString());
+                    Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+                    ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers, newGroupName);
+                    ChatFirebaseUtil.passIntentFromEditRoomAsIntent(intent,true);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    getApplicationContext().startActivity(intent);
+                } else {
+                    onBackPressed();
+                }
             }
         });
         groupNameLayout.setOnClickListener(new View.OnClickListener() {
@@ -91,11 +112,12 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
                 createDialog();
 
                 Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                ChatFirebaseUtil.passGroupNameAsIntent(intent,newGroupName);
+                ChatFirebaseUtil.passGroupNameAsIntent(intent, newGroupName);
             }
         });
 
     }
+
     private void navigateToProfileFragment(String userIDValue) {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("profileId", userIDValue);
@@ -114,15 +136,15 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         transaction.commit();
     }
 
-    private String createMembersDetails() {
-        StringBuilder builder = new StringBuilder();
-        for (Users user : groupUsers) {
-            Log.i("info", user.getName());
-            builder.append(user.getName());
-            builder.append("  ");
-        }
-        return builder.toString();
-    }
+//    private String createMembersDetails() {
+//        StringBuilder builder = new StringBuilder();
+//        for (Users user : groupUsers) {
+//            Log.i("info", user.getName());
+//            builder.append(user.getName());
+//            builder.append("  ");
+//        }
+//        return builder.toString();
+//    }
 
     private void initialView() {
         groupName = findViewById(R.id.group_name_text);
@@ -134,7 +156,7 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
         membersRecyclerView = findViewById(R.id.group_member_card_views);
     }
 
-//    private String getUserNames(List<Users> users){
+    //    private String getUserNames(List<Users> users){
 //        StringBuilder builder = new StringBuilder();
 //        for(Users theUser:groupUsers){
 //            builder.append(theUser.getName()+"  ");
@@ -151,15 +173,36 @@ public class EditChatRoomInfoActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-
                         newGroupName = editTextField.getText().toString();
                         groupName.setText(newGroupName);
                         groupChatModel.setGroupName(newGroupName);
-                        ChatFirebaseUtil.passGroupNameAsIntent(intent,newGroupName);
+                        ChatFirebaseUtil.passGroupNameAsIntent(intent, newGroupName);
+                        updateFirestoreData();
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .create();
         dialog.show();
+    }
+
+    private void updateFirestoreData() {
+        if (newGroupName != null) {
+            isChatroomEdited = true;
+            String chatroomId = ChatFirebaseUtil.getGroupRoomId(groupChatModel.getGroupMembers());
+            ChatFirebaseUtil.getChatroomReference(chatroomId)
+                    .update("chatRoomName", newGroupName)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d("Firestore", "Document successfully updated!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("Firestore", "Error updating document", e);
+                        }
+                    });
+        }
     }
 }

@@ -282,4 +282,11 @@ public class ChatFirebaseUtil {
             dataCallback.onDismiss();
         }
     }
+
+    public static void passIntentFromEditRoomAsIntent(Intent intent,boolean a) {
+        intent.putExtra("fromEditRoom",a);
+    }
+    public static boolean getIntentFromEditRoomAsIntent(Intent intent){
+        return intent.getBooleanExtra("fromEditRoom",false);
+    }
 }

@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -82,6 +83,7 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.login.MainActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ImageUtil;
@@ -156,7 +158,21 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-        backBtn.setOnClickListener(v -> onBackPressed());
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("hello", ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent())+"");
+                if (ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent())){
+                    ChatFragment chatFragment = new ChatFragment();
+                    FragmentTransaction transaction = ChatRoomActivity.this.getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.chatRoomContainer, chatFragment);
+                    transaction.commit();
+
+                }else{
+                    onBackPressed();
+                }
+            }
+        });
         imgDisMissBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
