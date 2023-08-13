@@ -207,27 +207,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         MarkerOptions marker = new MarkerOptions();
         //String snippet = username + "\n" + "Location: " + latLng.toString(); // Customize this formatting as needed
 
-        if (feedItem.getType() == 1) {
-            marker.title(((PhotoVideo) feedItem).getCaption())
-                    .icon(icon)
-                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-        } else if (feedItem.getType() == 2) {
-            marker.title(((Services) feedItem).getServiceName())
-                    .icon(icon)
-                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-        } else if (feedItem.getType() == 3) {
-            marker.title(((Event) feedItem).getEventName())
-                    .icon(icon)
-                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-        } else if (feedItem.getType() == 4) {
-            marker.title(((Post) feedItem).getCaption())
-                    .icon(icon)
-                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-        }
+        marker.position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+
+//        if (feedItem.getType() == 1) {
+//            marker.title(((PhotoVideo) feedItem).getCaption())
+//                    .icon(icon)
+//                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+//        } else if (feedItem.getType() == 2) {
+//            marker.title(((Services) feedItem).getServiceName())
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+//        } else if (feedItem.getType() == 3) {
+//            marker.title(((Event) feedItem).getEventName())
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+//        } else if (feedItem.getType() == 4) {
+//            marker.title(((Post) feedItem).getCaption())
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+//        }
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
