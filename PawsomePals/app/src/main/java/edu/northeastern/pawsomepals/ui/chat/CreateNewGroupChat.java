@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
@@ -173,13 +174,6 @@ public class CreateNewGroupChat extends AppCompatActivity {
                 imgAdapter.updateData(imgList);
                 userAdapter.updateData(checkedUserList);
                 userAdapter.updateOptions(options);
-//
-//                options.getSnapshots()
-//                        .stream()
-//                        .filter(a -> a.getUserId().equals(selectedUser.getUserId()))
-//                        .findFirst()
-//                        .ifPresent(x -> x.setChatSelected(false));
-//                userAdapter.updateData(checkedUserList);
             }
         });
         LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
@@ -208,9 +202,33 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private void createDialogAndCreateIntent() {
         if (!userList.contains(currentUser)) {
             userList.add(currentUser);
+            checkedUserList.add(currentUser.getUserId());
         }
+        checkGroupExistence(checkedUserList);
+
+    }
+
+    private void checkGroupExistence(List<String> userList) {
+        String roomId = ChatFirebaseUtil.getGroupRoomId(userList);
+        DocumentReference df = ChatFirebaseUtil.allChatRoomCollectionReference().document(roomId);
+        df.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()){
+                            DocumentSnapshot document = task.getResult();
+                            if(document.exists()){
+                                Toast.makeText(getApplicationContext(),"The chatroom already exist.",Toast.LENGTH_SHORT).show();
+                            }else{
+                                showDialogAndCreateRoom();
+                            }
+                        }
+                    }
+                });
+
+    }
+    private void showDialogAndCreateRoom(){
         editTextField = new EditText(this.getApplicationContext());
-        Log.i("groupUsers",userList.toString()+"users");
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Create A Group Name")
                 .setView(editTextField)
