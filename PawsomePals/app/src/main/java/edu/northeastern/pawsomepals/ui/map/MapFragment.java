@@ -34,6 +34,9 @@ import androidx.navigation.NavDirections;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.location.CurrentLocationRequest;
@@ -249,7 +252,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
     private void showCustomInfoWithImageFetch(FeedItem feedItem, Marker marker) {
         if (feedItem instanceof FeedItemWithImage) {
-            Glide.with(mapView).load(((FeedItemWithImage) feedItem).getImg()).addListener(new RequestListener<Drawable>() {
+            Glide.with(mapView).load(((FeedItemWithImage) feedItem).getImg())
+                    .transform(new CenterCrop(), new GranularRoundedCorners(23, 23, 0, 0))
+                    .addListener(new RequestListener<Drawable>() {
                 @Override
                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                     return false;
@@ -260,7 +265,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
                     showCustomInfo(feedItem, marker, resource);
                     return true;
                 }
-            }).preload();
+            }).preload(dpToPx(getContext(), 150), dpToPx(getContext(), 150));
         } else {
             showCustomInfo(feedItem, marker, null);
         }
@@ -381,6 +386,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         intent.putExtra("feedId", marker.getTag().toString());
         activity.startActivity(intent);
         activity.finish();
+    }
+
+    public static int dpToPx(Context context, int dp) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * density + 0.5f); // Adding 0.5 for rounding to the nearest integer
     }
 
 }

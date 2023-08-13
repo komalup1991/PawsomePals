@@ -119,6 +119,8 @@
             android:id="@+id/eventDetailsTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:minHeight="40dp"
+            android:gravity="center_vertical"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
             android:text="Event Details"
