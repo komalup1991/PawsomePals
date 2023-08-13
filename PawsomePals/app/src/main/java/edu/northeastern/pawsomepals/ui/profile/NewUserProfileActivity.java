@@ -1,8 +1,10 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -17,6 +19,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -87,6 +90,14 @@ public class NewUserProfileActivity extends AppCompatActivity {
             userId = currentUser.getUid();
         }
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+
+            actionBar.setTitle("Create your Profile");
+        }
+
         imageProfile = findViewById(R.id.imageProfile);
         editTextName = findViewById(R.id.editTextName);
         radioGroupGender = findViewById(R.id.radioGroupGender);
@@ -124,6 +135,7 @@ public class NewUserProfileActivity extends AppCompatActivity {
             }
         });
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
