@@ -190,9 +190,10 @@ public class CreateNewGroupChat extends AppCompatActivity {
     }
 
     private void createGroupChat() {
-        if (imgList.size() > 2 && imgList.size() < 5) {
+        if (imgList.size() > 1 && imgList.size() < 5) {
             createDialogAndCreateIntent();
-        } else if (imgList.size() == 2) {
+        } else if (imgList.size() == 1) {
+            Log.i("googleaccount", userList.get(0).toString()+"account");
             Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
             ChatFirebaseUtil.passCurrentUserNameAsIntent(intent, currentUser.getName());
             ChatFirebaseUtil.passUserModelAsIntent(intent, userList.get(0));
