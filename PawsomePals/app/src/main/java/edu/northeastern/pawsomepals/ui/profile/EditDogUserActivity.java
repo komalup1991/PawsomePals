@@ -11,6 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,7 +65,9 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
+import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
 import edu.northeastern.pawsomepals.ui.login.HomeActivity;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class EditDogUserActivity extends AppCompatActivity {
 
@@ -102,7 +105,7 @@ public class EditDogUserActivity extends AppCompatActivity {
     private ArrayAdapter<String> breedAdapter;
     private ArrayAdapter<String> mixedBreedAdapter;
     private String dogId;
-
+    private Dialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,6 +192,7 @@ public class EditDogUserActivity extends AppCompatActivity {
         btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 UpdateDataToFirebaseStorage();
             }
         });
@@ -507,7 +511,7 @@ public class EditDogUserActivity extends AppCompatActivity {
             return;
         }
 
-        progressBar.setVisibility(View.VISIBLE);
+        DialogHelper.showProgressDialog("Profile is being saved...", progressDialog, EditDogUserActivity.this);
 
         if(photoUri != null) {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -542,25 +546,26 @@ public class EditDogUserActivity extends AppCompatActivity {
                             .document(dogId)
                             .update(dogData) // Use .set() to create or update the document
                             .addOnSuccessListener(aVoid -> {
-                                progressBar.setVisibility(View.GONE);
+
+                                DialogHelper.hideProgressDialog(progressDialog);
                                 Toast.makeText(EditDogUserActivity.this, "Pal's profile updated successfully!", Toast.LENGTH_SHORT).show();
 
                                 finish();
 
                             })
                             .addOnFailureListener(e -> {
-                                progressBar.setVisibility(View.GONE);
+                                DialogHelper.hideProgressDialog(progressDialog);
                                 Log.e("yoo", "Error adding document", e);
                                 Toast.makeText(EditDogUserActivity.this, "Failed to update Pal's profile. Please try again.", Toast.LENGTH_SHORT).show();
                             });
                 } else {
-                    progressBar.setVisibility(View.GONE);
+                    DialogHelper.hideProgressDialog(progressDialog);
                     Toast.makeText(this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    progressBar.setVisibility(View.GONE);
+                    DialogHelper.hideProgressDialog(progressDialog);
                     Toast.makeText(EditDogUserActivity.this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -581,14 +586,14 @@ public class EditDogUserActivity extends AppCompatActivity {
                     .document(dogId)
                     .update(dogData) // Use .set() to create or update the document
                     .addOnSuccessListener(aVoid -> {
-                        progressBar.setVisibility(View.GONE);
+                        DialogHelper.hideProgressDialog(progressDialog);
                         Toast.makeText(EditDogUserActivity.this, "Pal's profile updated successfully!", Toast.LENGTH_SHORT).show();
 
                         finish();
 
                     })
                     .addOnFailureListener(e -> {
-                        progressBar.setVisibility(View.GONE);
+                        DialogHelper.hideProgressDialog(progressDialog);
                         Log.e("yoo", "Error adding document", e);
                         Toast.makeText(EditDogUserActivity.this, "Failed to update Pal's profile. Please try again.", Toast.LENGTH_SHORT).show();
                     });

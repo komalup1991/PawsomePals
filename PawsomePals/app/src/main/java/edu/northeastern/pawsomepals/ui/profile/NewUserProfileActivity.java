@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -47,6 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class NewUserProfileActivity extends AppCompatActivity {
 
@@ -72,7 +74,7 @@ public class NewUserProfileActivity extends AppCompatActivity {
     private FirebaseUser currentUser;
     private String userId;
     private ProgressBar progressBar;
-
+    private Dialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -223,7 +225,7 @@ public class NewUserProfileActivity extends AppCompatActivity {
             Toast.makeText(this, "Please fill all the fields and add a profile picture.", Toast.LENGTH_SHORT).show();
             return;
         }
-        progressBar.setVisibility(View.VISIBLE);
+        DialogHelper.showProgressDialog("Profile is getting created ...", progressDialog, NewUserProfileActivity.this);
 
         String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageName = "user_image_" + timestamp + ".jpg";
@@ -254,17 +256,17 @@ public class NewUserProfileActivity extends AppCompatActivity {
                         .document(firebaseAuth.getUid())
                         .update(userData)
                         .addOnSuccessListener(aVoid -> {
-                            progressBar.setVisibility(View.GONE);
+                            DialogHelper.hideProgressDialog(progressDialog);
                             Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
                             navigateToEditDogProfileActivity();
                             finish();
                         })
                         .addOnFailureListener(e -> {
-                            progressBar.setVisibility(View.GONE);
+                            DialogHelper.hideProgressDialog(progressDialog);
                             Toast.makeText(this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
                         });
             } else {
-                progressBar.setVisibility(View.GONE);
+                DialogHelper.hideProgressDialog(progressDialog);
                 Toast.makeText(this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
             }
         });
