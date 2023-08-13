@@ -210,7 +210,9 @@ public class FeedAllFragment extends Fragment {
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
                                                                   add(posts);
                                                               }},
-                userIds, new FirestoreDataLoader.FirestoreDataListener() {
+                userIds,
+                FeedFilter.RECENT,
+                new FirestoreDataLoader.FirestoreDataListener() {
 
                     @Override
                     public void onDataLoaded(List<FeedItem> feedItems) {
@@ -278,7 +280,7 @@ public class FeedAllFragment extends Fragment {
             public void onFollowingUserIdListReceived(List<String> followingUserIds) {
                 super.onFollowingUserIdListReceived(followingUserIds);
                 FirestoreDataLoader.loadDataFromCollectionsForUserIds(FirestoreDataLoader.getAllCollections(),
-                        followingUserIds, new FirestoreDataLoader.FirestoreDataListener() {
+                        followingUserIds, feedFilter, new FirestoreDataLoader.FirestoreDataListener() {
 
                             @Override
                             public void onDataLoaded(List<FeedItem> feedItems) {

@@ -24,6 +24,7 @@ import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
+import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
@@ -31,6 +32,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     private final RecipeHorizontalListAdapter recipeHorizontalListAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
     private Spinner filterSpinner;
+    private int feedFilter = FeedFilter.POPULAR;
 
 
     private List<String> userIds = new ArrayList<>();
@@ -61,6 +63,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 onItemActionListener.onFeedFilterSpinnerClick(i);
+                feedFilter = i;
             }
 
             @Override
@@ -78,7 +81,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
         CollectionReference recipes = FirebaseFirestore.getInstance().collection(FeedCollectionType.RECIPES);
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
             add(recipes);
-        }}, userIds, new FirestoreDataLoader.FirestoreDataListener() {
+        }}, userIds, feedFilter, new FirestoreDataLoader.FirestoreDataListener() {
             @Override
             public void onDataLoaded(List<FeedItem> feedItems) {
                 recipeList.clear();

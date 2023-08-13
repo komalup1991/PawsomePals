@@ -61,8 +61,8 @@ public class FirestoreDataLoader {
         loadDataFromCollections(new ArrayList<>(), new ArrayList<>(), collections, feedFilter, firestoreDataListener);
     }
 
-    public static void loadDataFromCollectionsForUserIds(List<CollectionReference> collections, List<String> userIds, FirestoreDataListener firestoreDataListener) {
-        loadDataFromCollections(new ArrayList<>(), userIds, collections, FeedFilter.RECENT, firestoreDataListener);
+    public static void loadDataFromCollectionsForUserIds(List<CollectionReference> collections, List<String> userIds, int feedFilter, FirestoreDataListener firestoreDataListener) {
+        loadDataFromCollections(new ArrayList<>(), userIds, collections, feedFilter, firestoreDataListener);
     }
 
     public static void loadDataFromCollectionsForFeedIds(List<CollectionReference> collections, List<String> feedIds, FirestoreDataListener firestoreDataListener) {
