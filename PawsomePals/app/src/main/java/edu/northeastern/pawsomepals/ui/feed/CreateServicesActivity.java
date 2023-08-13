@@ -71,7 +71,11 @@ public class CreateServicesActivity extends AppCompatActivity {
         serviceTypeSpinnerOptions = findViewById(R.id.serviceTypeSpinnerOptions);
         serviceNameEditTextView = findViewById(R.id.serviceNameEditTextView);
         notesOnServiceEditTextView = findViewById(R.id.notesOnServiceEditTextView);
+
+
+
         taggingOptionsLayout = findViewById(R.id.tag_location_layout);
+
         taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
             @Override
             public void onLocation(LatLng latLng, String locationTagged) {
@@ -88,7 +92,8 @@ public class CreateServicesActivity extends AppCompatActivity {
         if (existingFeedItem != null) {
             serviceNameEditTextView.setText(existingFeedItem.getServiceName());
             notesOnServiceEditTextView.setText(existingFeedItem.getServiceNotes());
-            //  serviceTypeSpinnerOptions.setSelection(existingFeedItem.getServiceType());
+            setSpinnerOption(existingFeedItem.getServiceType());
+           // serviceTypeSpinnerOptions.setSelection(existingFeedItem.getServiceType());
             if (existingFeedItem.getUserTagged() != null) {
                 taggingOptionsLayout.setTagPeopleTextView(existingFeedItem.getUserTagged());
             }
@@ -246,5 +251,20 @@ public class CreateServicesActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void setSpinnerOption(String selectedService){
+        //String selectedService = "Dog Sitting";
+        String[] spinnerOptions = getResources().getStringArray(R.array.menu_options_array);
+        int selectedIndex = -1;
+        for (int i = 0; i < spinnerOptions.length; i++) {
+            if (spinnerOptions[i].equals(selectedService)) {
+                selectedIndex = i;
+                break;
+            }
+        }
+        if (selectedIndex != -1) {
+            serviceTypeSpinnerOptions.setSelection(selectedIndex);
+        }
     }
 }

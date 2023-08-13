@@ -2,17 +2,23 @@ package edu.northeastern.pawsomepals.ui.login;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -27,13 +33,11 @@ import edu.northeastern.pawsomepals.ui.profile.FollowersFollowingActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.ui.search.SearchFragment;
 
-public class HomeActivity extends AppCompatActivity implements LogoutDialogListener {
+public class HomeActivity extends AppCompatActivity  implements LogoutDialogListener{
     BottomNavigationView bottomNavigationView;
     private int currentSelectedItemIndex = 0;
     private Toolbar toolbar;
 
-    private ImageView logoutImageView;
-    private ImageView dogBreeds;
     public static int PROFILE_ACTIVITY_REQUEST_CODE = 4;
 
     @Override
@@ -42,34 +46,13 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
         setContentView(R.layout.activity_home);
         toolbar = findViewById(R.id.chatToolBar);
 
-        logoutImageView = findViewById(R.id.logoutImageView);
-        dogBreeds = findViewById(R.id.dogBreeds);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("Feed");
+        }
 
-        dogBreeds.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(HomeActivity.this, DogBreedActivity.class));
-            }
-        });
-        logoutImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LogoutDialogFragment dialog = new LogoutDialogFragment();
-                dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
-                dialog.show(getSupportFragmentManager(), "logout_dialog");
-//                Log out delete messaging token to avoid receiving messages
-//                FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                       if (task.isSuccessful()){
-//                           LogoutDialogFragment dialog = new LogoutDialogFragment();
-//                           dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
-//                           dialog.show(getSupportFragmentManager(), "logout_dialog");
-//                       }
-//                    }
-//                });
-            }
-        });
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -79,7 +62,6 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
                 String fragmentTag = getFragmentTagBasedOnId(item.getItemId());
                 Fragment fragment = getSupportFragmentManager().findFragmentByTag(fragmentTag);
 
-                dogBreeds.setVisibility(View.GONE);
 
                 if (fragment == null) {
                     fragment = getFragmentBasedOnId(currentSelectedItemIndex);
@@ -93,7 +75,6 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
                     editor.putString("profileId", FirebaseAuth.getInstance().getCurrentUser().getUid());
                     editor.apply();
 
-                    dogBreeds.setVisibility(View.VISIBLE);
                 }
 
                 replaceFragment(fragment, item.getItemId());
@@ -117,8 +98,36 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
         showInitialFragment();
     }
 
+
+    @SuppressLint("RestrictedApi")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (menu instanceof MenuBuilder) {
+            ((MenuBuilder) menu).setOptionalIconsVisible(true);
+        }
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+
+        if(itemId == R.id.action_display_breeds)
+        {
+            startActivity(new Intent(HomeActivity.this, DogBreedActivity.class));
+        } else if (itemId == R.id.action_logout) {
+            LogoutDialogFragment dialog = new LogoutDialogFragment();
+            dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
+            dialog.show(getSupportFragmentManager(), "logout_dialog");
+        } else if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private Fragment getFragmentBasedOnId(int itemId) {
-        dogBreeds.setVisibility(View.GONE);
         if (itemId == R.id.feed) {
             return new FeedFragment();
         } else if (itemId == R.id.search) {
@@ -133,7 +142,6 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
             Bundle args = new Bundle();
             args.putString("profileId", FirebaseAuth.getInstance().getCurrentUser().getUid());
             profileFragment.setArguments(args);
-            dogBreeds.setVisibility(View.VISIBLE);
             return profileFragment;
         } else if (itemId == R.id.map) {
             toolbar.setTitle("Map");
@@ -177,14 +185,12 @@ public class HomeActivity extends AppCompatActivity implements LogoutDialogListe
     }
 
     private void replaceFragment(Fragment fragment, int id) {
-        dogBreeds.setVisibility(View.GONE);
         // Check if the selected fragment is the ProfileFragment
         if (fragment instanceof ProfileFragment) {
             // Set the profileId to the current user's userId
             SharedPreferences sharedPreferences = getSharedPreferences("ProfileId", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString("profileId", FirebaseAuth.getInstance().getCurrentUser().getUid());
-            dogBreeds.setVisibility(View.VISIBLE);
             editor.apply();
         }
 

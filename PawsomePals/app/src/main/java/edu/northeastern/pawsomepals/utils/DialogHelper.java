@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -73,11 +72,12 @@ public class DialogHelper {
         progressDialog.show();
     }
 
-    public static void showMoreOptionsMenu(AppCompatActivity activity, FeedItem feedItem, View view){
+    public static PopupMenu getPopupMenu(AppCompatActivity activity, View view, FeedItem feedItem, FeedFragmentViewType feedFragmentViewType) {
         Context context = activity.getBaseContext();
-        PopupMenu popupMenu = new PopupMenu(context, view);
+        PopupMenu popupMenu = new PopupMenu(activity.getBaseContext(), view);
         popupMenu.inflate(R.menu.post_overflow_menu);
         MenuItem editMenuItem = popupMenu.getMenu().findItem(R.id.action_edit);
+
         if (editMenuItem != null) {
             if (feedItem.getCreatedBy().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
                 editMenuItem.setVisible(true);
@@ -85,6 +85,12 @@ public class DialogHelper {
                 editMenuItem.setVisible(false);
             }
         }
+
+        MenuItem favMenuItem = popupMenu.getMenu().findItem(R.id.action_goToFav);
+        if (favMenuItem != null && feedFragmentViewType == FeedFragmentViewType.FAVOURITE) {
+            favMenuItem.setVisible(false);
+        }
+
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -93,7 +99,7 @@ public class DialogHelper {
                     Intent intent = null;
 
                     if(feedItem.getType()==1){
-                     intent = new Intent(context, CreatePhotoVideoActivity.class);}
+                        intent = new Intent(context, CreatePhotoVideoActivity.class);}
                     else if (feedItem.getType()==2) {
                         intent = new Intent(context, CreateServicesActivity.class);}
                     else if (feedItem.getType()==3) {
@@ -125,7 +131,8 @@ public class DialogHelper {
                 return false;
             }
         });
-        popupMenu.show();
+
+        return popupMenu;
     }
 }
 

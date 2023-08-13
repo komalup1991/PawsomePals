@@ -1,8 +1,8 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
-import android.app.Activity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,10 +10,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
@@ -46,7 +49,7 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-    public void bindData(AppCompatActivity activity, PhotoVideo photoVideo, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, PhotoVideo photoVideo, FeedFragmentViewType feedFragmentViewType, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, photoVideo);
         Glide.with(userProfilePic.getContext())
                 .load(photoVideo.getUserProfileImage())
@@ -83,6 +86,7 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
 
         Glide.with(photoVideoImageView.getContext())
                 .load(photoVideo.getImg())
+                .transform(new FitCenter(), new GranularRoundedCorners(0, 0, 25, 25))
                 .into(photoVideoImageView);
 
         userProfilePic.setOnClickListener(new View.OnClickListener() {
@@ -98,10 +102,16 @@ public class PhotoVideoFeedViewHolder extends RecyclerView.ViewHolder {
                 onItemActionListener.onUserClick(photoVideo.getCreatedBy());
             }
         });
+
+        PopupMenu popupMenu = DialogHelper.getPopupMenu(activity, moreOptionImageView, photoVideo, feedFragmentViewType);
+        if (!popupMenu.getMenu().hasVisibleItems()) {
+            moreOptionImageView.setVisibility(View.GONE);
+        }
+
         moreOptionImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showMoreOptionsMenu(activity, photoVideo, view);
+                popupMenu.show();
             }
         });
     }

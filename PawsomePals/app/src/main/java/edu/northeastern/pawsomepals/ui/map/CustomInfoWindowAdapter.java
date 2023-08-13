@@ -9,12 +9,15 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
+import edu.northeastern.pawsomepals.models.Post;
+import edu.northeastern.pawsomepals.models.Services;
 
 public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private final AppCompatActivity activity;
@@ -39,20 +42,16 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
     @Override
     public View getInfoWindow(Marker marker) {
-        String imageUrl = null;
         ImageView imageView = infoWindowView.findViewById(R.id.imageView);
         TextView titleTextView = infoWindowView.findViewById(R.id.titleTextView);
+        TextView userNameTextView = infoWindowView.findViewById(R.id.username);
         TextView snippetTextView = infoWindowView.findViewById(R.id.snippetTextView);
-        titleTextView.setText(marker.getTitle());
-        snippetTextView.setText(marker.getSnippet());
 
-        if (feedItem.getType() == 1) {
-            imageUrl = ((PhotoVideo) feedItem).getImg();
-        } else if (feedItem.getType() == 2) {
-            imageView.setVisibility(View.GONE);
-        } else if (feedItem.getType() == 3) {
-            imageUrl = ((Event) feedItem).getImg();
-        } else if (feedItem.getType() == 4) {
+        titleTextView.setText(getTitle());
+        userNameTextView.setText("By: " + feedItem.getUsername());
+        snippetTextView.setText(feedItem.getLocationTagged());
+
+        if (feedItem.getType() == 2 || feedItem.getType() == 4) {
             imageView.setVisibility(View.GONE);
         }
 
@@ -61,4 +60,55 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         }
         return infoWindowView;
     }
+
+    private String getTitle() {
+        if (feedItem.getType() == 1) {
+            return ((PhotoVideo) feedItem).getCaption();
+//                    .icon(icon)
+//                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+        } else if (feedItem.getType() == 2) {
+            return ((Services) feedItem).getServiceName();
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+        } else if (feedItem.getType() == 3) {
+            return (((Event) feedItem).getEventName());
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+        } else if (feedItem.getType() == 4) {
+            return (((Post) feedItem).getCaption());
+//            marker.title(((Post) feedItem).getCaption())
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+        }
+        return "";
+    }
+
+//    private String getSnippet() {
+//        return feedItem.getLocationTagged();
+////        if (feedItem.getType() == 1) {
+////            return ((PhotoVideo) feedItem).getCaption();
+//                    .icon(icon)
+//                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+////        } else if (feedItem.getType() == 2) {
+////            return ((Services) feedItem).getServiceName();
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+////        } else if (feedItem.getType() == 3) {
+////            return (((Event) feedItem).getEventName());
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+////        } else if (feedItem.getType() == 4) {
+////            return (((Post) feedItem).getCaption());
+//            marker.title(((Post) feedItem).getCaption())
+//                    .icon(icon)
+//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
+//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
+////        }
+//        return "";
+//    }
 }

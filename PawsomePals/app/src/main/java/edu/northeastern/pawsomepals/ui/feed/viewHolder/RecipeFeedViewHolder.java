@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -10,11 +11,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
@@ -40,7 +42,7 @@ public class RecipeFeedViewHolder extends RecyclerView.ViewHolder {
         moreOptionImageView = itemView.findViewById(R.id.moreOptionImageView);
     }
 
-    public void bindData(AppCompatActivity activity, Recipe recipe, OnItemActionListener onItemActionListener) {
+    public void bindData(AppCompatActivity activity, FeedFragmentViewType feedFragmentViewType, Recipe recipe, OnItemActionListener onItemActionListener) {
         feedActionsLayout.bindView(activity, recipe);
         recipeName.setText(recipe.getTitle());
         username.setText(recipe.getUsername());
@@ -48,7 +50,7 @@ public class RecipeFeedViewHolder extends RecyclerView.ViewHolder {
 
         Glide.with(itemView.getContext())
                 .load(recipe.getImg())
-                .transform(new FitCenter(), new RoundedCorners(20))
+                .transform(new FitCenter(), new GranularRoundedCorners(0, 0, 25, 25))
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(recipeImage);
 
@@ -83,10 +85,15 @@ public class RecipeFeedViewHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        PopupMenu popupMenu = DialogHelper.getPopupMenu(activity, moreOptionImageView, recipe, feedFragmentViewType);
+        if (!popupMenu.getMenu().hasVisibleItems()) {
+            moreOptionImageView.setVisibility(View.GONE);
+        }
+
         moreOptionImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogHelper.showMoreOptionsMenu(activity, recipe, view);
+                popupMenu.show();
             }
         });
     }

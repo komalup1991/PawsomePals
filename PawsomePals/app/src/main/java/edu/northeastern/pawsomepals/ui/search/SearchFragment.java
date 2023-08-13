@@ -128,6 +128,12 @@ public class SearchFragment extends Fragment {
         Button recipeBtn = view.findViewById(R.id.recipe_btn);
         Button historyBtn = view.findViewById(R.id.history_button);
 
+        selectedSearchType = "dogs";
+        searchRecyclerView.setAdapter(searchDogAdapter);
+        dogBtn.setBackgroundColor(getResources().getColor(R.color.white));
+        dogBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+
+
         AutoCompleteTextView autoCompleteTextView = view.findViewById(R.id.search);
         autoCompleteTextView.requestFocus();
 
@@ -144,6 +150,7 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedQuery = autoCompleteAdapter.getItem(position);
                 searchInput.setText(selectedQuery);
+                cardView.setVisibility(View.GONE);
                 performSearch(selectedSearchType);
             }
         });
@@ -171,10 +178,6 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 cardView.setVisibility(View.GONE);
-                if (selectedSearchType.isEmpty()) {
-                    showToast("Please select a search type");
-                    return;
-                }
 
                 performSearch(selectedSearchType);
                 saveSearchHistory(searchInput.getText().toString());
@@ -184,9 +187,12 @@ public class SearchFragment extends Fragment {
         dogBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dogBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                dogBtn.setBackgroundColor(getResources().getColor(R.color.white));
                 userBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
                 recipeBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                dogBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+                userBtn.setTextColor(getResources().getColor(R.color.white));
+                recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "dogs";
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
@@ -201,8 +207,11 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 dogBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-                userBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                userBtn.setBackgroundColor(getResources().getColor(R.color.white));
                 recipeBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
+                userBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+                dogBtn.setTextColor(getResources().getColor(R.color.white));
+                recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "users";
                 searchRecyclerView.setAdapter(searchUserAdapter);
 
@@ -215,7 +224,10 @@ public class SearchFragment extends Fragment {
             public void onClick(View view) {
                 dogBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
                 userBtn.setBackgroundColor(getResources().getColor(R.color.colorSecondary));
-                recipeBtn.setBackgroundColor(getResources().getColor(R.color.black));
+                recipeBtn.setBackgroundColor(getResources().getColor(R.color.white));
+                recipeBtn.setTextColor(getResources().getColor(R.color.colorSecondary));
+                dogBtn.setTextColor(getResources().getColor(R.color.white));
+                userBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "recipes";
                 searchRecyclerView.setAdapter(searchRecipeAdapter);
 
@@ -274,12 +286,18 @@ public class SearchFragment extends Fragment {
 
     private void performSearch(String searchType) {
         String inputSearch = searchInput.getText().toString().trim();
+        if(inputSearch.isEmpty()){
+            showToast("Please enter a valid search");
+        }
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         Query query;
 
+
+
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").orderBy("name")
-                    .startAt(inputSearch.toLowerCase())
+            query = db.collection("dogs").whereGreaterThanOrEqualTo("name",inputSearch)
+                    .orderBy("name")
+                    .startAt(inputSearch.toUpperCase())
                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
                     .limit(10);
 
@@ -301,8 +319,9 @@ public class SearchFragment extends Fragment {
 
         } else if (selectedSearchType.equals("users")) {
 
-             query = db.collection("user").orderBy("name")
-                     .startAt(inputSearch.toLowerCase())
+             query = db.collection("user").whereGreaterThanOrEqualTo("name",inputSearch)
+                     .orderBy("name")
+                     .startAt(inputSearch.toUpperCase())
                      .endAt(inputSearch.toLowerCase()+ "\uf8ff")
                      .limit(10);
 
@@ -322,8 +341,9 @@ public class SearchFragment extends Fragment {
              });
         } else if (selectedSearchType.equals("recipes")) {
 
-            query = db.collection("recipes").orderBy("title")
-                    .startAt(inputSearch.toLowerCase())
+            query = db.collection("recipes").whereGreaterThanOrEqualTo("title",inputSearch)
+                    .orderBy("title")
+                    .startAt(inputSearch.toUpperCase())
                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
                     .limit(10);
 
@@ -403,22 +423,22 @@ public class SearchFragment extends Fragment {
         if (selectedSearchType.equals("dogs")) {
             suggestionsQuery = db.collection("dogs")
                     .orderBy("name")
-                    .startAt(input)
-                    .endAt(input + "\uf8ff")
+                    .startAt(input.toUpperCase())
+                    .endAt(input.toLowerCase() + "\uf8ff")
                     .limit(10);
 
         } else if (selectedSearchType.equals("users")) {
             suggestionsQuery = db.collection("user")
                     .orderBy("name")
-                    .startAt(input)
-                    .endAt(input + "\uf8ff")
+                    .startAt(input.toUpperCase())
+                    .endAt(input.toLowerCase() + "\uf8ff")
                     .limit(10);
 
         } else if (selectedSearchType.equals("recipes")) {
             suggestionsQuery = db.collection("recipes")
                     .orderBy("title")
-                    .startAt(input)
-                    .endAt(input + "\uf8ff")
+                    .startAt(input.toUpperCase())
+                    .endAt(input.toLowerCase() + "\uf8ff")
                     .limit(10);
 
         } else {

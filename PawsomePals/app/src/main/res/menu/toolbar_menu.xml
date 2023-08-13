@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item
+        android:id="@+id/action_display_breeds"
+        android:title="Breeds"
+        android:icon="@drawable/dog_icon"
+        android:iconTint="@color/black"
+        app:showAsAction="withText"/>
+    <item
+        android:id="@+id/action_logout"
+        android:title="Logout"
+        android:icon="@drawable/baseline_logout_24"
+        android:iconTint="@color/black"
+        app:showAsAction="withText"/>
+</menu>

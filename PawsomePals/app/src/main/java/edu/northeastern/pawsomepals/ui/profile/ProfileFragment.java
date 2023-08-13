@@ -50,6 +50,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -57,10 +58,12 @@ import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
+import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
+import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 
 public class ProfileFragment extends Fragment {
     private FirebaseAuth firebaseAuth;
@@ -97,6 +100,8 @@ public class ProfileFragment extends Fragment {
     private LinearLayout postsLayout;
     private ImageButton favImageButton;
     private String profileIdArg;
+
+    private long favoritesCountValue = 0;
 
     @Nullable
     @Override
@@ -233,7 +238,7 @@ public class ProfileFragment extends Fragment {
                     intent.putExtra("clickedValue", "following");
                     getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
                 } else {
-                    Toast.makeText(getContext(), "Following no users", Toast.LENGTH_SHORT);
+                    Toast.makeText(requireContext(), "Following no users", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -247,7 +252,7 @@ public class ProfileFragment extends Fragment {
                     intent.putExtra("clickedValue", "followers");
                     getActivity().startActivityForResult(intent, PROFILE_ACTIVITY_REQUEST_CODE);
                 } else {
-                    Toast.makeText(getContext(), "No followers", Toast.LENGTH_SHORT);
+                    Toast.makeText(requireContext(), "No followers", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -269,26 +274,34 @@ public class ProfileFragment extends Fragment {
                     transaction.addToBackStack(null);
                     transaction.commit();
                 } else {
-                    Toast.makeText(getContext(), "No posts", Toast.LENGTH_SHORT);
+                    Toast.makeText(requireContext(), "No posts", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
+        getFavoritesCount();
+
         favImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProfileFeedFragment feedFragment = new ProfileFeedFragment();
-                Bundle args = new Bundle();
+                if(favoritesCountValue > 0) {
+                    ProfileFeedFragment feedFragment = new ProfileFeedFragment();
+                    Bundle args = new Bundle();
 
-                args.putString("profileId", profileId);
-                args.putString("tabText", "Favourites");
-                args.putSerializable("feed_view_type", FeedFragmentViewType.FAVOURITE);
-                feedFragment.setArguments(args);
+                    args.putString("profileId", profileId);
+                    args.putString("tabText", "Favourites");
+                    args.putSerializable("feed_view_type", FeedFragmentViewType.FAVOURITE);
+                    feedFragment.setArguments(args);
 
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container_view, feedFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
+                    FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.fragment_container_view, feedFragment);
+                    transaction.addToBackStack(null);
+                    transaction.commit();
+                }
+                else
+                {
+                    Toast.makeText(requireContext(), "No Favorites", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -296,6 +309,23 @@ public class ProfileFragment extends Fragment {
         progressBar.setVisibility(View.GONE);
 
         return view;
+    }
+
+    private void getFavoritesCount()
+    {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<String> feedIds = new ArrayList<>(FirestoreDataLoader.fetchUserFavFeedIds());
+                favoritesCountValue = feedIds.size();
+
+                if (favoritesCountValue > 0) {
+                    favImageButton.setImageResource(R.drawable.pawprintfull);
+                } else {
+                    favImageButton.setImageResource(R.drawable.pawprintempty);
+                }
+            }
+        }).start();
     }
 
     @Override

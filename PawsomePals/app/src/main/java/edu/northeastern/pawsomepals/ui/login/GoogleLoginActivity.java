@@ -80,7 +80,7 @@ public class GoogleLoginActivity extends LoginActivity {
             } catch (ApiException e) {
                 progressBar.setVisibility(View.GONE);
                 // Google Sign In failed, update UI appropriately
-                Toast.makeText(GoogleLoginActivity.this, R.string.login_unsuccessful_google_login, Toast.LENGTH_SHORT);
+                Toast.makeText(GoogleLoginActivity.this, R.string.login_unsuccessful_google_login, Toast.LENGTH_SHORT).show();
                 Log.w(TAG, "Google sign in failed", e);
                 finish();
             }
@@ -101,7 +101,7 @@ public class GoogleLoginActivity extends LoginActivity {
                             updateUI(user);
                         } else {
                             progressBar.setVisibility(View.GONE);
-                            Toast.makeText(GoogleLoginActivity.this, R.string.login_unsuccessful_google_login, Toast.LENGTH_SHORT);
+                            Toast.makeText(GoogleLoginActivity.this, R.string.login_unsuccessful_google_login, Toast.LENGTH_SHORT).show();
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             updateUI(null);
@@ -124,7 +124,7 @@ public class GoogleLoginActivity extends LoginActivity {
 
     private void updateUI(FirebaseUser user) {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(GoogleLoginActivity.this);
-        String userUID = account.getId(); // Get user's unique identifier (UID)
+        String userUID = user.getUid(); // Get user's unique identifier (UID)
 
         // Query Firestore to check if a document with the UID exists
         FirebaseFirestore db = FirebaseFirestore.getInstance();

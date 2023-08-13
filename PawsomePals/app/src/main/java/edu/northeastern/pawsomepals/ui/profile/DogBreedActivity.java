@@ -129,7 +129,7 @@ public class DogBreedActivity extends AppCompatActivity {
             }
         }
         if (filteredList.isEmpty()) {
-            Toast.makeText(DogBreedActivity.this, "No breed found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(DogBreedActivity.this, "Searched breed not found", Toast.LENGTH_SHORT).show();
         } else {
             profileAllDogBreedsAdapter.setFilteredList(filteredList);
         }

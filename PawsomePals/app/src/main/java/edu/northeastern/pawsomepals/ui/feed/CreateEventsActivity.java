@@ -36,9 +36,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -111,6 +113,8 @@ public class CreateEventsActivity extends AppCompatActivity {
         eventDetailsEditText = findViewById(R.id.eventDetailsEditText);
         eventImageView = findViewById(R.id.eventImageView);
         selectPhoto = findViewById(R.id.addPhotoImageView);
+        setEventTimeTextView = findViewById(R.id.setEventTimeTextView);
+
         taggingOptionsLayout = findViewById(R.id.tag_location_layout);
         taggingOptionsLayout.bindView(this, new TaggingOptionsLayout.OnTaggedDataFetchListener() {
             @Override
@@ -155,6 +159,15 @@ public class CreateEventsActivity extends AppCompatActivity {
                         existingFeedItem.getLatLng().getLongitude());
             }
 
+            Calendar dateCalendar = getDateCalendar(existingFeedItem.getEventDate());
+            selectedDate = dateCalendar.getTimeInMillis();
+
+            if (existingFeedItem.getEventTime() != null) {
+                setEventTimeTextView.setText(existingFeedItem.getEventTime());
+            }
+            Calendar timeCalendar = getTimeCalendar(existingFeedItem.getEventTime());
+            selectedHour = timeCalendar.get(Calendar.HOUR_OF_DAY);
+            selectedMinute = timeCalendar.get(Calendar.MINUTE);
 
             imageUri = Uri.parse(existingFeedItem.getImg());
             currentFeedItemId = existingFeedItem.getFeedItemId();
@@ -197,7 +210,6 @@ public class CreateEventsActivity extends AppCompatActivity {
             }
         });
 
-        setEventTimeTextView = findViewById(R.id.setEventTimeTextView);
         setEventTimeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -328,10 +340,12 @@ public class CreateEventsActivity extends AppCompatActivity {
 //            return;
 //        }
 
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTimeInMillis(System.currentTimeMillis());
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(selectedHour)
-                .setMinute(selectedMinute)
+                .setHour(timeCal.get(Calendar.HOUR_OF_DAY))
+                .setMinute(timeCal.get(Calendar.MINUTE) + 5)
                 .build();
 
         picker.show(getSupportFragmentManager(), "TIME_PICKER");
@@ -352,7 +366,7 @@ public class CreateEventsActivity extends AppCompatActivity {
             if (selectedDateTime.before(currentDateTime)) {
                 Toast.makeText(getApplicationContext(), "Date and time should not be a past value.", Toast.LENGTH_SHORT).show();
                 return;
-            }
+            };
 
             SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
             String formattedTime = sdf.format(selectedDateTime.getTime()); // Format in local time zone
@@ -366,15 +380,21 @@ public class CreateEventsActivity extends AppCompatActivity {
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
         constraintsBuilder.setValidator(DateValidatorPointForward.now()); // Restrict past dates
 
-        MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder
+        MaterialDatePicker.Builder<Long> materialDatePicker = MaterialDatePicker.Builder
                 .datePicker()
                 .setTitleText("Select date of the event")
                 .setCalendarConstraints(constraintsBuilder.build())
-                .build();
+                .setSelection(System.currentTimeMillis());
 
-        materialDatePicker.show(getSupportFragmentManager(), "DATE_PICKER");
+        if (selectedDate > 0) {
+            materialDatePicker.setSelection(selectedDate);
+        }
 
-        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+        MaterialDatePicker<Long> picker = materialDatePicker.build();
+
+        picker.show(getSupportFragmentManager(), "DATE_PICKER");
+
+        picker.addOnPositiveButtonClickListener(selection -> {
             Log.d("yoo", "selectedDatefefff " + selection);
             Calendar selectedCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // Set to UTC
             selectedCalendar.setTimeInMillis(selection);
@@ -531,5 +551,31 @@ public class CreateEventsActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    Calendar getDateCalendar(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        Date date = null;
+        try {
+            date = dateFormat.parse(dateString);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return calendar;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Calendar getTimeCalendar(String dateString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("h:mm a", Locale.US);
+        Date date = null;
+        try {
+            date = dateFormat.parse(dateString);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return calendar;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -112,7 +112,7 @@ public class FeedAllFragment extends Fragment {
                 }
             });
         }
-        feedAdapter = new FeedAdapter(feedItemList, requireContext(), new OnItemActionListener() {
+        feedAdapter = new FeedAdapter(feedItemList, requireContext(), feedFragmentViewType, new OnItemActionListener() {
             @Override
             public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
@@ -217,18 +217,16 @@ public class FeedAllFragment extends Fragment {
             @Override
             public void run() {
                 List<String> feedIds = new ArrayList<>(FirestoreDataLoader.fetchUserFavFeedIds());
-                if (!(feedIds.size() == 0))
-                {
-                    FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollections(), feedIds,
+                if (!(feedIds.size() == 0)) {
+                    FirestoreDataLoader.loadDataFromCollectionsForFeedIds(FirestoreDataLoader.getAllCollectionsWithRecipes(), feedIds,
                             new FirestoreDataLoader.FirestoreDataListener() {
                                 @Override
                                 public void onDataLoaded(List<FeedItem> feedItems) {
                                     notifyDatasetChange(feedItems);
                                 }
                             });
-            }
-                else {
-                    return;
+                } else {
+                    notifyDatasetChange(new ArrayList<>());
                 }
 
             }

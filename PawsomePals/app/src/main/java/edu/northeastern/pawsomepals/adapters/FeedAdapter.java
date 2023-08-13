@@ -1,6 +1,5 @@
 package edu.northeastern.pawsomepals.adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,7 @@ import edu.northeastern.pawsomepals.models.PhotoVideo;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
+import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.EventFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PhotoVideoFeedViewHolder;
 import edu.northeastern.pawsomepals.ui.feed.viewHolder.PostFeedViewHolder;
@@ -31,13 +31,15 @@ import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<FeedItem> feedItems;
     private Context context;
+    private FeedFragmentViewType feedFragmentViewType;
     private OnItemActionListener onItemActionListener;
 
     private List<String> userIds = new ArrayList<>();
 
-    public FeedAdapter(List<FeedItem> feedItems, Context context, OnItemActionListener onItemActionListener) {
+    public FeedAdapter(List<FeedItem> feedItems, Context context, FeedFragmentViewType feedFragmentViewType, OnItemActionListener onItemActionListener) {
         this.feedItems = feedItems;
         this.context = context;
+        this.feedFragmentViewType = feedFragmentViewType;
         this.onItemActionListener = onItemActionListener;
     }
 
@@ -86,15 +88,15 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case FeedItem.TYPE_RECIPE_HEADER ->
                     ((RecipeFeedsHeaderViewHolder) holder).bindRecylerViewData();
             case FeedItem.TYPE_POST ->
-                    ((PostFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Post) feedItem, onItemActionListener);
+                    ((PostFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Post) feedItem, feedFragmentViewType, onItemActionListener);
             case FeedItem.TYPE_PHOTO_VIDEO ->
-                    ((PhotoVideoFeedViewHolder) holder).bindData(((AppCompatActivity) context), (PhotoVideo) feedItem, onItemActionListener);
+                    ((PhotoVideoFeedViewHolder) holder).bindData(((AppCompatActivity) context), (PhotoVideo) feedItem, feedFragmentViewType, onItemActionListener);
             case FeedItem.TYPE_EVENT ->
-                    ((EventFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Event) feedItem, onItemActionListener);
+                    ((EventFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Event) feedItem, feedFragmentViewType, onItemActionListener);
             case FeedItem.TYPE_SERVICE ->
-                    ((ServicesFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Services) feedItem, onItemActionListener);
+                    ((ServicesFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Services) feedItem, feedFragmentViewType, onItemActionListener);
             case FeedItem.TYPE_RECIPE ->
-                    ((RecipeFeedViewHolder) holder).bindData(((AppCompatActivity) context), (Recipe) feedItem, onItemActionListener);
+                    ((RecipeFeedViewHolder) holder).bindData(((AppCompatActivity) context), feedFragmentViewType, (Recipe) feedItem, onItemActionListener);
         }
     }
 
