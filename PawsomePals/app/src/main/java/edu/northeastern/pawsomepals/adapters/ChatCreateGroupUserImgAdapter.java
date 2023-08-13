@@ -1,12 +1,12 @@
 package edu.northeastern.pawsomepals.adapters;
 
+import static edu.northeastern.pawsomepals.ui.chat.CreateNewGroupChat.ADD_DATA_POSITION;
+
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
@@ -18,7 +18,6 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Users;
 
 public class ChatCreateGroupUserImgAdapter extends RecyclerView.Adapter<ChatCreateGroupUserImgAdapter.GroupUserImgHolder> {
     private Context context;
@@ -70,9 +69,14 @@ public class ChatCreateGroupUserImgAdapter extends RecyclerView.Adapter<ChatCrea
     public int getItemCount() {
         return usersList.size();
     }
-    public void updateData(List<String> data) {
+    public void updateData(List<String> data,int position) {
+        if(position == ADD_DATA_POSITION ){
+            usersList = data;
+            notifyDataSetChanged();
+        } else if (position >= 0){
+        notifyItemRemoved(position);
         usersList = data;
-        notifyDataSetChanged();
+        notifyDataSetChanged();}
     }
     class GroupUserImgHolder extends RecyclerView.ViewHolder {
         private ImageView profileImg;

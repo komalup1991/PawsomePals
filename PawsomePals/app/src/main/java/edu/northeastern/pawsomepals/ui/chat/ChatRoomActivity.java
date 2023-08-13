@@ -15,41 +15,32 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.MediaRouteButton;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -80,13 +71,9 @@ import edu.northeastern.pawsomepals.models.ChatLocationModel;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
 import edu.northeastern.pawsomepals.models.ChatStyle;
-import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.GroupChatModel;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
-import edu.northeastern.pawsomepals.ui.login.MainActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
-import edu.northeastern.pawsomepals.utils.ImageUtil;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
@@ -109,9 +96,8 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageButton infoBtn;
     private ImageView img_preview, image_view_container;
     private CardView img_cardview;
-    private TextView imgPreviewTextView, locationPreviewTextView;
+    private TextView  locationPreviewTextView;
     private TextView chatRoomName;
-    private LinearLayout chatRoomToolbar;
 
     private RecyclerView chatRoomRecyclerView;
     private List<Users> otherGroupUsers;
@@ -120,7 +106,6 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ConstraintLayout chat_image_preview_container, chat_location_preview_container;
 
     private Users currentUser, otherUser;
-    private FrameLayout profileShowBackground;
     private String chatRoomId;
     private ChatRoomModel chatRoomModel;
     private ChatMessageRecyclerAdapter adapter;
@@ -158,40 +143,25 @@ public class ChatRoomActivity extends AppCompatActivity {
             }
         });
 
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i("hello", ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent()) + "");
-                if (ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent())) {
-                    ChatFragment chatFragment = new ChatFragment();
-                    FragmentTransaction transaction = ChatRoomActivity.this.getSupportFragmentManager().beginTransaction();
-                    transaction.replace(R.id.chatRoomContainer, chatFragment);
-                    transaction.commit();
+        backBtn.setOnClickListener(view -> {
+            if (ChatFirebaseUtil.getIntentFromEditRoomAsIntent(getIntent())) {
+                ChatFragment chatFragment = new ChatFragment();
+                FragmentTransaction transaction = ChatRoomActivity.this.getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.chatRoomContainer, chatFragment);
+                transaction.commit();
 
-                } else {
-                    onBackPressed();
-                }
+            } else {
+                onBackPressed();
             }
         });
-        imgDisMissBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                img_cardview.setVisibility(View.INVISIBLE);
-            }
+        imgDisMissBtn.setOnClickListener(view -> img_cardview.setVisibility(View.INVISIBLE));
+        preview_dismiss_button.setOnClickListener(view -> {
+            chat_image_preview_container.setVisibility(View.INVISIBLE);
+            fileUri = null;
         });
-        preview_dismiss_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                chat_image_preview_container.setVisibility(View.INVISIBLE);
-                fileUri = null;
-            }
-        });
-        preview_location_dismiss_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                chat_location_preview_container.setVisibility(View.INVISIBLE);
-                location = null;
-            }
+        preview_location_dismiss_button.setOnClickListener(view -> {
+            chat_location_preview_container.setVisibility(View.INVISIBLE);
+            location = null;
         });
 
         functionBtn.setOnClickListener(view -> showDialog()
@@ -342,11 +312,8 @@ public class ChatRoomActivity extends AppCompatActivity {
         img_cardview = findViewById(R.id.image_cardview);
         chat_location_preview_container = findViewById(R.id.chat_location_preview_container);
         image_view_container = findViewById(R.id.image_view_container);
-        imgPreviewTextView = findViewById(R.id.image_preview_textView);
         locationPreviewTextView = findViewById(R.id.location_preview_textView);
-        profileShowBackground = findViewById(R.id.profile_show_background);
         chat_image_preview_container = findViewById(R.id.chat_image_preview_container);
-        chatRoomToolbar = findViewById(R.id.chatRoomToolBar);
     }
 
     private void showDialog() {
@@ -354,26 +321,17 @@ public class ChatRoomActivity extends AppCompatActivity {
         LinearLayout galleryLayout = functionDialog.findViewById(R.id.layoutGallery);
         LinearLayout locationLayout = functionDialog.findViewById(R.id.layoutLocation);
 
-        cameraLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleImageCaptureFromCamera();
-                functionDialog.dismiss();
-            }
+        cameraLayout.setOnClickListener(view -> {
+            handleImageCaptureFromCamera();
+            functionDialog.dismiss();
         });
-        galleryLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleImagePickFromGallery();
-                functionDialog.dismiss();
-            }
+        galleryLayout.setOnClickListener(view -> {
+            handleImagePickFromGallery();
+            functionDialog.dismiss();
         });
-        locationLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                handleLocationPickFromApi();
-                functionDialog.dismiss();
-            }
+        locationLayout.setOnClickListener(view -> {
+            handleLocationPickFromApi();
+            functionDialog.dismiss();
         });
         functionDialog.show();
         functionDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -402,14 +360,11 @@ public class ChatRoomActivity extends AppCompatActivity {
                 .setQuery(query, ChatMessageModel.class).build();
 
         adapter = new ChatMessageRecyclerAdapter(options, getApplicationContext());
-        adapter.setOnItemClickListener(new ChatMessageRecyclerAdapter.OnImgItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                img_cardview.setVisibility(View.VISIBLE);
-                Glide.with(getApplicationContext())
-                        .load(options.getSnapshots().get(position).getImage())
-                        .into(image_view_container);
-            }
+        adapter.setOnItemClickListener(position -> {
+            Glide.with(getApplicationContext())
+                    .load(options.getSnapshots().get(position).getImage())
+                    .into(image_view_container);
+            img_cardview.setVisibility(View.VISIBLE);
         });
         LinearLayoutManager manager = new LinearLayoutManager(this);
         manager.setReverseLayout(true);
