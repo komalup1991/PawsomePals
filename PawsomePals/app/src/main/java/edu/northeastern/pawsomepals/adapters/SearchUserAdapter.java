@@ -50,19 +50,13 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchViewHolder>{
                 into(holder.searchImage);
 
 
-        holder.title.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onUserClick(users.get(position));
             }
         });
 
-        holder.searchImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onItemActionListener.onUserClick(users.get(position));
-            }
-        });
 
     }
 

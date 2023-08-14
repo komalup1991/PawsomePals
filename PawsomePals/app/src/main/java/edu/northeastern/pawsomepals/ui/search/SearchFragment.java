@@ -298,7 +298,7 @@ public class SearchFragment extends Fragment {
 
             query = db.collection("dogs")
                     .orderBy("name")
-                    .startAt(inputSearch.toUpperCase())
+                    .startAt(inputSearch)
                     .endAt(inputSearch.toLowerCase() + "\uf8ff")
                     .limit(10);
 

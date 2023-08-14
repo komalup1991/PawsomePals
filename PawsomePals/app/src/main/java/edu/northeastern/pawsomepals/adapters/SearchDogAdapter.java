@@ -47,20 +47,13 @@ public class SearchDogAdapter extends RecyclerView.Adapter<SearchViewHolder>{
                 load(dog.getProfileImage()).
                 into(holder.searchImage);
 
-
-        holder.title.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-               onItemActionListener.onDogsClick(dogs.get(position));
-            }
-        });
-
-        holder.searchImage.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onItemActionListener.onDogsClick(dogs.get(position));
             }
         });
+
 
     }
 
