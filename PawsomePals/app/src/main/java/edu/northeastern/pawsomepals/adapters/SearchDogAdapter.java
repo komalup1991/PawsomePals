@@ -74,4 +74,9 @@ public class SearchDogAdapter extends RecyclerView.Adapter<SearchViewHolder>{
         return dogs.size();
     }
 
+    public void clearData() {
+        dogs.clear();
+        notifyDataSetChanged();
+    }
+
 }

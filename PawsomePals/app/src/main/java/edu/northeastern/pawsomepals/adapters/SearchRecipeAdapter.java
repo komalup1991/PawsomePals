@@ -72,4 +72,9 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchViewHolder> 
     public int getItemCount() {
         return recipes.size();
     }
+
+    public void clearData() {
+        recipes.clear();
+        notifyDataSetChanged();
+    }
 }

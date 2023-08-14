@@ -76,4 +76,9 @@ public class SearchUserAdapter extends RecyclerView.Adapter<SearchViewHolder>{
     public int getItemCount() {
         return users.size();
     }
+
+    public void clearData() {
+        users.clear();
+        notifyDataSetChanged();
+    }
 }
