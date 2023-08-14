@@ -368,6 +368,7 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            DialogHelper.hideProgressDialog(progressDialog);
             onBackPressed();
             return true;
         }
@@ -376,9 +377,9 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        DialogHelper.hideProgressDialog(progressDialog);
         showConfirmationDialog();
     }
-
     private void showConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Are you sure you want to discard changes?");

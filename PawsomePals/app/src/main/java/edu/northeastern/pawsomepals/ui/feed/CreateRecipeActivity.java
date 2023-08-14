@@ -308,17 +308,8 @@ public class CreateRecipeActivity extends AppCompatActivity {
         String recipeInstructions = instructionsEditTextView.getText().toString();
 
         String recipeServing = setServingSizeTextView.getText().toString();
-//        if (recipeServing.equals(getString(R.string.set_servings))) {
-//            recipeServing = "";
-//        }
         String recipePrepTime = setPrepTextView.getText().toString();
-//        if (recipePrepTime.equals(getString(R.string.set_time))) {
-//            recipePrepTime = "";
-//        }
         String recipeCookTime = setCookTextView.getText().toString();
-//        if (recipeCookTime.equals(getString(R.string.set_time))) {
-//            recipeCookTime = "";
-//        }
         String createdAt = String.valueOf(dateFormat.format(System.currentTimeMillis()));
 
         feedItem.setTitle(recipeTitle);
@@ -466,6 +457,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
+            DialogHelper.hideProgressDialog(progressDialog);
             onBackPressed();
             return true;
         }
@@ -474,9 +466,9 @@ public class CreateRecipeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        DialogHelper.hideProgressDialog(progressDialog);
         showConfirmationDialog();
     }
-
     private void showQuantityPickerDialog() {
         Dialog dialog = new Dialog(CreateRecipeActivity.this);
         dialog.setContentView(R.layout.dialog_quantity_picker);

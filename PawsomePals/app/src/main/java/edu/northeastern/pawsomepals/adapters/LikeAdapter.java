@@ -85,6 +85,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeViewHolder> {
             public void onClick(View view) {
                 String buttonText = holder.followFollowingButton.getText().toString();
                 if (buttonText.equals("Follow")) {
+                    holder.followFollowingButton.setText("Following");
                     followProfile(like.getCreatedBy(),holder);
                 } else if (buttonText.equals("Following")) {
                     unfollowProfile(like.getCreatedBy(),holder);
