@@ -22,7 +22,7 @@ import edu.northeastern.pawsomepals.models.ChatRoomModel;
 
 public class ChatSearchChatroomActivity extends AppCompatActivity {
     private EditText searchInput;
-    private ImageButton searchButton;
+//    private ImageButton searchButton;
     private RecyclerView chatRecyclerview;
     private RecentChatRecyclerAdapter adapter;
     private boolean buttonClicked;
@@ -32,7 +32,7 @@ public class ChatSearchChatroomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_search_chatroom);
         searchInput = findViewById(R.id.chat_search_chat);
-        searchButton = findViewById(R.id.chat_search_chat_btn);
+//        searchButton = findViewById(R.id.chat_search_chat_btn);
         chatRecyclerview = findViewById(R.id.chat_search_user_recyclerView);
         buttonClicked = false;
         searchInput.addTextChangedListener(new TextWatcher() {
@@ -52,12 +52,12 @@ public class ChatSearchChatroomActivity extends AppCompatActivity {
             }
         });
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                setupRecyclerView(searchInput.getText().toString(),true);
-            }
-        });
+//        searchButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                setupRecyclerView(searchInput.getText().toString(),true);
+//            }
+//        });
     }
 
     private void setupRecyclerView(String searchTerm,boolean buttonClicked) {

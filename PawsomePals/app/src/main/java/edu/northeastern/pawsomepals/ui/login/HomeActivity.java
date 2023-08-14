@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity  implements LogoutDialogList
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
+//            actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("Feed");
         }
 

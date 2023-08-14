@@ -33,6 +33,7 @@ import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 public class FirestoreDataLoader {
@@ -56,16 +57,16 @@ public class FirestoreDataLoader {
         return collections;
     }
 
-    public static void loadDataFromCollections(List<CollectionReference> collections, FirestoreDataListener firestoreDataListener) {
-        loadDataFromCollections(new ArrayList<>(), new ArrayList<>(), collections, firestoreDataListener);
+    public static void loadDataFromCollections(List<CollectionReference> collections, int feedFilter, FirestoreDataListener firestoreDataListener) {
+        loadDataFromCollections(new ArrayList<>(), new ArrayList<>(), collections, feedFilter, firestoreDataListener);
     }
 
-    public static void loadDataFromCollectionsForUserIds(List<CollectionReference> collections, List<String> userIds, FirestoreDataListener firestoreDataListener) {
-        loadDataFromCollections(new ArrayList<>(), userIds, collections, firestoreDataListener);
+    public static void loadDataFromCollectionsForUserIds(List<CollectionReference> collections, List<String> userIds, int feedFilter, FirestoreDataListener firestoreDataListener) {
+        loadDataFromCollections(new ArrayList<>(), userIds, collections, feedFilter, firestoreDataListener);
     }
 
     public static void loadDataFromCollectionsForFeedIds(List<CollectionReference> collections, List<String> feedIds, FirestoreDataListener firestoreDataListener) {
-        loadDataFromCollections(feedIds, new ArrayList<>(), collections, firestoreDataListener);
+        loadDataFromCollections(feedIds, new ArrayList<>(), collections, FeedFilter.RECENT, firestoreDataListener);
     }
 
 
@@ -85,6 +86,7 @@ public class FirestoreDataLoader {
      */
     public static void loadDataFromCollections(List<String> feedItemIds, List<String> userIds,
                                                List<CollectionReference> collections,
+                                               int feedFilter,
                                                FirestoreDataListener firestoreDataListener) {
         new Thread(new Runnable() {
             @Override
@@ -123,7 +125,7 @@ public class FirestoreDataLoader {
                 }
 
                 if (firestoreDataListener != null) {
-                    firestoreDataListener.onDataLoaded(process(querySnapshots, list, likeList));
+                    firestoreDataListener.onDataLoaded(process(querySnapshots, list, likeList, feedFilter));
                 }
             }
         }).start();
@@ -153,7 +155,7 @@ public class FirestoreDataLoader {
     }
 
 
-    private static List<FeedItem> process(List<QuerySnapshot> querySnapshots, Set<String> favoriteFeedIds, Set<String> likeFeedIds) {
+    private static List<FeedItem> process(List<QuerySnapshot> querySnapshots, Set<String> favoriteFeedIds, Set<String> likeFeedIds, int feedFilter) {
         List<FeedItem> feedItemList = new ArrayList<>();
         Map<String, Users> users = new HashMap<>();
         Set<String> userIds = new HashSet<>();
@@ -183,6 +185,9 @@ public class FirestoreDataLoader {
                         feedItem.setLiked(true);
                     }
 
+                    double ranking = feedItem.getLikeCount() * 0.6 + feedItem.getCommentCount() * 0.4;
+                    feedItem.setRankingWeight(ranking);
+
                     userIds.add(feedItem.getCreatedBy());
                     feedItemList.add(feedItem);
                 }
@@ -200,7 +205,36 @@ public class FirestoreDataLoader {
             }
         }
 
-        Collections.sort(feedItemList, new Comparator<FeedItem>() {
+        Comparator<FeedItem> comparator;
+
+        if (feedFilter == FeedFilter.POPULAR) {
+            comparator = getPopularityFeedComparator();
+        } else {
+            comparator = getRecencyComparator();
+        }
+
+        Collections.sort(feedItemList, comparator);
+        return feedItemList;
+    }
+
+    private static Comparator<FeedItem> getPopularityFeedComparator() {
+        return new Comparator<FeedItem>() {
+            @Override
+            public int compare(FeedItem feedItem, FeedItem feedItem2) {
+                if (feedItem.getType() == FeedItem.TYPE_RECIPE_HEADER || feedItem2.getType() == FeedItem.TYPE_RECIPE_HEADER) {
+                    return 1;
+                }
+                if (feedItem.getRankingWeight() >= feedItem2.getRankingWeight()) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
+        };
+    }
+
+    private static Comparator<FeedItem> getRecencyComparator() {
+        return new Comparator<FeedItem>() {
             @Override
             public int compare(FeedItem feedItem, FeedItem feedItem2) {
                 if (feedItem.getType() == FeedItem.TYPE_RECIPE_HEADER || feedItem2.getType() == FeedItem.TYPE_RECIPE_HEADER) {
@@ -208,8 +242,7 @@ public class FirestoreDataLoader {
                 }
                 return convertStringToDate(feedItem2.getCreatedAt()).compareTo(convertStringToDate(feedItem.getCreatedAt()));
             }
-        });
-        return feedItemList;
+        };
     }
 
     public static Set<String> fetchUserFavFeedIds() {

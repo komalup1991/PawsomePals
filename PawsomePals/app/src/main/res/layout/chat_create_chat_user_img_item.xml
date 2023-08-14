@@ -21,8 +21,8 @@
 
     <ImageButton
         android:id="@+id/dismiss_button"
-        android:layout_width="8dp"
-        android:layout_height="7dp"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
         android:background="@drawable/chat_cross_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

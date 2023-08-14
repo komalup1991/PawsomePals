@@ -9,4 +9,5 @@ public interface OnItemActionListener {
     void onUserClick(String userId);
 
     void onLocationClick(FeedItem feedItem);
+    void onFeedFilterSpinnerClick(int feedfilter);
 }

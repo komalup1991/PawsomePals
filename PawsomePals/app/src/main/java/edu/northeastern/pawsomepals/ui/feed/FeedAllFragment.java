@@ -54,6 +54,7 @@ import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
+import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
@@ -67,6 +68,7 @@ public class FeedAllFragment extends Fragment {
     private String feedIdFromDeepLink;
     private TextView pullToRefreshTextView;
     private ProgressBar loadingSpinner;
+    private int feedFilter;
 
     @Nullable
     @Override
@@ -81,6 +83,7 @@ public class FeedAllFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         feedFragmentViewType = (FeedFragmentViewType) requireArguments().getSerializable("feed_view_type");
+        feedFilter = FeedFilter.POPULAR;
 
         feedsRecyclerView = view.findViewById(R.id.feedsRecyclerView);
         pullToRefreshTextView = view.findViewById(R.id.pullToRefreshTextView);
@@ -113,6 +116,7 @@ public class FeedAllFragment extends Fragment {
             });
         }
         feedAdapter = new FeedAdapter(feedItemList, requireContext(), feedFragmentViewType, new OnItemActionListener() {
+
             @Override
             public void onRecipeClick(Recipe recipe) {
                 Intent intent = new Intent(getActivity(), RecipeDetailActivity.class);
@@ -143,6 +147,12 @@ public class FeedAllFragment extends Fragment {
                         .add(R.id.fragment_container_view, MapFragment.class, bundle, "MapFragment")
                         .commit();
             }
+
+            @Override
+            public void onFeedFilterSpinnerClick(int feedfilter) {
+                feedFilter = feedfilter;
+                refreshFeeds();
+            }
         });
         feedsRecyclerView.setAdapter(feedAdapter);
         Log.d("yoo", "yooooooo = " + feedItemList.size());
@@ -152,6 +162,7 @@ public class FeedAllFragment extends Fragment {
 
     private void refreshFeeds() {
         feedItemList.clear();
+        loadingSpinner.setVisibility(View.VISIBLE);
         fetchFeeds();
         swipeRefreshLayout.setRefreshing(false);
         pullToRefreshTextView.setVisibility(View.GONE);
@@ -199,7 +210,9 @@ public class FeedAllFragment extends Fragment {
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
                                                                   add(posts);
                                                               }},
-                userIds, new FirestoreDataLoader.FirestoreDataListener() {
+                userIds,
+                FeedFilter.RECENT,
+                new FirestoreDataLoader.FirestoreDataListener() {
 
                     @Override
                     public void onDataLoaded(List<FeedItem> feedItems) {
@@ -252,6 +265,7 @@ public class FeedAllFragment extends Fragment {
         FirestoreDataLoader.loadDataFromCollections(new ArrayList<>() {{
                                                         add(recipes);
                                                     }},
+                FeedFilter.RECENT,
                 new FirestoreDataLoader.FirestoreDataListener() {
                     @Override
                     public void onDataLoaded(List<FeedItem> feedItems) {
@@ -266,7 +280,7 @@ public class FeedAllFragment extends Fragment {
             public void onFollowingUserIdListReceived(List<String> followingUserIds) {
                 super.onFollowingUserIdListReceived(followingUserIds);
                 FirestoreDataLoader.loadDataFromCollectionsForUserIds(FirestoreDataLoader.getAllCollections(),
-                        followingUserIds, new FirestoreDataLoader.FirestoreDataListener() {
+                        followingUserIds, feedFilter, new FirestoreDataLoader.FirestoreDataListener() {
 
                             @Override
                             public void onDataLoaded(List<FeedItem> feedItems) {
@@ -282,6 +296,7 @@ public class FeedAllFragment extends Fragment {
             return;
         }
         FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(),
+                feedFilter,
                 new FirestoreDataLoader.FirestoreDataListener() {
                     @Override
                     public void onDataLoaded(List<FeedItem> feedItems) {

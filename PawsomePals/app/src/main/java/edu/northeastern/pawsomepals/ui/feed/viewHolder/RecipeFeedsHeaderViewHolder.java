@@ -1,8 +1,12 @@
 package edu.northeastern.pawsomepals.ui.feed.viewHolder;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,30 +19,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.FeedAdapter;
 import edu.northeastern.pawsomepals.adapters.RecipeHorizontalListAdapter;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
+import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     private final RecyclerView recipeRecyclerView;
     private final RecipeHorizontalListAdapter recipeHorizontalListAdapter;
     private List<Recipe> recipeList = new ArrayList<>();
+    private Spinner filterSpinner;
+    private int feedFilter = FeedFilter.POPULAR;
+
 
     private List<String> userIds = new ArrayList<>();
 
     public RecipeFeedsHeaderViewHolder(@NonNull View itemView, List<String> userIds, OnItemActionListener onItemActionListener) {
         super(itemView);
         recipeRecyclerView = itemView.findViewById(R.id.recipeRecyclerView);
+        filterSpinner = itemView.findViewById(R.id.filterSpinner);
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(itemView.getContext(),
                 LinearLayoutManager.HORIZONTAL, false);
         recipeRecyclerView.setLayoutManager(horizontalLayoutManager);
         recipeHorizontalListAdapter = new RecipeHorizontalListAdapter(recipeList, new ArrayList<>(), onItemActionListener);
         recipeRecyclerView.setAdapter(recipeHorizontalListAdapter);
         this.userIds = userIds;
+
+        setupFeedFilterSpinner(itemView.getContext(), onItemActionListener);
+    }
+
+    private void setupFeedFilterSpinner(Context context, OnItemActionListener onItemActionListener) {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                context,
+                R.array.filter_options_array,
+                android.R.layout.simple_spinner_item
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        filterSpinner.setAdapter(adapter);
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                onItemActionListener.onFeedFilterSpinnerClick(i);
+                feedFilter = i;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     public void bindRecylerViewData() {
@@ -49,7 +81,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
         CollectionReference recipes = FirebaseFirestore.getInstance().collection(FeedCollectionType.RECIPES);
         FirestoreDataLoader.loadDataFromCollectionsForUserIds(new ArrayList<>() {{
             add(recipes);
-        }}, userIds, new FirestoreDataLoader.FirestoreDataListener() {
+        }}, userIds, feedFilter, new FirestoreDataLoader.FirestoreDataListener() {
             @Override
             public void onDataLoaded(List<FeedItem> feedItems) {
                 recipeList.clear();

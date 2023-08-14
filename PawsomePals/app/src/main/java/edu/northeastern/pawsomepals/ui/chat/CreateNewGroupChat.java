@@ -3,34 +3,27 @@ package edu.northeastern.pawsomepals.ui.chat;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import edu.northeastern.pawsomepals.R;
@@ -40,9 +33,8 @@ import edu.northeastern.pawsomepals.models.ChatStyle;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class CreateNewGroupChat extends AppCompatActivity {
+    public final static int ADD_DATA_POSITION = -1;
     private EditText searchInput;
-    private ImageButton searchButton;
-    private ImageButton backButton;
     private RecyclerView usersRecyclerview;
     private RecyclerView groupUserImgsRecyclerview;
     private ChatGroupUserRecyclerAdapter userAdapter;
@@ -50,12 +42,9 @@ public class CreateNewGroupChat extends AppCompatActivity {
     private FirestoreRecyclerOptions<Users> options;
     private List<Users> userList;
     private List<String> imgList, checkedUserList;
-    private Map<String, Boolean> userChecked;
     private Users currentUser;
-    private Button createNewChat;
     private String groupName;
     private EditText editTextField;
-    private Query query;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,13 +54,11 @@ public class CreateNewGroupChat extends AppCompatActivity {
         userList = new ArrayList<>();
         imgList = new ArrayList<>();
         checkedUserList = new ArrayList<>();
-        userChecked = new HashMap<>();
         searchInput = findViewById(R.id.chat_search_username);
-        searchButton = findViewById(R.id.chat_search_user_btn);
-        backButton = findViewById(R.id.chat_user_back_button);
+        ImageButton backButton = findViewById(R.id.chat_user_back_button);
         usersRecyclerview = findViewById(R.id.chat_search_user_recyclerView);
         groupUserImgsRecyclerview = findViewById(R.id.create_group_imgs_recyclerview);
-        createNewChat = findViewById(R.id.finish_select_button);
+        Button createNewChat = findViewById(R.id.finish_select_button);
 
         backButton.setOnClickListener(v -> onBackPressed());
         searchInput.addTextChangedListener(new TextWatcher() {
@@ -90,25 +77,17 @@ public class CreateNewGroupChat extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
             }
         });
-        createNewChat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createGroupChat();
-            }
-        });
-        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
-                currentUser = task.getResult().toObject(Users.class);
-            }
+        createNewChat.setOnClickListener(view -> createGroupChat());
+        ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> {
+//            Intent intent = new Intent(getApplicationContext(), ChatRoomActivity.class);
+            currentUser = task.getResult().toObject(Users.class);
         });
         setupUsersRecyclerView(searchInput.getText().toString());
-        Log.i("refresh", "refresh");
         setupCreateGroupImgsRecyclerView();
     }
 
     private void setupUsersRecyclerView(String searchTerm) {
+        Query query;
         if (searchTerm.equals("")) {
             query = ChatFirebaseUtil.allUserCollectionReference()
                     .orderBy("searchName");
@@ -120,40 +99,32 @@ public class CreateNewGroupChat extends AppCompatActivity {
         options = new FirestoreRecyclerOptions.Builder<Users>()
                 .setQuery(query, Users.class).build();
 
-
-        Log.i("check", options.getSnapshots().size() + "");
-
         userAdapter = new ChatGroupUserRecyclerAdapter(options, getApplicationContext(), checkedUserList);
-        userAdapter.setOnItemClickListener(new ChatGroupUserRecyclerAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position, boolean isChecked) {
-                Users selectedUser = options.getSnapshots().get(position);
-                if (isChecked) {
-                    userChecked.put(selectedUser.getUserId(), true);
+        userAdapter.setOnItemClickListener((position, isChecked) -> {
+            Users selectedUser = options.getSnapshots().get(position);
+            if (isChecked) {
+                if (!checkedUserList.contains(selectedUser.getUserId()))
                     checkedUserList.add(selectedUser.getUserId());
-                    if (!imgList.contains(selectedUser.getProfileImage())) {
-                        userList.add(selectedUser);
-                        imgList.add(selectedUser.getProfileImage());
-                        imgAdapter.updateData(imgList);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "You have selected this user", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    userChecked.put(selectedUser.getUserId(), false);
-                    userChecked.remove(selectedUser.getUserId());
-                    checkedUserList.remove(selectedUser.getUserId());
-                    if (imgList.contains(selectedUser.getProfileImage())) {
-                        Optional<String> findFirst = imgList.stream()
-                                .filter(a -> a.equals(selectedUser.getProfileImage()))
-                                .findFirst();
-                        findFirst.ifPresent(img -> {
-                            userList.remove(imgList.indexOf(img));
-                            imgList.remove(img);
-                        });
-                        imgAdapter.updateData(imgList);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "You did not select this user", Toast.LENGTH_SHORT).show();
-                    }
+                if (!imgList.contains(selectedUser.getProfileImage())) {
+                    userList.add(selectedUser);
+                    imgList.add(selectedUser.getProfileImage());
+                    imgAdapter.updateData(imgList,ADD_DATA_POSITION);
+                } else if (imgList.contains(selectedUser.getProfileImage())){
+                    Toast.makeText(getApplicationContext(), "You have selected this user", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                checkedUserList.remove(selectedUser.getUserId());
+                if (imgList.contains(selectedUser.getProfileImage())) {
+                    Optional<String> findFirst = imgList.stream()
+                            .filter(a -> a.equals(selectedUser.getProfileImage()))
+                            .findFirst();
+                    findFirst.ifPresent(img -> {
+                        userList.remove(imgList.indexOf(img));
+                        imgList.remove(img);
+                        imgAdapter.updateData(imgList,imgList.indexOf(img));
+                    });
+                } else if(!imgList.contains(selectedUser.getProfileImage())){
+                    Toast.makeText(getApplicationContext(), "You did not select this user", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -164,17 +135,14 @@ public class CreateNewGroupChat extends AppCompatActivity {
 
     private void setupCreateGroupImgsRecyclerView() {
         imgAdapter = new ChatCreateGroupUserImgAdapter(getApplicationContext(), imgList);
-        imgAdapter.setOnItemClickListener(new ChatCreateGroupUserImgAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                Users selectedUser = userList.get(position);
-                userList.remove(position);
-                imgList.remove(position);
-                checkedUserList.remove(selectedUser.getUserId());
-                imgAdapter.updateData(imgList);
-                userAdapter.updateData(checkedUserList);
-                userAdapter.updateOptions(options);
-            }
+        imgAdapter.setOnItemClickListener(position -> {
+            Users selectedUser = userList.get(position);
+            userList.remove(position);
+            imgList.remove(position);
+            checkedUserList.remove(selectedUser.getUserId());
+            imgAdapter.updateData(imgList,position);
+            userAdapter.updateData(checkedUserList);
+            userAdapter.updateOptions(options);
         });
         LinearLayoutManager manager = new LinearLayoutManager(getApplicationContext());
         manager.setOrientation(RecyclerView.HORIZONTAL);
@@ -212,16 +180,13 @@ public class CreateNewGroupChat extends AppCompatActivity {
         String roomId = ChatFirebaseUtil.getGroupRoomId(userList);
         DocumentReference df = ChatFirebaseUtil.allChatRoomCollectionReference().document(roomId);
         df.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()){
-                            DocumentSnapshot document = task.getResult();
-                            if(document.exists()){
-                                Toast.makeText(getApplicationContext(),"The chatroom already exist.",Toast.LENGTH_SHORT).show();
-                            }else{
-                                showDialogAndCreateRoom();
-                            }
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()){
+                        DocumentSnapshot document = task.getResult();
+                        if(document.exists()){
+                            Toast.makeText(getApplicationContext(),"The chatroom already exist.",Toast.LENGTH_SHORT).show();
+                        }else{
+                            showDialogAndCreateRoom();
                         }
                     }
                 });

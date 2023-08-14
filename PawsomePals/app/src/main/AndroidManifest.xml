@@ -29,16 +29,19 @@
         android:theme="@style/Theme.PawsomePals"
         tools:targetApi="31">
         <activity
+            android:name=".utils.BulkUserCreationActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.feed.LikeActivity"
             android:exported="false" />
         <activity
             android:name=".ui.profile.NewUserProfileActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.profile.FollowersFollowingActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.chat.ChatSearchChatroomActivity"
             android:exported="false" />
@@ -62,24 +65,22 @@
         <activity
             android:name=".ui.login.ForgotPassword"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.profile.UserProfileActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.profile.NewDogProfileActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.profile.EditUserProfileActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
-
             android:name=".ui.search.DogDetailActivity"
-            android:label="Dog Detail Activity">
-        </activity>
+            android:label="Dog Detail Activity"></activity>
         <activity
             android:name=".ui.profile.DogBreedActivity"
             android:exported="false"
@@ -87,27 +88,27 @@
         <activity
             android:name=".ui.profile.EditDogUserActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.chat.EditChatRoomInfoActivity"
             android:exported="false" />
         <activity
             android:name=".ui.login.GoogleLoginActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.login.SignUpActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.chat.CreateNewGroupChat"
             android:exported="false" />
         <activity
             android:name=".ui.login.LoginActivity"
             android:exported="false"
-            android:windowSoftInputMode="stateHidden"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".ui.chat.ChatRoomActivity"
             android:exported="false" />
@@ -154,16 +155,17 @@
         </activity>
 
         <service
-            android:name="edu.northeastern.pawsomepals.ui.chat.FCMNotificationService"
+            android:name=".ui.chat.FCMNotificationService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.goolge.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <receiver
-            android:name="edu.northeastern.pawsomepals.ui.chat.FirebaseDataReceiver"
+            android:name=".ui.chat.FirebaseDataReceiver"
             android:exported="true"
-            android:permission="com.google.android.c2dm.permission.SEND" >
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
