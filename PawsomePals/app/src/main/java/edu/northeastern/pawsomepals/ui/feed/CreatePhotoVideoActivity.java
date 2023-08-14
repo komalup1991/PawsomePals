@@ -276,7 +276,6 @@ public class CreatePhotoVideoActivity extends AppCompatActivity {
                 }
             }
         });
-        builder.show();
 
         AlertDialog dialog = builder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
