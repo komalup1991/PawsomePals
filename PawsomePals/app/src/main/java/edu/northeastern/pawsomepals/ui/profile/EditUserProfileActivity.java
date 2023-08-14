@@ -59,6 +59,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class EditUserProfileActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -84,6 +85,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private String userId;
     private ProgressBar progressBar;
     private Dialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -162,17 +164,26 @@ public class EditUserProfileActivity extends AppCompatActivity {
                                 // Convert the data to your Dog model class
                                 Users user = document.toObject(Users.class);
                                 String profileImagePath = user.getProfileImage();
-                                if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
-                                    // Load the profile image using Glide
-                                    Glide.with(EditUserProfileActivity.this)
-                                            .load(profileImagePath)
-                                            .into(imageProfile);
+
+                                if (!Objects.isNull(profileImagePath)) {
+                                    if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
+                                        // Load the profile image using Glide
+                                        Glide.with(EditUserProfileActivity.this)
+                                                .load(profileImagePath)
+                                                .into(imageProfile);
+                                    } else {
+                                        // If the profile image path is empty or null, you can use a placeholder image
+                                        Glide.with(EditUserProfileActivity.this)
+                                                .load(R.drawable.default_profile_image)
+                                                .into(imageProfile);
+                                    }
                                 } else {
                                     // If the profile image path is empty or null, you can use a placeholder image
                                     Glide.with(EditUserProfileActivity.this)
                                             .load(R.drawable.default_profile_image)
                                             .into(imageProfile);
                                 }
+
                                 editTextName.setText(user.getName());
                                 textViewDOB.setText(user.getDob());
 
@@ -219,7 +230,8 @@ public class EditUserProfileActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
             case PERMISSIONS_REQUEST_CAMERA:

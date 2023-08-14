@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 
 
 import edu.northeastern.pawsomepals.R;
@@ -32,9 +33,11 @@ public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<Profil
     private static final int VIEW_TYPE_FOLLOWER_FOLLOWING_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
     private OnItemClickListener mListener;
+
     public interface OnItemClickListener {
         void onUserClick(int position);
     }
+
     public ProfileFollowingFollowerAdapter(List<Users> userProfiles, Context context) {
         this.userProfiles = userProfiles;
         this.context = context;
@@ -103,8 +106,8 @@ public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<Profil
         this.userProfiles = userProfiles;
 
     }
-    private void setAnimation(View viewToAnimate, int position)
-    {
+
+    private void setAnimation(View viewToAnimate, int position) {
         Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
         viewToAnimate.startAnimation(slideIn);
     }
@@ -137,10 +140,16 @@ public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<Profil
 
             String imageUrl = userProfile.getProfileImage();
 
-            if (!imageUrl.equals("") && !imageUrl.equals("null")) {
-                Glide.with(context)
-                        .load(imageUrl)
-                        .into(imageUser);
+            if (!Objects.isNull(imageUrl)) {
+                if (!imageUrl.equals("") && !imageUrl.equals("null")) {
+                    Glide.with(context)
+                            .load(imageUrl)
+                            .into(imageUser);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.dog)
+                            .into(imageUser);
+                }
             } else {
                 Glide.with(context)
                         .load(R.drawable.dog)

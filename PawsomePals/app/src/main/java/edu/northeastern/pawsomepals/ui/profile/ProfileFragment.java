@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
@@ -284,7 +285,7 @@ public class ProfileFragment extends Fragment {
         favImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(favoritesCountValue > 0) {
+                if (favoritesCountValue > 0) {
                     ProfileFeedFragment feedFragment = new ProfileFeedFragment();
                     Bundle args = new Bundle();
 
@@ -297,9 +298,7 @@ public class ProfileFragment extends Fragment {
                     transaction.replace(R.id.fragment_container_view, feedFragment);
                     transaction.addToBackStack(null);
                     transaction.commit();
-                }
-                else
-                {
+                } else {
                     Toast.makeText(requireContext(), "No Favorites", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -311,8 +310,7 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    private void getFavoritesCount()
-    {
+    private void getFavoritesCount() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -625,11 +623,19 @@ public class ProfileFragment extends Fragment {
                             Users user = userDocument.toObject(Users.class);
 
                             String profileImagePath = user.getProfileImage();
-                            if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
-                                // Load the profile image using Glide
-                                Glide.with(requireContext())
-                                        .load(profileImagePath)
-                                        .into(profileImage);
+
+                            if (!Objects.isNull(profileImagePath)) {
+                                if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
+                                    // Load the profile image using Glide
+                                    Glide.with(requireContext())
+                                            .load(profileImagePath)
+                                            .into(profileImage);
+                                } else {
+                                    // If the profile image path is empty or null, you can use a placeholder image
+                                    Glide.with(requireContext())
+                                            .load(R.drawable.default_profile_image)
+                                            .into(profileImage);
+                                }
                             } else {
                                 // If the profile image path is empty or null, you can use a placeholder image
                                 Glide.with(requireContext())

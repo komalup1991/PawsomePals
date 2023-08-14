@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
@@ -38,6 +39,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_DOG_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
+
     public ProfileDogAdapter(List<Dogs> dogProfiles, Context context, Boolean isUserProfile) {
         this.dogProfiles = dogProfiles;
         this.context = context;
@@ -55,6 +57,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
         View view = LayoutInflater.from(context).inflate(R.layout.profile_dogs_items_row, parent, false);
         return new DogProfileViewHolder(view);
     }
+
     private void deleteDogProfileFromFirebase(int position) {
         // Get the Dog object to be deleted
         Dogs dogProfileToDelete = dogProfiles.get(position);
@@ -129,8 +132,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
         }
     }
 
-    private void setAnimation(View viewToAnimate, int position)
-    {
+    private void setAnimation(View viewToAnimate, int position) {
         Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
         viewToAnimate.startAnimation(slideIn);
     }
@@ -186,6 +188,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
         private TextView textDogGenderValue;
         private TextView textDogSizeValue;
         private MaterialCardView materialCardView;
+
         public DogProfileViewHolder(@NonNull View itemView) {
             super(itemView);
             imageDog = itemView.findViewById(R.id.imageDog);
@@ -216,11 +219,16 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
             breedTextView.setText(breed);
 
             String imageUrl = dogProfile.getProfileImage();
-
-            if (!imageUrl.equals("") && !imageUrl.equals("null")) {
-                Glide.with(context)
-                        .load(imageUrl)
-                        .into(imageDog);
+            if (!Objects.isNull(imageUrl)) {
+                if (!imageUrl.equals("") && !imageUrl.equals("null")) {
+                    Glide.with(context)
+                            .load(imageUrl)
+                            .into(imageDog);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.dog)
+                            .into(imageDog);
+                }
             } else {
                 Glide.with(context)
                         .load(R.drawable.dog)

@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
@@ -32,6 +33,7 @@ public class ProfileRecipeAdapter extends RecyclerView.Adapter<ProfileRecipeAdap
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_RECIPE_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
+
     public ProfileRecipeAdapter(List<Recipe> recipes, Context context) {
         this.recipes = recipes;
         this.context = context;
@@ -121,10 +123,16 @@ public class ProfileRecipeAdapter extends RecyclerView.Adapter<ProfileRecipeAdap
 
             String imageUrl = recipe.getImg();
 
-            if (!imageUrl.equals("") && !imageUrl.equals("null")) {
-                Glide.with(context)
-                        .load(imageUrl)
-                        .into(imageRecipe);
+            if (!Objects.isNull(imageUrl)) {
+                if (!imageUrl.equals("") && !imageUrl.equals("null")) {
+                    Glide.with(context)
+                            .load(imageUrl)
+                            .into(imageRecipe);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.dog)
+                            .into(imageRecipe);
+                }
             } else {
                 Glide.with(context)
                         .load(R.drawable.dog)

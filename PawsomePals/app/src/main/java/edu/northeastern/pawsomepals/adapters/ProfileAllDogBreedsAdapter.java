@@ -20,6 +20,7 @@ import com.google.android.material.card.MaterialCardView;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.BreedDetails;
@@ -116,8 +117,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
 
     }
 
-    private void setAnimation(View viewToAnimate, int position)
-    {
+    private void setAnimation(View viewToAnimate, int position) {
         Animation slideIn = AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left);
         viewToAnimate.startAnimation(slideIn);
     }
@@ -128,6 +128,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
         private TextView breedDescription;
         private ConstraintLayout constraintLayout;
         private MaterialCardView materialCardView;
+
         public ProfileAllDogBreedsViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -144,10 +145,16 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
 
             String imageUrl = breedDetail.getImage().getUrl();
 
-            if (!imageUrl.equals("") && !imageUrl.equals("null")) {
-                Glide.with(context)
-                        .load(imageUrl)
-                        .into(dogImage);
+            if (!Objects.isNull(imageUrl)) {
+                if (!imageUrl.equals("") && !imageUrl.equals("null")) {
+                    Glide.with(context)
+                            .load(imageUrl)
+                            .into(dogImage);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.dog)
+                            .into(dogImage);
+                }
             } else {
                 Glide.with(context)
                         .load(R.drawable.dog)
@@ -156,36 +163,31 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
 
             StringBuilder breedDesc = new StringBuilder();
 
-            if(!breedDetail.getHeight().getImperial().isEmpty())
-            {
+            if (!breedDetail.getHeight().getImperial().isEmpty()) {
                 breedDesc.append("Height: ");
                 breedDesc.append(breedDetail.getHeight().getImperial());
                 breedDesc.append(" inches \n \n");
             }
 
-            if(!breedDetail.getWeight().getImperial().isEmpty())
-            {
+            if (!breedDetail.getWeight().getImperial().isEmpty()) {
                 breedDesc.append("Weight: ");
                 breedDesc.append(breedDetail.getWeight().getImperial());
                 breedDesc.append(" pounds \n \n");
             }
 
-            if(!breedDetail.getLife_span().isEmpty())
-            {
+            if (!breedDetail.getLife_span().isEmpty()) {
                 breedDesc.append("Life Expectancy: ");
                 breedDesc.append(breedDetail.getLife_span());
                 breedDesc.append(" \n \n");
             }
 
-            if(!breedDetail.getBred_for().isEmpty())
-            {
+            if (!breedDetail.getBred_for().isEmpty()) {
                 breedDesc.append("Breed For: ");
                 breedDesc.append(breedDetail.getBred_for());
                 breedDesc.append(" \n \n");
             }
 
-            if(!breedDetail.getBreed_group().isEmpty())
-            {
+            if (!breedDetail.getBreed_group().isEmpty()) {
                 breedDesc.append("Breed Group: ");
                 breedDesc.append(breedDetail.getBreed_group());
             }
@@ -193,7 +195,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
             breedDescription.setText(breedDesc);
         }
 
-        public void collapseExpandedView(){
+        public void collapseExpandedView() {
             breedDescription.setVisibility(View.GONE);
         }
     }

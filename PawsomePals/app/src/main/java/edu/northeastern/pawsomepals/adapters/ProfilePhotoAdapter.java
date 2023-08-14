@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
@@ -28,6 +29,7 @@ public class ProfilePhotoAdapter extends RecyclerView.Adapter<ProfilePhotoAdapte
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_PHOTO_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
+
     public ProfilePhotoAdapter(List<PhotoVideo> photos, Context context) {
         this.photos = photos;
         this.context = context;
@@ -114,10 +116,16 @@ public class ProfilePhotoAdapter extends RecyclerView.Adapter<ProfilePhotoAdapte
 
             String imageUrl = photo.getImg();
 
-            if (!imageUrl.equals("") && !imageUrl.equals("null")) {
-                Glide.with(context)
-                        .load(imageUrl)
-                        .into(imagePhoto);
+            if (!Objects.isNull(imageUrl)) {
+                if (!imageUrl.equals("") && !imageUrl.equals("null")) {
+                    Glide.with(context)
+                            .load(imageUrl)
+                            .into(imagePhoto);
+                } else {
+                    Glide.with(context)
+                            .load(R.drawable.dog)
+                            .into(imagePhoto);
+                }
             } else {
                 Glide.with(context)
                         .load(R.drawable.dog)

@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
@@ -106,6 +107,7 @@ public class EditDogUserActivity extends AppCompatActivity {
     private ArrayAdapter<String> mixedBreedAdapter;
     private String dogId;
     private Dialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -262,11 +264,19 @@ public class EditDogUserActivity extends AppCompatActivity {
                                 Dogs dog = document.toObject(Dogs.class);
 
                                 String profileImagePath = dog.getProfileImage();
-                                if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
-                                    // Load the profile image using Glide
-                                    Glide.with(EditDogUserActivity.this)
-                                            .load(profileImagePath)
-                                            .into(imageProfile);
+
+                                if (!Objects.isNull(profileImagePath)) {
+                                    if (!profileImagePath.equals("") && !profileImagePath.equals("null")) {
+                                        // Load the profile image using Glide
+                                        Glide.with(EditDogUserActivity.this)
+                                                .load(profileImagePath)
+                                                .into(imageProfile);
+                                    } else {
+                                        // If the profile image path is empty or null, you can use a placeholder image
+                                        Glide.with(EditDogUserActivity.this)
+                                                .load(R.drawable.default_profile_image)
+                                                .into(imageProfile);
+                                    }
                                 } else {
                                     // If the profile image path is empty or null, you can use a placeholder image
                                     Glide.with(EditDogUserActivity.this)
@@ -283,16 +293,15 @@ public class EditDogUserActivity extends AppCompatActivity {
                                 radioGroupDogGender.check(radioButtonId);
 
 
-
-                                    int radioButtonSizeId = 0;
-                                    if (dog.getSize() != null) {
-                                        switch (dog.getSize()) {
-                                            case "Small" -> radioButtonSizeId = R.id.radioButtonSmall;
-                                            case "Medium" -> radioButtonSizeId = R.id.radioButtonMedium;
-                                            case "Large" -> radioButtonSizeId = R.id.radioButtonLarge;
-                                        }
+                                int radioButtonSizeId = 0;
+                                if (dog.getSize() != null) {
+                                    switch (dog.getSize()) {
+                                        case "Small" -> radioButtonSizeId = R.id.radioButtonSmall;
+                                        case "Medium" -> radioButtonSizeId = R.id.radioButtonMedium;
+                                        case "Large" -> radioButtonSizeId = R.id.radioButtonLarge;
                                     }
-                                    radioGroupDogSize.check(radioButtonSizeId);
+                                }
+                                radioGroupDogSize.check(radioButtonSizeId);
 
 
                                 int position = breedAdapter.getPosition(dog.getBreed());
@@ -513,7 +522,7 @@ public class EditDogUserActivity extends AppCompatActivity {
 
         DialogHelper.showProgressDialog("Profile is being saved...", progressDialog, EditDogUserActivity.this);
 
-        if(photoUri != null) {
+        if (photoUri != null) {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String imageName = "dog_image_" + timestamp + ".jpg";
 
@@ -569,8 +578,7 @@ public class EditDogUserActivity extends AppCompatActivity {
                     Toast.makeText(EditDogUserActivity.this, "Failed to upload profile picture. Please try again.", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
-        else {
+        } else {
             Map<String, Object> dogData = new HashMap<>();
             dogData.put("userId", userId);
             dogData.put("name", dogName);
