@@ -161,7 +161,6 @@ public class FeedAllFragment extends Fragment {
     }
 
     private void refreshFeeds() {
-        feedItemList.clear();
         loadingSpinner.setVisibility(View.VISIBLE);
         fetchFeeds();
         swipeRefreshLayout.setRefreshing(false);

@@ -254,7 +254,6 @@ public class CreateRecipeActivity extends AppCompatActivity {
                 }
             }
         });
-        builder.show();
 
         AlertDialog dialog = builder.create();
         dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
