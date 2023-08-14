@@ -192,6 +192,8 @@ public class SearchFragment extends Fragment {
                 userBtn.setTextColor(getResources().getColor(R.color.white));
                 recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "dogs";
+                searchDogList.clear();
+                searchDogAdapter.notifyDataSetChanged();
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
                 dogBtn.setSelected(true);
@@ -211,6 +213,8 @@ public class SearchFragment extends Fragment {
                 dogBtn.setTextColor(getResources().getColor(R.color.white));
                 recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "users";
+                searchUserList.clear();
+                searchUserAdapter.notifyDataSetChanged();
                 searchRecyclerView.setAdapter(searchUserAdapter);
 
 
@@ -227,6 +231,8 @@ public class SearchFragment extends Fragment {
                 dogBtn.setTextColor(getResources().getColor(R.color.white));
                 userBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "recipes";
+                searchRecipeList.clear();
+                searchRecipeAdapter.notifyDataSetChanged();
                 searchRecyclerView.setAdapter(searchRecipeAdapter);
 
             }
@@ -292,6 +298,7 @@ public class SearchFragment extends Fragment {
 
 
         if (selectedSearchType.equals("dogs")) {
+
             query = db.collection("dogs")
                     .orderBy("name")
                     .startAt(inputSearch.toUpperCase())
