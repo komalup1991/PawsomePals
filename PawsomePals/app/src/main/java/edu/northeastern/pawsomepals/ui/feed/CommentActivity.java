@@ -93,7 +93,6 @@ public class CommentActivity extends AppCompatActivity {
         createdBy = intent.getStringExtra("createdBy");
 
         commentRecyclerView = findViewById(R.id.recycler_view);
-        commentRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         commentRecyclerView.setLayoutManager(linearLayoutManager);
         commentList = new ArrayList<>();
