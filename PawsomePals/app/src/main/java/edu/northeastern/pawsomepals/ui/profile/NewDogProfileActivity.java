@@ -100,6 +100,7 @@ public class NewDogProfileActivity extends AppCompatActivity {
     private ArrayAdapter<String> mixedBreedAdapter;
     private String redirectTo;
     private Dialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -393,9 +394,30 @@ public class NewDogProfileActivity extends AppCompatActivity {
         String dob = textViewDOB.getText().toString();
 
         // Check if all the required fields are filled
-        if (TextUtils.isEmpty(dogName) || TextUtils.isEmpty(dogGender) || TextUtils.isEmpty(dob) ||
-                TextUtils.isEmpty(dogSize) || TextUtils.isEmpty(dogBreed) || photoUri == null) {
-            Toast.makeText(this, "Please fill all the fields.", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(dogName)) {
+            editTextDogName.setError("Please add dog's name.");
+            Toast.makeText(this, "Please add dog's name.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dogGender)) {
+            Toast.makeText(this, "Please select gender.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dob)) {
+            Toast.makeText(this, "Please select Date of Birth/Adoption.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dogSize)) {
+            Toast.makeText(this, "Please select dog's size.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        if (photoUri == null) {
+            Toast.makeText(this, "Please add photo.", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -407,6 +429,7 @@ public class NewDogProfileActivity extends AppCompatActivity {
 
         // Check if the mixed breed is checked and if the selected mixed breed is not the default text
         if (isMixedBreedChecked && dogMixedBreed.equals("Dog's Mixed Breed")) {
+
             Toast.makeText(this, "Please select a valid mixed breed.", Toast.LENGTH_SHORT).show();
             return;
         }

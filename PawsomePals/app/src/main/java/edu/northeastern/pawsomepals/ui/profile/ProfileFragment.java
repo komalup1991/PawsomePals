@@ -223,6 +223,7 @@ public class ProfileFragment extends Fragment {
                 if (buttonText.equals("Edit Profile")) {
                     navigateToEditUserProfile();
                 } else if (buttonText.equals("Follow")) {
+                    editOrFollowButton.setText("Following");
                     followProfile();
                 } else if (buttonText.equals("Following")) {
                     unfollowProfile();
@@ -360,12 +361,13 @@ public class ProfileFragment extends Fragment {
                                                     List<String> followersList = (List<String>) profileDocumentSnapshot.get("followers");
                                                     if (followersList != null && !followersList.contains(userId)) {
                                                         followersList.add(userId);
+
                                                         firebaseFirestore.collection("follow")
                                                                 .document(profileId)
                                                                 .update("followers", followersList)
                                                                 .addOnSuccessListener(aVoid1 -> {
                                                                     // Update the UI and change the button text to "Following"
-                                                                    editOrFollowButton.setText("Following");
+
                                                                     progressBar.setVisibility(View.GONE);
 
                                                                     // Update the Followers count in the UI
@@ -384,12 +386,13 @@ public class ProfileFragment extends Fragment {
                                                     // Document does not exist, create it and set the "followers" field
                                                     Map<String, Object> profileData = new HashMap<>();
                                                     profileData.put("followers", Arrays.asList(userId));
+
                                                     firebaseFirestore.collection("follow")
                                                             .document(profileId)
                                                             .set(profileData)
                                                             .addOnSuccessListener(aVoid1 -> {
                                                                 // Update the UI and change the button text to "Following"
-                                                                editOrFollowButton.setText("Following");
+
                                                                 progressBar.setVisibility(View.GONE);
 
                                                                 // Update the Followers count in the UI
@@ -434,7 +437,7 @@ public class ProfileFragment extends Fragment {
                                                                 .update("followers", followersList)
                                                                 .addOnSuccessListener(aVoid1 -> {
                                                                     // Update the UI and change the button text to "Following"
-                                                                    editOrFollowButton.setText("Following");
+
                                                                     progressBar.setVisibility(View.GONE);
 
                                                                     // Update the Followers count in the UI
@@ -457,7 +460,7 @@ public class ProfileFragment extends Fragment {
                                                             .set(profileData)
                                                             .addOnSuccessListener(aVoid1 -> {
                                                                 // Update the UI and change the button text to "Following"
-                                                                editOrFollowButton.setText("Following");
+
                                                                 progressBar.setVisibility(View.GONE);
 
                                                                 // Update the Followers count in the UI

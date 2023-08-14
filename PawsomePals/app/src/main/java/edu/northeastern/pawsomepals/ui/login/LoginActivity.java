@@ -3,6 +3,7 @@ package edu.northeastern.pawsomepals.ui.login;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,9 +22,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.ui.profile.NewDogProfileActivity;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class LoginActivity extends AppCompatActivity {
-
+    private Dialog progressDialog;
     private TextView createNewAccount, forgotPassword;
     private EditText inputEmail, inputPassword;
     private Button btnLogin, btnGoogle, btnFacebook;
@@ -91,12 +94,12 @@ public class LoginActivity extends AppCompatActivity {
         } else if (TextUtils.isEmpty(password) || password.length() < 6) {
             inputPassword.setError("Enter valid password.");
         } else {
-            progressBar.setVisibility(View.VISIBLE);
+            DialogHelper.showProgressDialog("Profile is getting logged in...", progressDialog, LoginActivity.this);
             auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
-                        progressBar.setVisibility(View.GONE);
+                        DialogHelper.hideProgressDialog(progressDialog);
 
                         Toast.makeText(LoginActivity.this, R.string.login_successful_login, Toast.LENGTH_SHORT).show();
 

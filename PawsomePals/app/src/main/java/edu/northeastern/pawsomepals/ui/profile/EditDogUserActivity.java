@@ -497,11 +497,28 @@ public class EditDogUserActivity extends AppCompatActivity {
         String dob = textViewDOB.getText().toString();
 
         // Check if all the required fields are filled
-        if (TextUtils.isEmpty(dogName) || TextUtils.isEmpty(dogGender) || TextUtils.isEmpty(dob) ||
-                TextUtils.isEmpty(dogSize) || TextUtils.isEmpty(dogBreed)) {
-            Toast.makeText(this, "Please fill all the fields.", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(dogName)) {
+            editTextDogName.setError("Please add dog's name.");
+            Toast.makeText(this, "Please add dog's name.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        if (TextUtils.isEmpty(dogGender)) {
+            Toast.makeText(this, "Please select gender.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dob)) {
+
+            Toast.makeText(this, "Please select Date of Birth/Adoption.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dogSize)) {
+            Toast.makeText(this, "Please select dog's size.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
 
         // Check if the selected breed is not the default text
         if (dogBreed.equals("Dog's Breed")) {
