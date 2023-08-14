@@ -291,9 +291,6 @@ public class FeedAllFragment extends Fragment {
     }
 
     private void fetchAllFeeds() {
-        if (!feedItemList.isEmpty()) {
-            return;
-        }
         FirestoreDataLoader.loadDataFromCollections(FirestoreDataLoader.getAllCollections(),
                 feedFilter,
                 new FirestoreDataLoader.FirestoreDataListener() {

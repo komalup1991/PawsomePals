@@ -116,6 +116,7 @@ public class DogDetailActivity extends AppCompatActivity {
 
         dogGender.setText(dogs.getGender());
         dogSize.setText(dogs.getSize());
+
     }
 
 

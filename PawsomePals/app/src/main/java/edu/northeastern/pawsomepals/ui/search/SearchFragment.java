@@ -296,14 +296,13 @@ public class SearchFragment extends Fragment {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             Query query;
 
+            inputSearch = toTitleCase(inputSearch);
+
 
         if (selectedSearchType.equals("dogs")) {
 
             query = db.collection("dogs")
-                    .orderBy("name")
-                    .startAt(inputSearch)
-                    .endAt(inputSearch.toLowerCase() + "\uf8ff")
-                    .limit(10);
+                            .whereGreaterThanOrEqualTo("name",inputSearch);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -324,10 +323,7 @@ public class SearchFragment extends Fragment {
         } else if (selectedSearchType.equals("users")) {
 
             query = db.collection("user")
-                    .orderBy("name")
-                    .startAt(inputSearch.toUpperCase())
-                    .endAt(inputSearch.toLowerCase() + "\uf8ff")
-                    .limit(10);
+                            .whereGreaterThanOrEqualTo("name",inputSearch);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -346,10 +342,7 @@ public class SearchFragment extends Fragment {
         } else if (selectedSearchType.equals("recipes")) {
 
             query = db.collection("recipes")
-                    .orderBy("title")
-                    .startAt(inputSearch.toUpperCase())
-                    .endAt(inputSearch.toLowerCase() + "\uf8ff")
-                    .limit(10);
+                            .whereGreaterThanOrEqualTo("title",inputSearch);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
@@ -511,6 +504,24 @@ public class SearchFragment extends Fragment {
 
     public int getRandomNumber(int min, int max) {
         return (int) ((Math.random() * (max - min)) + min);
+    }
+
+    public static String toTitleCase(String input) {
+        StringBuilder titleCase = new StringBuilder(input.length());
+        boolean next = true;
+
+        for (char c : input.toCharArray()) {
+            if (Character.isSpaceChar(c)) {
+                next = true;
+            } else if (next) {
+                c = Character.toTitleCase(c);
+                next = false;
+            }
+
+            titleCase.append(c);
+        }
+
+        return titleCase.toString();
     }
 
 
