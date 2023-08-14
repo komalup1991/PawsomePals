@@ -123,9 +123,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
             android:text="User Tagged"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/userTaggedImageView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
             app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
 
@@ -147,9 +149,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
             android:text="Location Tagged"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/locationTaggedImageView"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
             app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
