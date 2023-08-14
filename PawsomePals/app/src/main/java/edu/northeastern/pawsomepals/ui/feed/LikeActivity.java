@@ -1,26 +1,23 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.collection.ArraySet;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,23 +26,19 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.CommentAdapter;
 import edu.northeastern.pawsomepals.adapters.LikeAdapter;
-import edu.northeastern.pawsomepals.models.Comment;
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Like;
 import edu.northeastern.pawsomepals.models.Recipe;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFeedFragment;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
-import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 import edu.northeastern.pawsomepals.utils.TimeUtil;
 
 public class LikeActivity extends AppCompatActivity implements OnItemActionListener {
-    private ImageView userImageProfile;
     private RecyclerView likesRecyclerView;
     private LikeAdapter likeAdapter;
     private FirebaseUser firebaseUser;
@@ -54,7 +47,7 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
     private Object createdBy;
     private List<Like> likeList;
     private FirebaseFirestore firebaseFirestore;
-
+    private Set<String> followListSet = new HashSet<>();
 
 
     @Override
@@ -62,7 +55,6 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_like);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        userImageProfile = findViewById(R.id.image_profile);
 
         Intent intent = getIntent();
         feedItemId = intent.getStringExtra("feedItemId");
@@ -73,6 +65,7 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Likes");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        fetchFollowData();
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,7 +74,6 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
             }
         });
 
-        likeUserList();
         likesRecyclerView=findViewById(R.id.recycler_view);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         likesRecyclerView.setLayoutManager(linearLayoutManager);
@@ -157,5 +149,19 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
     @Override
     public void onFeedFilterSpinnerClick(int feedfilter) {
 
+    }
+
+    private void fetchFollowData() {
+        FirebaseFirestore.getInstance().collection("follow").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                List<String> followList = (List<String>) documentSnapshot.get("following");
+                followListSet.addAll(followList);
+            }
+            likeAdapter.setFollowListSet(followListSet);
+            likeUserList();
+        }).addOnFailureListener(e -> {
+            // Handle the error if needed
+            Log.e("Setup Follow Button", "Error checking if document exists", e);
+        });
     }
 }

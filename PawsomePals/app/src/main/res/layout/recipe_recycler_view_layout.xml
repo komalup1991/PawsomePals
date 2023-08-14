@@ -6,6 +6,7 @@
     android:paddingStart="4dp">
 
     <TextView
+        android:id="@+id/top_recipes_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Top Recipes"

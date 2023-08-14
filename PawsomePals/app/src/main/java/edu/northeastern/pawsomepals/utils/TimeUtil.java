@@ -22,7 +22,7 @@ TimeUtil {
         long timeDifferenceMillis = currentTimeMillis - firebaseTimeMillis;
 
         if (timeDifferenceMillis < 0) {
-            timeAgoText = "Future date";
+            timeAgoText = dateFormat.format(firebaseTimeMillis);
         } else if (timeDifferenceMillis < 60 * 1000) { // Less than 1 minute
             timeAgoText = "Just now";
         } else if (timeDifferenceMillis < 60 * 60 * 1000) { // Less than 1 hour

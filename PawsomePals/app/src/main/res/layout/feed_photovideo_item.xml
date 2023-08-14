@@ -95,54 +95,60 @@
             app:layout_constraintStart_toStartOf="parent" />
 
 
-    <ImageView
-        android:id="@+id/userTaggedImageView"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/custom_border_sticker"
-        android:contentDescription="User Tagged"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/user"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/photoVideoCaptionTextView" />
+        <ImageView
+            android:id="@+id/userTaggedImageView"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/custom_border_sticker"
+            android:contentDescription="User Tagged"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/user"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photoVideoCaptionTextView" />
 
         <TextView
             android:id="@+id/userTaggedTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@+id/userTaggedImageView"
-            app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
-            app:layout_constraintTop_toTopOf="@id/userTaggedImageView"
             app:layout_constraintEnd_toStartOf="@+id/timestampTextView"
-            app:layout_constraintHorizontal_bias="0.0"/>
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@id/userTaggedImageView"
+            app:layout_constraintTop_toTopOf="@id/userTaggedImageView" />
 
         <ImageView
             android:id="@+id/locationTaggedImageView"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="8dp"
+            android:layout_marginEnd="4dp"
             android:background="@drawable/custom_border_sticker"
             android:contentDescription="Location Tagged"
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/pin"
+            app:layout_constraintBottom_toBottomOf="@+id/locationTaggedTextView"
+            app:layout_constraintEnd_toStartOf="@+id/locationTaggedTextView"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/userTaggedImageView" />
+            app:layout_constraintTop_toTopOf="@+id/locationTaggedTextView" />
 
         <TextView
             android:id="@+id/locationTaggedTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="4dp"
             android:text="Location Tagged"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/locationTaggedImageView"
+            app:layout_constraintEnd_toStartOf="@+id/timestampTextView"
             app:layout_constraintStart_toEndOf="@id/locationTaggedImageView"
-            app:layout_constraintTop_toTopOf="@id/locationTaggedImageView" />
+            app:layout_constraintTop_toBottomOf="@+id/userTaggedImageView" />
 
         <TextView
             android:id="@+id/timestampTextView"
@@ -160,9 +166,9 @@
     <edu.northeastern.pawsomepals.ui.feed.layout.FeedActionsLayout
         android:id="@+id/feed_action"
         android:layout_width="match_parent"
-        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/content_layout"
-        android:layout_height="wrap_content" />
+        app:layout_constraintTop_toBottomOf="@id/content_layout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

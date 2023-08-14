@@ -15,12 +15,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Like;
@@ -39,6 +40,8 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeViewHolder> {
     private FirebaseFirestore firebaseFirestore;
     private String userId;
 
+    private Set<String> followListSet = new HashSet<>();
+
     public LikeAdapter(Context context, List<Like> likeList, String postId, OnItemActionListener onItemActionListener) {
         this.context = context;
         this.likeList = likeList;
@@ -53,6 +56,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeViewHolder> {
         return new LikeViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull LikeViewHolder holder, int position) {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -61,7 +65,6 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeViewHolder> {
         FirebaseUtil.fetchUserInfoFromFirestore(like.getCreatedBy(), new BaseDataCallback() {
             @Override
             public void onUserReceived(Users user) {
-
                 Glide.with(context).load(user.getProfileImage()).into(holder.image_profile);
                 holder.username.setText(user.getName());
                 holder.createdAtTextView.setText(like.getCreatedAt());
@@ -91,31 +94,16 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeViewHolder> {
     }
 
     private void setupFollowButton(String profileId, LikeViewHolder holder) {
-        // Check if the document for the current user exists in the "follow" collection
-        FirebaseFirestore.getInstance().collection("follow").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
-                List<String> followingList = (List<String>) documentSnapshot.get("following");
-                if (followingList != null && followingList.contains(profileId)) {
-                    // The current user is already following this profile
-                    holder.followFollowingButton.setText("Following");
-                } else {
-                    if (Objects.equals(profileId, FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                        holder.followFollowingButton.setVisibility(View.GONE);
-                    } else
-                    // The current user is not following this profile
-                    {
-                        holder.followFollowingButton.setText("Follow");
-                    }
-                }
+        holder.followFollowingButton.setVisibility(View.VISIBLE);
+        if (followListSet != null && followListSet.contains(profileId)) {
+            holder.followFollowingButton.setText("Following");
+        } else {
+            if (Objects.equals(profileId, FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                holder.followFollowingButton.setVisibility(View.GONE);
             } else {
-                // Document does not exist, the current user is not following this profile
                 holder.followFollowingButton.setText("Follow");
             }
-        }).addOnFailureListener(e -> {
-            // Handle the error if needed
-            Log.e("Setup Follow Button", "Error checking if document exists", e);
-
-        });
+        }
     }
 
 
@@ -249,4 +237,7 @@ public class LikeAdapter extends RecyclerView.Adapter<LikeViewHolder> {
     }
 
 
+    public void setFollowListSet(Set<String> followListSet) {
+        this.followListSet = followListSet;
+    }
 }

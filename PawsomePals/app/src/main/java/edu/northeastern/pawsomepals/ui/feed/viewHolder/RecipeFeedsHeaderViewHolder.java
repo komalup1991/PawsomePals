@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     private final RecyclerView recipeRecyclerView;
     private final RecipeHorizontalListAdapter recipeHorizontalListAdapter;
+    private final TextView recipeTitle;
     private List<Recipe> recipeList = new ArrayList<>();
     private Spinner filterSpinner;
     private int feedFilter = FeedFilter.POPULAR;
@@ -39,6 +41,7 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
 
     public RecipeFeedsHeaderViewHolder(@NonNull View itemView, List<String> userIds, OnItemActionListener onItemActionListener) {
         super(itemView);
+        recipeTitle = itemView.findViewById(R.id.top_recipes_title);
         recipeRecyclerView = itemView.findViewById(R.id.recipeRecyclerView);
         filterSpinner = itemView.findViewById(R.id.filterSpinner);
         LinearLayoutManager horizontalLayoutManager = new LinearLayoutManager(itemView.getContext(),
@@ -92,6 +95,11 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
+                        if (recipeList.isEmpty()) {
+                            recipeTitle.setVisibility(View.GONE);
+                        } else {
+                            recipeTitle.setVisibility(View.VISIBLE);
+                        }
                         recipeHorizontalListAdapter.notifyDataSetChanged();
                     }
                 });
