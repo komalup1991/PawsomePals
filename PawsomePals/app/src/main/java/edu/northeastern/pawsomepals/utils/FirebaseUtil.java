@@ -52,25 +52,38 @@ public class FirebaseUtil {
 
     public static Map<String, Users> fetchUserInfoFromFirestoreBlocking(List<String> userIds) {
         Map<String, Users> map = new HashMap<>();
-        if(userIds.isEmpty()){
+        if (userIds.isEmpty()) {
             return map;
         }
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Task<QuerySnapshot> task = db.collection("user").whereIn("userId", userIds).get();
-        try {
-            Tasks.await(task);
-            if (task.isSuccessful()) {
-                for (DocumentSnapshot d: task.getResult().getDocuments()) {
-                    Users users = d.toObject(Users.class);
-                    map.put(users.getUserId(), users);
+
+        int batchSize = 30; 
+        int totalUsers = userIds.size();
+        int batchCount = (int) Math.ceil((double) totalUsers / batchSize);
+
+        for (int i = 0; i < batchCount; i++) {
+            int fromIndex = i * batchSize;
+            int toIndex = Math.min((i + 1) * batchSize, totalUsers);
+            List<String> batchIds = userIds.subList(fromIndex, toIndex);
+
+            Task<QuerySnapshot> task = db.collection("user").whereIn("userId", batchIds).get();
+            try {
+                Tasks.await(task);
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot d : task.getResult().getDocuments()) {
+                        Users users = d.toObject(Users.class);
+                        map.put(users.getUserId(), users);
+                    }
                 }
-                return map;
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
         }
+
         return map;
     }
+
 
     public static void uploadImageToStorage(Uri imageUri, String postType, DataCallback dataCallback) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
