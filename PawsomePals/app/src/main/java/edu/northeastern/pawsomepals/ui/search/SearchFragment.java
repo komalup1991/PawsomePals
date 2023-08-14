@@ -262,6 +262,9 @@ public class SearchFragment extends Fragment {
             if (!isAdded() || !isVisible()) {
                 return;
             }
+            if(breeds.isEmpty()){
+                return;
+            }
             int random = getRandomNumber(0, breeds.size() - 1);
             Log.d("breeds", breeds.get(0).toString());
             BreedDetails randomBreed = breeds.get(random);
