@@ -75,6 +75,7 @@ public class NewUserProfileActivity extends AppCompatActivity {
     private String userId;
     private ProgressBar progressBar;
     private Dialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -199,16 +200,15 @@ public class NewUserProfileActivity extends AppCompatActivity {
     private boolean checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
         }
-        else
-        {return ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;}
     }
 
     private void requestStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_MEDIA_IMAGES}, REQUEST_IMAGE_GALLERY);
-        }
-        else{
+        } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSIONS_REQUEST_STORAGE);
         }
     }
@@ -220,9 +220,24 @@ public class NewUserProfileActivity extends AppCompatActivity {
         String dob = textViewDOB.getText().toString().trim();
 
         // Check if all the required fields are filled
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(gender) || TextUtils.isEmpty(dob) ||
-                photoUri == null) {
-            Toast.makeText(this, "Please fill all the fields and add a profile picture.", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(name)) {
+            editTextName.setError("Please add name.");
+            Toast.makeText(this, "Please add name.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(gender)) {
+            Toast.makeText(this, "Please select gender.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dob)) {
+            Toast.makeText(this, "Please select Date of Birth.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (photoUri == null) {
+            Toast.makeText(this, "Please add a profile picture.", Toast.LENGTH_SHORT).show();
             return;
         }
         DialogHelper.showProgressDialog("Profile is getting created ...", progressDialog, NewUserProfileActivity.this);
@@ -249,7 +264,7 @@ public class NewUserProfileActivity extends AppCompatActivity {
                 userData.put("dob", dob);
                 userData.put("gender", gender);
                 userData.put("profileImage", downloadUri.toString());
-                userData.put("searchName",name.toLowerCase());
+                userData.put("searchName", name.toLowerCase());
 
                 // Save the user data to Firebase Firestore
                 firebaseFirestore.collection("user")

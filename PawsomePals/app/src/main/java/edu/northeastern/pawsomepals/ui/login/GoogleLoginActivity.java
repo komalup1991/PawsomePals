@@ -2,6 +2,7 @@ package edu.northeastern.pawsomepals.ui.login;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,9 +32,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class GoogleLoginActivity extends LoginActivity {
-
+    private Dialog progressDialog;
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
     private FirebaseAuth mAuth;
@@ -78,7 +80,7 @@ public class GoogleLoginActivity extends LoginActivity {
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
-                progressBar.setVisibility(View.GONE);
+                DialogHelper.hideProgressDialog(progressDialog);
                 // Google Sign In failed, update UI appropriately
                 Toast.makeText(GoogleLoginActivity.this, R.string.login_unsuccessful_google_login, Toast.LENGTH_SHORT).show();
                 Log.w(TAG, "Google sign in failed", e);
@@ -94,13 +96,13 @@ public class GoogleLoginActivity extends LoginActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            progressBar.setVisibility(View.GONE);
+                            DialogHelper.hideProgressDialog(progressDialog);
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             updateUI(user);
                         } else {
-                            progressBar.setVisibility(View.GONE);
+                            DialogHelper.hideProgressDialog(progressDialog);
                             Toast.makeText(GoogleLoginActivity.this, R.string.login_unsuccessful_google_login, Toast.LENGTH_SHORT).show();
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());

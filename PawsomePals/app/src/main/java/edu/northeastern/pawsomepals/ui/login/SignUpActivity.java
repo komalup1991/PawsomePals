@@ -3,6 +3,7 @@ package edu.northeastern.pawsomepals.ui.login;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,10 +27,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.ui.profile.NewDogProfileActivity;
 import edu.northeastern.pawsomepals.ui.profile.NewUserProfileActivity;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class SignUpActivity extends AppCompatActivity {
-
+    private Dialog progressDialog;
     private TextView alreadyExistingAccount;
     private EditText inputEmail, inputPassword, inputConfirmPassword;
     private Button btnSignUp;
@@ -87,7 +90,7 @@ public class SignUpActivity extends AppCompatActivity {
         } else if (!password.equals(confirmPassword)) {
             inputPassword.setError("Password mismatch.");
         } else {
-            progressBar.setVisibility(View.VISIBLE);
+            DialogHelper.showProgressDialog("Profile is getting created...", progressDialog, SignUpActivity.this);
 
             auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
@@ -99,7 +102,7 @@ public class SignUpActivity extends AppCompatActivity {
                             createUserDetails(email, loggedInUserId);
                         }
 
-                        progressBar.setVisibility(View.GONE);
+                        DialogHelper.hideProgressDialog(progressDialog);
 
                         Toast.makeText(SignUpActivity.this, R.string.signup_successful_registration, Toast.LENGTH_SHORT).show();
 
@@ -109,7 +112,7 @@ public class SignUpActivity extends AppCompatActivity {
                         finish();
                     } else {
                         Toast.makeText(SignUpActivity.this, R.string.signup_unsuccessful_registration, Toast.LENGTH_LONG).show();
-                        progressBar.setVisibility(View.GONE);
+                        DialogHelper.hideProgressDialog(progressDialog);
                     }
                 }
             });
@@ -127,11 +130,11 @@ public class SignUpActivity extends AppCompatActivity {
                 .document(loggedInUserId)
                 .set(userInfo)
                 .addOnSuccessListener(aVoid -> {
-                    progressBar.setVisibility(View.GONE);
+                    DialogHelper.hideProgressDialog(progressDialog);
                     finish();
                 })
                 .addOnFailureListener(e -> {
-                    progressBar.setVisibility(View.GONE);
+                    DialogHelper.hideProgressDialog(progressDialog);
                     Log.w("Create User", "Error adding document", e);
                 });
 

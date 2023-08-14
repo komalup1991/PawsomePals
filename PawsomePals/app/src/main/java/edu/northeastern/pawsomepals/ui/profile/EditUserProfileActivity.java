@@ -310,11 +310,24 @@ public class EditUserProfileActivity extends AppCompatActivity {
         String dob = textViewDOB.getText().toString().trim();
 
         // Check if all the required fields are filled
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(gender) || TextUtils.isEmpty(dob)) {
-            Toast.makeText(this, "Please fill all the fields.", Toast.LENGTH_SHORT).show();
+
+        if (TextUtils.isEmpty(name)) {
+            editTextName.setError("Please add name.");
+            Toast.makeText(this, "Please add name.", Toast.LENGTH_SHORT).show();
             return;
         }
-        DialogHelper.showProgressDialog("Profile is being saved...", progressDialog, EditUserProfileActivity.this);
+
+        if (TextUtils.isEmpty(gender)) {
+            Toast.makeText(this, "Please select gender.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(dob)) {
+            Toast.makeText(this, "Please select Date of Birth.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DialogHelper.showProgressDialog("Profile is being updated...", progressDialog, EditUserProfileActivity.this);
 
         if (photoUri != null) {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -347,7 +360,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                             .update(userData)
                             .addOnSuccessListener(aVoid -> {
                                 DialogHelper.hideProgressDialog(progressDialog);
-                                Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show();
 
                                 navigateToProfileFragment();
                             })
@@ -373,7 +386,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
                     .update(userData)
                     .addOnSuccessListener(aVoid -> {
                         DialogHelper.hideProgressDialog(progressDialog);
-                        Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Profile updated successfully!", Toast.LENGTH_SHORT).show();
 
                         finish();
                     })
