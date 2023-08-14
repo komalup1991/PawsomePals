@@ -83,7 +83,6 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
 
         likeUserList();
         likesRecyclerView=findViewById(R.id.recycler_view);
-        likesRecyclerView.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         likesRecyclerView.setLayoutManager(linearLayoutManager);
         likeList = new ArrayList<>();
