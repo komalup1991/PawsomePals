@@ -1,7 +1,6 @@
 package edu.northeastern.pawsomepals.models;
-import androidx.annotation.NonNull;
 
-import com.google.android.gms.maps.model.LatLng;
+import androidx.annotation.NonNull;
 
 public class ChatLocationModel {
     private String locationName;

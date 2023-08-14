@@ -1,7 +1,6 @@
 package edu.northeastern.pawsomepals.ui.login;
 
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;

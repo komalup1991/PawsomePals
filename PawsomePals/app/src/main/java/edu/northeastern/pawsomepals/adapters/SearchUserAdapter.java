@@ -1,6 +1,5 @@
 package edu.northeastern.pawsomepals.adapters;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,9 +11,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.search.SearchViewHolder;
 

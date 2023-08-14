@@ -1,22 +1,10 @@
 package edu.northeastern.pawsomepals.ui.chat;
 
 
-import static android.app.Notification.EXTRA_NOTIFICATION_ID;
-
-import android.Manifest;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
-import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.application.PawsomePalsApplication;
 
 public class FirebaseDataReceiver extends BroadcastReceiver {
 

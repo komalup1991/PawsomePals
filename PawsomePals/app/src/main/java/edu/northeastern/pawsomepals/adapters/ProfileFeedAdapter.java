@@ -12,8 +12,8 @@ import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 
 public class ProfileFeedAdapter extends FragmentStateAdapter {
     private static final int NUM_TABS = 1;
-    private String profileId;
-    private FeedFragmentViewType viewType;
+    private final String profileId;
+    private final FeedFragmentViewType viewType;
 
     public ProfileFeedAdapter(@NonNull FragmentActivity fragmentActivity, String profileId, FeedFragmentViewType viewType) {
         super(fragmentActivity);

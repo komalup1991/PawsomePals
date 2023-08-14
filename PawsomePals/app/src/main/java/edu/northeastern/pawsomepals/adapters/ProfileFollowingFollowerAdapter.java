@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -21,14 +20,13 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Objects;
 
-
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
 
 public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<ProfileFollowingFollowerAdapter.ProfileFollowingFollowerViewHolder> {
     private List<Users> userProfiles;
-    private Context context;
-    private FirebaseFirestore firebaseFirestore;
+    private final Context context;
+    private final FirebaseFirestore firebaseFirestore;
 
     private static final int VIEW_TYPE_FOLLOWER_FOLLOWING_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
@@ -114,9 +112,9 @@ public class ProfileFollowingFollowerAdapter extends RecyclerView.Adapter<Profil
 
 
     public class ProfileFollowingFollowerViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imageUser;
-        private TextView textUserName;
-        private LinearLayout layoutUserInfo;
+        private final ImageView imageUser;
+        private final TextView textUserName;
+        private final LinearLayout layoutUserInfo;
 
         public ProfileFollowingFollowerViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);

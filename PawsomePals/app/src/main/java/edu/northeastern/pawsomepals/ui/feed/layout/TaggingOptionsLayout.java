@@ -43,7 +43,7 @@ public class TaggingOptionsLayout extends LinearLayout {
     private TextView tagPeopleTextView;
     private TextView tagLocationSearchTextView;
     private final Map<String, Users> allUsers = new HashMap<>();
-    private List<Users> selectedUsers = new ArrayList<>();
+    private final List<Users> selectedUsers = new ArrayList<>();
 
     public TextView getTagPeopleTextView() {
         return tagPeopleTextView;

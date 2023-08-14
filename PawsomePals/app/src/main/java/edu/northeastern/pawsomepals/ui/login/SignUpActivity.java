@@ -1,8 +1,5 @@
 package edu.northeastern.pawsomepals.ui.login;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +13,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.ui.profile.NewDogProfileActivity;
 import edu.northeastern.pawsomepals.ui.profile.NewUserProfileActivity;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 
@@ -168,19 +167,19 @@ public class SignUpActivity extends AppCompatActivity {
             String email = savedInstanceState.getString("email");
             inputEmail.setText(email);
             emailCursorPosition = savedInstanceState.getInt("emailCursorPosition");
-            EditText editEmailText = (EditText) inputEmail;
+            EditText editEmailText = inputEmail;
             editEmailText.setSelection(emailCursorPosition);
 
             String password = savedInstanceState.getString("password");
             inputPassword.setText(password);
             passwordCursorPosition = savedInstanceState.getInt("passwordCursorPosition");
-            EditText editPasswordText = (EditText) inputPassword;
+            EditText editPasswordText = inputPassword;
             editPasswordText.setSelection(passwordCursorPosition);
 
             String confirmPassword = savedInstanceState.getString("confirmPassword");
             inputConfirmPassword.setText(confirmPassword);
             confirmPasswordCursorPosition = savedInstanceState.getInt("confirmPasswordCursorPosition");
-            EditText editConfirmPasswordText = (EditText) inputConfirmPassword;
+            EditText editConfirmPasswordText = inputConfirmPassword;
             editConfirmPasswordText.setSelection(confirmPasswordCursorPosition);
         }
     }

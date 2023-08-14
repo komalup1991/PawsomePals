@@ -5,11 +5,8 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.ImageView;
-
 import android.widget.TextView;
-
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -28,8 +25,8 @@ import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
 
 public class ProfileRecipeAdapter extends RecyclerView.Adapter<ProfileRecipeAdapter.ProfileRecipeViewHolder> {
     private List<Recipe> recipes;
-    private Context context;
-    private FirebaseFirestore firebaseFirestore;
+    private final Context context;
+    private final FirebaseFirestore firebaseFirestore;
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_RECIPE_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
@@ -103,10 +100,10 @@ public class ProfileRecipeAdapter extends RecyclerView.Adapter<ProfileRecipeAdap
     }
 
     public class ProfileRecipeViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imageRecipe;
-        private TextView nameTextView;
+        private final ImageView imageRecipe;
+        private final TextView nameTextView;
 
-        private CardView cardView;
+        private final CardView cardView;
 
         public ProfileRecipeViewHolder(@NonNull View itemView) {
             super(itemView);

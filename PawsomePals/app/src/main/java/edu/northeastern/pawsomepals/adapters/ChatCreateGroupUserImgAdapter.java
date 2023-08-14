@@ -3,7 +3,6 @@ package edu.northeastern.pawsomepals.adapters;
 import static edu.northeastern.pawsomepals.ui.chat.CreateNewGroupChat.ADD_DATA_POSITION;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import java.util.List;
 import edu.northeastern.pawsomepals.R;
 
 public class ChatCreateGroupUserImgAdapter extends RecyclerView.Adapter<ChatCreateGroupUserImgAdapter.GroupUserImgHolder> {
-    private Context context;
+    private final Context context;
     private List<String> usersList;
     private ChatCreateGroupUserImgAdapter.OnItemClickListener mListener;
 
@@ -79,8 +78,8 @@ public class ChatCreateGroupUserImgAdapter extends RecyclerView.Adapter<ChatCrea
         notifyDataSetChanged();}
     }
     class GroupUserImgHolder extends RecyclerView.ViewHolder {
-        private ImageView profileImg;
-        private ImageButton dismissButton;
+        private final ImageView profileImg;
+        private final ImageButton dismissButton;
 
         public GroupUserImgHolder(@NonNull View itemView) {
             super(itemView);

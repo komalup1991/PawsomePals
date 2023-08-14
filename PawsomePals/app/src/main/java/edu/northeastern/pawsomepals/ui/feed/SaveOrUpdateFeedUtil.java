@@ -3,10 +3,6 @@ package edu.northeastern.pawsomepals.ui.feed;
 import android.app.Activity;
 import android.app.Dialog;
 import android.net.Uri;
-import android.util.Log;
-
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.FeedItemWithImage;

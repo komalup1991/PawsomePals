@@ -20,12 +20,11 @@ import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.PhotoVideo;
-import edu.northeastern.pawsomepals.models.Recipe;
 
 public class ProfilePhotoAdapter extends RecyclerView.Adapter<ProfilePhotoAdapter.ProfilePhotoViewHolder> {
     private List<PhotoVideo> photos;
-    private Context context;
-    private FirebaseFirestore firebaseFirestore;
+    private final Context context;
+    private final FirebaseFirestore firebaseFirestore;
     private Boolean isUserProfile;
     private static final int VIEW_TYPE_PHOTO_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
@@ -97,10 +96,10 @@ public class ProfilePhotoAdapter extends RecyclerView.Adapter<ProfilePhotoAdapte
     }
 
     public class ProfilePhotoViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imagePhoto;
-        private TextView nameTextView;
+        private final ImageView imagePhoto;
+        private final TextView nameTextView;
 
-        private CardView cardView;
+        private final CardView cardView;
 
         public ProfilePhotoViewHolder(@NonNull View itemView) {
             super(itemView);

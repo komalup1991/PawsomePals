@@ -32,8 +32,8 @@ public class RecipeFeedsHeaderViewHolder extends RecyclerView.ViewHolder {
     private final RecyclerView recipeRecyclerView;
     private final RecipeHorizontalListAdapter recipeHorizontalListAdapter;
     private final TextView recipeTitle;
-    private List<Recipe> recipeList = new ArrayList<>();
-    private Spinner filterSpinner;
+    private final List<Recipe> recipeList = new ArrayList<>();
+    private final Spinner filterSpinner;
     private int feedFilter = FeedFilter.POPULAR;
 
 
