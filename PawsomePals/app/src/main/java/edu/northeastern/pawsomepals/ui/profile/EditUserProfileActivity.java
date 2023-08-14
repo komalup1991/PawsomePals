@@ -174,13 +174,13 @@ public class EditUserProfileActivity extends AppCompatActivity {
                                     } else {
                                         // If the profile image path is empty or null, you can use a placeholder image
                                         Glide.with(EditUserProfileActivity.this)
-                                                .load(R.drawable.default_profile_image)
+                                                .load(R.drawable.ud)
                                                 .into(imageProfile);
                                     }
                                 } else {
                                     // If the profile image path is empty or null, you can use a placeholder image
                                     Glide.with(EditUserProfileActivity.this)
-                                            .load(R.drawable.default_profile_image)
+                                            .load(R.drawable.ud)
                                             .into(imageProfile);
                                 }
 

@@ -633,13 +633,13 @@ public class ProfileFragment extends Fragment {
                                 } else {
                                     // If the profile image path is empty or null, you can use a placeholder image
                                     Glide.with(requireContext())
-                                            .load(R.drawable.default_profile_image)
+                                            .load(R.drawable.ud)
                                             .into(profileImage);
                                 }
                             } else {
                                 // If the profile image path is empty or null, you can use a placeholder image
                                 Glide.with(requireContext())
-                                        .load(R.drawable.default_profile_image)
+                                        .load(R.drawable.ud)
                                         .into(profileImage);
                             }
 
