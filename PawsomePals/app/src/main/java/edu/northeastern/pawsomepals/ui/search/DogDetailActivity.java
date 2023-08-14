@@ -106,7 +106,14 @@ public class DogDetailActivity extends AppCompatActivity {
                 .load(dogImage)
                 .into(dogImageCircle);
 
-        dogBreed.setText(dogs.getBreed());
+        if(dogs.getIsMixedBreed()){
+            String mixed = dogs.getBreed() + " + " + dogs.getMixedBreed();
+            dogBreed.setText(mixed);
+        }
+        else{
+            dogBreed.setText(dogs.getBreed());
+        }
+
         dogGender.setText(dogs.getGender());
         dogSize.setText(dogs.getSize());
     }
