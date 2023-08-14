@@ -90,13 +90,10 @@ public class FirebaseUtil {
         StorageReference storageRef = storage.getReference();
 
         if (imageUri != null) {
-            Log.d("yoo","image uri "+ imageUri);
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String imageName = postType + "_image_" + timestamp + ".jpg";
             StorageReference imageRef = storageRef.child(postType + "_images/" + imageName);
-            Log.d("yoo","image ref "+imageRef);
             UploadTask uploadTask = imageRef.putFile(imageUri);
-            Log.d("yoo","image task "+uploadTask);
 
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override

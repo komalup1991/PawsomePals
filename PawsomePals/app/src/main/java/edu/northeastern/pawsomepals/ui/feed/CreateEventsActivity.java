@@ -395,13 +395,11 @@ public class CreateEventsActivity extends AppCompatActivity {
         picker.show(getSupportFragmentManager(), "DATE_PICKER");
 
         picker.addOnPositiveButtonClickListener(selection -> {
-            Log.d("yoo", "selectedDatefefff " + selection);
             Calendar selectedCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // Set to UTC
             selectedCalendar.setTimeInMillis(selection);
 
             selectedDate = selectedCalendar.getTimeInMillis();
 
-            Log.d("yoo", "selectedDate " + selectedCalendar);
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             String date = sdf.format(selectedDate);

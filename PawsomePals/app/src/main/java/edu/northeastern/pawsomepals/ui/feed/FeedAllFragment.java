@@ -155,7 +155,6 @@ public class FeedAllFragment extends Fragment {
             }
         });
         feedsRecyclerView.setAdapter(feedAdapter);
-        Log.d("yoo", "yooooooo = " + feedItemList.size());
         fetchFeeds();
         addCollectionListeners();
     }

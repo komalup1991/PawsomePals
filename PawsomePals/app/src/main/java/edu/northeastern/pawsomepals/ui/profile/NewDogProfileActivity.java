@@ -488,7 +488,6 @@ public class NewDogProfileActivity extends AppCompatActivity {
                         })
                         .addOnFailureListener(e -> {
                             DialogHelper.hideProgressDialog(progressDialog);
-                            Log.e("yoo", "Error adding document", e);
                             Toast.makeText(NewDogProfileActivity.this, "Failed to save profile. Please try again.", Toast.LENGTH_SHORT).show();
                         });
             } else {

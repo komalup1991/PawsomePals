@@ -581,7 +581,6 @@ public class EditDogUserActivity extends AppCompatActivity {
                             })
                             .addOnFailureListener(e -> {
                                 DialogHelper.hideProgressDialog(progressDialog);
-                                Log.e("yoo", "Error adding document", e);
                                 Toast.makeText(EditDogUserActivity.this, "Failed to update Pal's profile. Please try again.", Toast.LENGTH_SHORT).show();
                             });
                 } else {
@@ -619,7 +618,6 @@ public class EditDogUserActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(e -> {
                         DialogHelper.hideProgressDialog(progressDialog);
-                        Log.e("yoo", "Error adding document", e);
                         Toast.makeText(EditDogUserActivity.this, "Failed to update Pal's profile. Please try again.", Toast.LENGTH_SHORT).show();
                     });
         }

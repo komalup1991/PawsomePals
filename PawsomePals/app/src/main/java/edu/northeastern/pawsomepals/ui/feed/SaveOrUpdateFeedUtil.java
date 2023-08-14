@@ -75,7 +75,6 @@ public class SaveOrUpdateFeedUtil {
 
                     @Override
                     public void onError(Exception exception) {
-                        Log.d("yoo", exception.getMessage());
                     }
                 });
     }
