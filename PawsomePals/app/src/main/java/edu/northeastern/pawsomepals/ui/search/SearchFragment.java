@@ -95,8 +95,6 @@ public class SearchFragment extends Fragment {
     private PawsomePalWebService pawsomePalWebService;
 
 
-
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -194,6 +192,8 @@ public class SearchFragment extends Fragment {
                 userBtn.setTextColor(getResources().getColor(R.color.white));
                 recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "dogs";
+                searchDogList.clear();
+                searchDogAdapter.notifyDataSetChanged();
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
                 dogBtn.setSelected(true);
@@ -213,6 +213,8 @@ public class SearchFragment extends Fragment {
                 dogBtn.setTextColor(getResources().getColor(R.color.white));
                 recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "users";
+                searchUserList.clear();
+                searchUserAdapter.notifyDataSetChanged();
                 searchRecyclerView.setAdapter(searchUserAdapter);
 
 
@@ -229,6 +231,8 @@ public class SearchFragment extends Fragment {
                 dogBtn.setTextColor(getResources().getColor(R.color.white));
                 userBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "recipes";
+                searchRecipeList.clear();
+                searchRecipeAdapter.notifyDataSetChanged();
                 searchRecyclerView.setAdapter(searchRecipeAdapter);
 
             }
@@ -261,14 +265,14 @@ public class SearchFragment extends Fragment {
             if (!isAdded() || !isVisible()) {
                 return;
             }
-            int random = getRandomNumber(0,breeds.size()-1);
-            Log.d("breeds",breeds.get(0).toString());
+            int random = getRandomNumber(0, breeds.size() - 1);
+            Log.d("breeds", breeds.get(0).toString());
             BreedDetails randomBreed = breeds.get(random);
             ImageView breedImage = getView().findViewById(R.id.breed_image);
             TextView breedName = getView().findViewById(R.id.breed_name);
 
             String imageUrl = randomBreed.getImage().getUrl();
-            Log.d("image",imageUrl);
+            Log.d("image", imageUrl);
 
             breedName.setText(randomBreed.getName());
             Glide.with(requireContext())
@@ -279,26 +283,26 @@ public class SearchFragment extends Fragment {
         }
 
 
-
-
     };
 
 
     private void performSearch(String searchType) {
         String inputSearch = searchInput.getText().toString().trim();
-        if(inputSearch.isEmpty()){
+        if (inputSearch.isEmpty()) {
             showToast("Please enter a valid search");
         }
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        Query query;
+        else{
 
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            Query query;
 
 
         if (selectedSearchType.equals("dogs")) {
-            query = db.collection("dogs").whereGreaterThanOrEqualTo("name",inputSearch)
+
+            query = db.collection("dogs")
                     .orderBy("name")
                     .startAt(inputSearch.toUpperCase())
-                    .endAt(inputSearch.toLowerCase()+ "\uf8ff")
+                    .endAt(inputSearch.toLowerCase() + "\uf8ff")
                     .limit(10);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -319,32 +323,32 @@ public class SearchFragment extends Fragment {
 
         } else if (selectedSearchType.equals("users")) {
 
-             query = db.collection("user").whereGreaterThanOrEqualTo("name",inputSearch)
-                     .orderBy("name")
-                     .startAt(inputSearch.toUpperCase())
-                     .endAt(inputSearch.toLowerCase()+ "\uf8ff")
-                     .limit(10);
+            query = db.collection("user")
+                    .orderBy("name")
+                    .startAt(inputSearch.toUpperCase())
+                    .endAt(inputSearch.toLowerCase() + "\uf8ff")
+                    .limit(10);
 
-             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                 @Override
-                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                     if (task.isSuccessful()) {
-                         searchUserList = new ArrayList<>();
-                         for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        searchUserList = new ArrayList<>();
+                        for (QueryDocumentSnapshot documentSnapshot : task.getResult()) {
                             Users user1 = documentSnapshot.toObject(Users.class);
-                             searchUserList.add(user1);
-                         }
-                         searchUserAdapter.setUsers(searchUserList);
-                         searchUserAdapter.notifyDataSetChanged();
-                     }
-                 }
-             });
+                            searchUserList.add(user1);
+                        }
+                        searchUserAdapter.setUsers(searchUserList);
+                        searchUserAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
         } else if (selectedSearchType.equals("recipes")) {
 
-            query = db.collection("recipes").whereGreaterThanOrEqualTo("title",inputSearch)
+            query = db.collection("recipes")
                     .orderBy("title")
                     .startAt(inputSearch.toUpperCase())
-                    .endAt(inputSearch.toLowerCase()+ "\uf8ff")
+                    .endAt(inputSearch.toLowerCase() + "\uf8ff")
                     .limit(10);
 
             query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -366,6 +370,8 @@ public class SearchFragment extends Fragment {
             });
         }
     }
+
+}
 
     private void showToast(String message) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
