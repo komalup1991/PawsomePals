@@ -43,7 +43,7 @@ public class ProfilePhotoAdapter extends RecyclerView.Adapter<ProfilePhotoAdapte
     @NonNull
     @Override
     public ProfilePhotoAdapter.ProfilePhotoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.profile_recipes_items_row, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.profile_photos_items_row, parent, false);
         return new ProfilePhotoAdapter.ProfilePhotoViewHolder(view);
     }
 
