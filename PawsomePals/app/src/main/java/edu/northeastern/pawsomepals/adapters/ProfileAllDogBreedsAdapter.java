@@ -121,7 +121,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
     }
 
     public class ProfileAllDogBreedsViewHolder extends RecyclerView.ViewHolder {
-        private final ImageView dogImage;
+        //private final ImageView dogImage;
         private final TextView breedName;
         private final TextView breedDescription;
         private final ConstraintLayout constraintLayout;
