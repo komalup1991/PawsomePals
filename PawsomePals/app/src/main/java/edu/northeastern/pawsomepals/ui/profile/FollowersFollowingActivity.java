@@ -114,11 +114,12 @@ private List<Users> filteredList;
                     String selectedUserId = selectedUser.getUserId();
                     navigateToProfileFragment(selectedUserId);
                 } else {
+                    if (!filteredList.isEmpty()) {
                     // User is searching, use the position from filtered list
                     Users selectedUser = filteredList.get(position);
                     String selectedUserId = selectedUser.getUserId();
                     navigateToProfileFragment(selectedUserId);
-                }
+                }}
             }
         });
 
