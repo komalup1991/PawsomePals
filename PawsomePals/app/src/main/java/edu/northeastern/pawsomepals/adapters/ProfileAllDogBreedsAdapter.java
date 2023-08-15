@@ -132,7 +132,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
         public ProfileAllDogBreedsViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            dogImage = itemView.findViewById(R.id.dogImage);
+            //dogImage = itemView.findViewById(R.id.dogImage);
             breedName = itemView.findViewById(R.id.breedName);
             breedDescription = itemView.findViewById(R.id.breedDesc);
             constraintLayout = itemView.findViewById(R.id.constraintLayout);
@@ -143,9 +143,9 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
 
             breedName.setText(breedDetail.getName());
 
-            String imageUrl = breedDetail.getImage().getUrl();
+            //String imageUrl = breedDetail.getImage().getUrl();
 
-            if (!Objects.isNull(imageUrl)) {
+            /*if (!Objects.isNull(imageUrl)) {
                 if (!imageUrl.equals("") && !imageUrl.equals("null")) {
                     Glide.with(context)
                             .load(imageUrl)
@@ -159,7 +159,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
                 Glide.with(context)
                         .load(R.drawable.dog)
                         .into(dogImage);
-            }
+            }*/
 
             StringBuilder breedDesc = new StringBuilder();
 

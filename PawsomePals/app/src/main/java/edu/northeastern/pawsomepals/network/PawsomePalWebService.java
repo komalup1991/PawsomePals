@@ -122,20 +122,24 @@ public class PawsomePalWebService {
                 String origin = breedObject.has("origin") ? breedObject.getString("origin") : "";
                 String reference_image_id = breedObject.has("reference_image_id") ? breedObject.getString("reference_image_id") : "";
 
-                JSONObject imageObject = breedObject.getJSONObject("image");
-                String imageId = imageObject.has("id") ? imageObject.getString("id") : "";
-                String imageWidth = imageObject.has("width") ? imageObject.getString("width") : "";
-                String imageHeight = imageObject.has("height") ? imageObject.getString("height") : "";
-                String imageUrl = imageObject.has("url") ? imageObject.getString("url") : "";
-
+                BreedImageDetails image;
+                if (breedObject.has("image")) {
+                    JSONObject imageObject = breedObject.getJSONObject("image");
+                    String imageId = imageObject.has("id") ? imageObject.getString("id") : "";
+                    String imageWidth = imageObject.has("width") ? imageObject.getString("width") : "";
+                    String imageHeight = imageObject.has("height") ? imageObject.getString("height") : "";
+                    String imageUrl = imageObject.has("url") ? imageObject.getString("url") : "";
+                    image = new BreedImageDetails(imageId, imageWidth, imageHeight, imageUrl);
+                } else {
+                    image = new BreedImageDetails("", "", "", "");
+                }
 
                 BreedWeightDetails weight = new BreedWeightDetails(imperialWeight, metricWeight);
 
                 BreedHeightDetails height = new BreedHeightDetails(imperialHeight, metricHeight);
 
-                BreedImageDetails image = new BreedImageDetails(imageId, imageWidth, imageHeight, imageUrl);
-
                 BreedDetails breed = new BreedDetails(weight, height, id, name, bred_for, breed_group, life_span, temperament, origin, reference_image_id, image);
+
 
                 breeds.add(breed);
             }
@@ -163,6 +167,7 @@ public class PawsomePalWebService {
         }
         return breedNames;
     }
+
     private void postToUiThread(Runnable runnable) {
         handler.post(runnable);
     }
