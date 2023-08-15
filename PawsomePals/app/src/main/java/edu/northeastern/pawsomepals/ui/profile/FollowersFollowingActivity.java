@@ -163,6 +163,7 @@ private List<Users> filteredList;
             }
         }
         if (filteredList.isEmpty()) {
+            profileFollowingFollowerAdapter.setFilteredList(filteredList);
             Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
         } else {
             profileFollowingFollowerAdapter.setFilteredList(filteredList);
