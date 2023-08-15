@@ -96,7 +96,7 @@ public class ChatRoomActivity extends AppCompatActivity {
     private ImageButton infoBtn;
     private ImageView img_preview, image_view_container;
     private CardView img_cardview;
-    private TextView  locationPreviewTextView;
+    private TextView locationPreviewTextView;
     private TextView chatRoomName;
 
     private RecyclerView chatRoomRecyclerView;
@@ -168,56 +168,57 @@ public class ChatRoomActivity extends AppCompatActivity {
         );
 
         ChatFirebaseUtil.currentUserDetails().get().addOnCompleteListener(task -> currentUser = task.getResult().toObject(Users.class));
-        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.ONEONONE.toString())) {
-            otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
-            chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
-            infoBtn.setOnClickListener(v -> {
-                navigateToProfileFragment(otherUser.getUserId());
-            });
-            if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null) {
-                chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
-            } else {
-                chatRoomName.setText(otherUser.getName());
-            }
-
-            getOrCreateChatRoomModel();
-
-        } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.GROUP.toString())) {
-            infoBtn.setOnClickListener(v -> {
-                Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
-                //check
-                ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers, chatRoomName.getText().toString());
-                ChatFirebaseUtil.passMembersCardViewsDataAsIntent(intent, groupUsers);
-                StringBuilder builder = new StringBuilder();
-                startActivity(intent);
-            });
-            group = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
-            chatRoomId = ChatFirebaseUtil.getGroupRoomId(group.getGroupMembers());
-            chatRoomName.setText(group.getGroupName());
-
-            List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(group.getGroupMembers());
-            for (DocumentReference reference : references) {
-                reference.get().addOnSuccessListener(snapshot -> {
-                    Users user = snapshot.toObject(Users.class);
-                    if (user != null) {
-                        if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
-                            otherGroupUsers.add(user);
-                            groupUsers.add(user);
-                            groupUsersNames.add(user.getName().toLowerCase());
-                        }
-                        if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
-                            groupUsers.add(user);
-                            groupUsersNames.add(user.getName().toLowerCase());
-                        }
-                    }
+        if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()) != null) {
+            if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.ONEONONE.toString())) {
+                otherUser = ChatFirebaseUtil.getUserModelFromIntent(getIntent());
+                chatRoomId = ChatFirebaseUtil.getChatroomId(ChatFirebaseUtil.currentUserId(), otherUser.getUserId());
+                infoBtn.setOnClickListener(v -> {
+                    navigateToProfileFragment(otherUser.getUserId());
                 });
+                if (ChatFirebaseUtil.getGroupNameFromIntent(getIntent()) != null) {
+                    chatRoomName.setText(ChatFirebaseUtil.getGroupNameFromIntent(getIntent()));
+                } else {
+                    chatRoomName.setText(otherUser.getName());
+                }
+
+                getOrCreateChatRoomModel();
+
+            } else if (ChatFirebaseUtil.getChatStyleFromIntent(getIntent()).equals(ChatStyle.GROUP.toString())) {
+                infoBtn.setOnClickListener(v -> {
+                    Intent intent = new Intent(getApplicationContext(), EditChatRoomInfoActivity.class);
+                    //check
+                    ChatFirebaseUtil.passGroupChatModelAsIntent(intent, groupUsers, chatRoomName.getText().toString());
+                    ChatFirebaseUtil.passMembersCardViewsDataAsIntent(intent, groupUsers);
+                    StringBuilder builder = new StringBuilder();
+                    startActivity(intent);
+                });
+                group = ChatFirebaseUtil.getGroupChatModelFromIntent(getIntent());
+                chatRoomId = ChatFirebaseUtil.getGroupRoomId(group.getGroupMembers());
+                chatRoomName.setText(group.getGroupName());
+
+                List<DocumentReference> references = ChatFirebaseUtil.getGroupFromChatRoom(group.getGroupMembers());
+                for (DocumentReference reference : references) {
+                    reference.get().addOnSuccessListener(snapshot -> {
+                        Users user = snapshot.toObject(Users.class);
+                        if (user != null) {
+                            if (!user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
+                                otherGroupUsers.add(user);
+                                groupUsers.add(user);
+                                groupUsersNames.add(user.getName().toLowerCase());
+                            }
+                            if (user.getUserId().equals(ChatFirebaseUtil.currentUserId())) {
+                                groupUsers.add(user);
+                                groupUsersNames.add(user.getName().toLowerCase());
+                            }
+                        }
+                    });
+                }
+
+                getOrCreateGroupChatModel();
             }
-
-            getOrCreateGroupChatModel();
+            setupChatRecyclerView();
+            setupLocationRequire();
         }
-
-        setupChatRecyclerView();
-        setupLocationRequire();
     }
 
     private void sendLocationFileToUser() {
