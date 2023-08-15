@@ -1,16 +1,13 @@
 package edu.northeastern.pawsomepals.ui.search;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 
@@ -18,13 +15,9 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.adapters.SearchUserAdapter;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.feed.RecipeDetailActivity;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
-import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 
 

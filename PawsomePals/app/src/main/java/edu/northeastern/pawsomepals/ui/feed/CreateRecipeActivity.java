@@ -63,7 +63,7 @@ public class CreateRecipeActivity extends AppCompatActivity {
     private TextView setServingSizeTextView, setPrepTextView, setCookTextView, valueTextView;
     private boolean isEditImageDialogVisible = false;
     private boolean isDeleteConfirmationDialogVisible = false;
-    private boolean isQuantityPickerDialogVisible = false;
+    private final boolean isQuantityPickerDialogVisible = false;
     private int selectedValue;
     private boolean isPrepTimeDialogVisible = false;
     private boolean isCookTimeDialogVisible = false;

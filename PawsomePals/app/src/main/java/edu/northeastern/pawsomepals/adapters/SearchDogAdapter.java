@@ -1,6 +1,5 @@
 package edu.northeastern.pawsomepals.adapters;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
-
 import edu.northeastern.pawsomepals.ui.search.SearchViewHolder;
 
 public class SearchDogAdapter extends RecyclerView.Adapter<SearchViewHolder>{

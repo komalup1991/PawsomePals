@@ -20,7 +20,7 @@ public class SearchRecipeAdapter extends RecyclerView.Adapter<SearchViewHolder> 
 
     private List<Recipe> recipes;
 
-    private SearchRecipeAdapter.OnItemActionListener onItemActionListener;
+    private final SearchRecipeAdapter.OnItemActionListener onItemActionListener;
     public interface OnItemActionListener {
         void onRecipeClick(Recipe recipe);
     }

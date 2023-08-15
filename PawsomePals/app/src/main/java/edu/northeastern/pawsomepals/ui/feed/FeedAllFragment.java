@@ -2,7 +2,6 @@ package edu.northeastern.pawsomepals.ui.feed;
 
 import static android.content.Context.MODE_PRIVATE;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,12 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -52,7 +46,6 @@ import edu.northeastern.pawsomepals.models.Services;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
-import edu.northeastern.pawsomepals.utils.ActivityHelper;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FeedFilter;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
@@ -155,7 +148,6 @@ public class FeedAllFragment extends Fragment {
             }
         });
         feedsRecyclerView.setAdapter(feedAdapter);
-        Log.d("yoo", "yooooooo = " + feedItemList.size());
         fetchFeeds();
         addCollectionListeners();
     }

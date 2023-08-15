@@ -9,10 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -73,7 +69,7 @@ public class FeedCreateListDialogFragment extends BottomSheetDialogFragment {
     }
 
     class ItemAdapter extends RecyclerView.Adapter<ViewHolder> {
-        private Activity activity;
+        private final Activity activity;
         private final String[] actions = {"Recipe", "Post", "Photo", "Services", "Events"};
         private final int[] icons = {R.drawable.dogbowl, R.drawable.socialmedia,
                 R.drawable.media, R.drawable.groomingcolor, R.drawable.planner};

@@ -1,5 +1,13 @@
 package edu.northeastern.pawsomepals.ui.login;
 
+import android.annotation.SuppressLint;
+import android.app.NotificationManager;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
@@ -7,18 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-
-import android.annotation.SuppressLint;
-import android.app.NotificationManager;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -29,7 +25,6 @@ import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.map.MapFragment;
 import edu.northeastern.pawsomepals.ui.profile.DogBreedActivity;
-import edu.northeastern.pawsomepals.ui.profile.FollowersFollowingActivity;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.ui.search.SearchFragment;
 
@@ -118,7 +113,7 @@ public class HomeActivity extends AppCompatActivity  implements LogoutDialogList
             startActivity(new Intent(HomeActivity.this, DogBreedActivity.class));
         } else if (itemId == R.id.action_logout) {
             LogoutDialogFragment dialog = new LogoutDialogFragment();
-            dialog.setLogoutDialogListener((LogoutDialogListener) HomeActivity.this);
+            dialog.setLogoutDialogListener(HomeActivity.this);
             dialog.show(getSupportFragmentManager(), "logout_dialog");
         } else if (item.getItemId() == android.R.id.home) {
             onBackPressed();

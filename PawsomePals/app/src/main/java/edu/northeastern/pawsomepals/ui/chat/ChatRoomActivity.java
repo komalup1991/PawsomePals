@@ -2,33 +2,21 @@ package edu.northeastern.pawsomepals.ui.chat;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,6 +29,18 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
@@ -76,10 +76,10 @@ import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class ChatRoomActivity extends AppCompatActivity {
@@ -672,10 +672,9 @@ public class ChatRoomActivity extends AppCompatActivity {
         dialog.show();
 
         String fileName = getFileName(getContentResolver(), imageUri);
-        String path = new StringBuilder(ChatFirebaseUtil.currentUserId())
-                .append("/")
-                .append(fileName)
-                .toString();
+        String path = ChatFirebaseUtil.currentUserId() +
+                "/" +
+                fileName;
 //        StorageReference imageRef = storageRef.child("chat_message_images/" + imageName);
         storageReference = FirebaseStorage.getInstance()
                 .getReference("chat_message_images/")

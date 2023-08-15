@@ -21,9 +21,9 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Comment;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHolder> {
-    private Context context;
+    private final Context context;
     private List<Comment> comments;
-    private String postId;
+    private final String postId;
     private FirebaseUser firebaseUser;
 
     public CommentAdapter(Context context, List<Comment> comments, String postId) {

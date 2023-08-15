@@ -12,10 +12,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -90,13 +88,10 @@ public class FirebaseUtil {
         StorageReference storageRef = storage.getReference();
 
         if (imageUri != null) {
-            Log.d("yoo","image uri "+ imageUri);
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
             String imageName = postType + "_image_" + timestamp + ".jpg";
             StorageReference imageRef = storageRef.child(postType + "_images/" + imageName);
-            Log.d("yoo","image ref "+imageRef);
             UploadTask uploadTask = imageRef.putFile(imageUri);
-            Log.d("yoo","image task "+uploadTask);
 
             uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override

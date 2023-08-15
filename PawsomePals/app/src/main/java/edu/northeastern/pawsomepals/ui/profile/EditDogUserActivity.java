@@ -1,20 +1,10 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,7 +13,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.InputType;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -38,6 +27,14 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -66,8 +63,6 @@ import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Dogs;
 import edu.northeastern.pawsomepals.network.BaseUiThreadCallback;
 import edu.northeastern.pawsomepals.network.PawsomePalWebService;
-import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
-import edu.northeastern.pawsomepals.ui.login.HomeActivity;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 public class EditDogUserActivity extends AppCompatActivity {
@@ -581,7 +576,6 @@ public class EditDogUserActivity extends AppCompatActivity {
                             })
                             .addOnFailureListener(e -> {
                                 DialogHelper.hideProgressDialog(progressDialog);
-                                Log.e("yoo", "Error adding document", e);
                                 Toast.makeText(EditDogUserActivity.this, "Failed to update Pal's profile. Please try again.", Toast.LENGTH_SHORT).show();
                             });
                 } else {
@@ -619,7 +613,6 @@ public class EditDogUserActivity extends AppCompatActivity {
                     })
                     .addOnFailureListener(e -> {
                         DialogHelper.hideProgressDialog(progressDialog);
-                        Log.e("yoo", "Error adding document", e);
                         Toast.makeText(EditDogUserActivity.this, "Failed to update Pal's profile. Please try again.", Toast.LENGTH_SHORT).show();
                     });
         }

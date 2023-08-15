@@ -3,11 +3,9 @@ package edu.northeastern.pawsomepals.ui.feed;
 import static edu.northeastern.pawsomepals.ui.login.HomeActivity.PROFILE_ACTIVITY_REQUEST_CODE;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,7 +13,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 
@@ -23,7 +20,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Recipe;
 import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.ui.profile.ProfileFragment;
 import edu.northeastern.pawsomepals.utils.BaseDataCallback;
 import edu.northeastern.pawsomepals.utils.FirebaseUtil;
 

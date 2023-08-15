@@ -51,8 +51,8 @@ public class ProfileFeedFragment extends Fragment {
         viewPager.setOffscreenPageLimit(1);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
-            switch (position) {
-                case 0 -> tab.setText(tabText);
+            if (position == 0) {
+                tab.setText(tabText);
             }
         }).attach();
     }

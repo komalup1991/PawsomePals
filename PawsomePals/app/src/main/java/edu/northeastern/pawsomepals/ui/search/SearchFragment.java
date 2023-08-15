@@ -34,10 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -49,7 +47,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.northeastern.pawsomepals.R;
-
 import edu.northeastern.pawsomepals.adapters.SearchDogAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchRecipeAdapter;
 import edu.northeastern.pawsomepals.adapters.SearchUserAdapter;
@@ -192,7 +189,7 @@ public class SearchFragment extends Fragment {
                 userBtn.setTextColor(getResources().getColor(R.color.white));
                 recipeBtn.setTextColor(getResources().getColor(R.color.white));
                 selectedSearchType = "dogs";
-                searchDogAdapter.clearData();;
+                searchDogAdapter.clearData();
                 searchRecyclerView.setAdapter(searchDogAdapter);
 
                 dogBtn.setSelected(true);

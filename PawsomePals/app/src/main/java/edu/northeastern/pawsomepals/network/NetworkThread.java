@@ -4,7 +4,6 @@ import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,8 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class NetworkThread extends Thread {
-    private String url;
-    private NetworkCallback networkCallback;
+    private final String url;
+    private final NetworkCallback networkCallback;
 
     public interface NetworkCallback {
         void processResponse(String responseData);

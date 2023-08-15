@@ -1,7 +1,6 @@
 package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,23 +13,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+
+import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
-import edu.northeastern.pawsomepals.ui.chat.ChatRoomActivity;
-
-import com.bumptech.glide.Glide;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users, ChatGroupUserRecyclerAdapter.UserModelViewHolder> {
 
-    private Context context;
+    private final Context context;
     private OnItemClickListener mListener;
     private List<String> checkedUserList;
 
@@ -57,18 +52,10 @@ public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users
 
     @Override
     protected void onBindViewHolder(@NonNull UserModelViewHolder holder, int position, @NonNull Users model) {
-        if(holder.addCheckBox.isChecked()){
-            holder.addCheckBox.setChecked(true);
-        }else{
-            holder.addCheckBox.setChecked(false);
-        }
+        holder.addCheckBox.setChecked(holder.addCheckBox.isChecked());
 
         if (!checkedUserList.isEmpty()) {
-            if (checkedUserList.contains(model.getUserId())){
-                holder.addCheckBox.setChecked(true);
-            }else{
-                holder.addCheckBox.setChecked(false);
-            }
+            holder.addCheckBox.setChecked(checkedUserList.contains(model.getUserId()));
         }else{
             holder.addCheckBox.setChecked(false);
         }
@@ -109,9 +96,9 @@ public class ChatGroupUserRecyclerAdapter extends FirestoreRecyclerAdapter<Users
     }
 
     class UserModelViewHolder extends RecyclerView.ViewHolder {
-        private TextView userNameText;
-        private ImageView profilePic;
-        private CheckBox addCheckBox;
+        private final TextView userNameText;
+        private final ImageView profilePic;
+        private final CheckBox addCheckBox;
 
         public UserModelViewHolder(@NonNull View itemView) {
             super(itemView);

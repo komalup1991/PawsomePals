@@ -1,24 +1,21 @@
 package edu.northeastern.pawsomepals.ui.login;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-
 
 import edu.northeastern.pawsomepals.R;
 
@@ -105,7 +102,7 @@ public class ForgotPassword extends AppCompatActivity {
             String email = savedInstanceState.getString("email");
             inputEmail.setText(email);
             emailCursorPosition = savedInstanceState.getInt("emailCursorPosition");
-            EditText editEmailText = (EditText) inputEmail;
+            EditText editEmailText = inputEmail;
             editEmailText.setSelection(emailCursorPosition);
         }
     }

@@ -79,11 +79,7 @@ public class DialogHelper {
         MenuItem editMenuItem = popupMenu.getMenu().findItem(R.id.action_edit);
 
         if (editMenuItem != null) {
-            if (feedItem.getCreatedBy().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
-                editMenuItem.setVisible(true);
-            } else {
-                editMenuItem.setVisible(false);
-            }
+            editMenuItem.setVisible(feedItem.getCreatedBy().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()));
         }
 
         MenuItem favMenuItem = popupMenu.getMenu().findItem(R.id.action_goToFav);

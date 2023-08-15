@@ -1,8 +1,6 @@
 package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +25,7 @@ import edu.northeastern.pawsomepals.models.BreedDetails;
 
 public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllDogBreedsAdapter.ProfileAllDogBreedsViewHolder> {
     private List<BreedDetails> breedDetails;
-    private Context context;
+    private final Context context;
     private static final int VIEW_TYPE_DOG_BREED_DETAILS = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
 
@@ -123,16 +121,16 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
     }
 
     public class ProfileAllDogBreedsViewHolder extends RecyclerView.ViewHolder {
-        private ImageView dogImage;
-        private TextView breedName;
-        private TextView breedDescription;
-        private ConstraintLayout constraintLayout;
-        private MaterialCardView materialCardView;
+        //private final ImageView dogImage;
+        private final TextView breedName;
+        private final TextView breedDescription;
+        private final ConstraintLayout constraintLayout;
+        private final MaterialCardView materialCardView;
 
         public ProfileAllDogBreedsViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            dogImage = itemView.findViewById(R.id.dogImage);
+            //dogImage = itemView.findViewById(R.id.dogImage);
             breedName = itemView.findViewById(R.id.breedName);
             breedDescription = itemView.findViewById(R.id.breedDesc);
             constraintLayout = itemView.findViewById(R.id.constraintLayout);
@@ -143,9 +141,9 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
 
             breedName.setText(breedDetail.getName());
 
-            String imageUrl = breedDetail.getImage().getUrl();
+            //String imageUrl = breedDetail.getImage().getUrl();
 
-            if (!Objects.isNull(imageUrl)) {
+            /*if (!Objects.isNull(imageUrl)) {
                 if (!imageUrl.equals("") && !imageUrl.equals("null")) {
                     Glide.with(context)
                             .load(imageUrl)
@@ -159,7 +157,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
                 Glide.with(context)
                         .load(R.drawable.dog)
                         .into(dogImage);
-            }
+            }*/
 
             StringBuilder breedDesc = new StringBuilder();
 

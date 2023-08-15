@@ -1,7 +1,5 @@
 package edu.northeastern.pawsomepals.models;
 
-import androidx.annotation.Nullable;
-
 public class Event extends FeedItemWithImage {
     private String eventName;
     private String eventDate;

@@ -29,10 +29,10 @@ import edu.northeastern.pawsomepals.ui.feed.viewHolder.ServicesFeedViewHolder;
 import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<FeedItem> feedItems;
-    private Context context;
-    private FeedFragmentViewType feedFragmentViewType;
-    private OnItemActionListener onItemActionListener;
+    private final List<FeedItem> feedItems;
+    private final Context context;
+    private final FeedFragmentViewType feedFragmentViewType;
+    private final OnItemActionListener onItemActionListener;
 
     private List<String> userIds = new ArrayList<>();
 
