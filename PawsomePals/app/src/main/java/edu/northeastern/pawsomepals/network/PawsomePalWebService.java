@@ -17,7 +17,7 @@ import edu.northeastern.pawsomepals.models.BreedWeightDetails;
 
 public class PawsomePalWebService {
     private static final String API_KEY = "live_fLrLBAIBG2wu5m1YEvBZvVAHsI6ZIjrSH5RXdGaKVNTNpvjrS5JTp1ohgfIPm3vg";
-    private static final String BASE_URL = "https://api.thedogapi.com/";
+    public static final String BASE_URL = "https://api.thedogapi.com/";
 
     private final UiThreadCallback uiThreadCallback;
 
