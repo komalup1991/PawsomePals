@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:background="@color/darkPink"
-                android:text="Pet of the Day!"
+                android:text="Check this out!"
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
