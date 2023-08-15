@@ -10,7 +10,7 @@
         android:id="@+id/recipeDetailToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/backgroundColor"
+        android:background="@color/darkPink"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:title="Dog Detail" />
@@ -18,73 +18,76 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imageProfile"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="4dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="32dp"
         android:scaleType="centerCrop"
         android:src="@drawable/dog"
         app:civ_border_color="#FFFFFF"
-        app:civ_border_width="2dp"
+        app:civ_border_width="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/cardViewUserDetails"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/recipeDetailToolbar" />
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardViewUserDetails"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="10dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imageProfile">
+        android:layout_marginTop="16dp"
+    android:layout_marginEnd="24dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/imageProfile">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/textViewUserDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Owner Details"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:padding="16dp">
 
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/userImage"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/dogbone"
+                app:civ_border_color="@color/darkPink"
+                app:civ_border_width="4dp" />
+
             <TextView
-                android:id="@+id/textViewUserDetails"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Owner Details"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold" />
-
-            <LinearLayout
+                android:id="@+id/UserName"
                 android:layout_width="match_parent"
-                android:layout_height="71dp"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:id="@+id/userImage"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginEnd="10dp"
-                    android:background="@drawable/circle_background"
-                    android:src="@drawable/dogbone" />
-
-                <TextView
-                    android:id="@+id/UserName"
-                    android:layout_width="match_parent"
-                    android:layout_height="39dp"
-                    android:hint="Owner's Name"
-                    android:paddingTop="8dp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+            android:text="Owner's Name"
+            android:textStyle="bold" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
+
 
     <!-- Name CardView -->
     <androidx.cardview.widget.CardView
@@ -211,11 +214,9 @@
         android:layout_marginStart="24dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="40dp"
 
         app:cardCornerRadius="8dp"
         app:cardElevation="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cardViewGender">
