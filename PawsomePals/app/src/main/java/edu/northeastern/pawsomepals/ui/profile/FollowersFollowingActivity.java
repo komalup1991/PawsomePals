@@ -47,7 +47,7 @@ public class FollowersFollowingActivity extends AppCompatActivity {
     private TextView textNoUserProfiles;
     private SearchView searchView;
     private String displayFollowersOrFollowingUsers;
-
+private List<Users> filteredList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +60,7 @@ public class FollowersFollowingActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
-
+        filteredList = new ArrayList<>();
         currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             userId = currentUser.getUid();
@@ -77,8 +77,9 @@ public class FollowersFollowingActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
-            if(displayFollowersOrFollowingUsers.equals("following")) {
-            actionBar.setTitle("Following Users");} else {
+            if (displayFollowersOrFollowingUsers.equals("following")) {
+                actionBar.setTitle("Following Users");
+            } else {
                 actionBar.setTitle("Followers");
             }
         }
@@ -106,15 +107,24 @@ public class FollowersFollowingActivity extends AppCompatActivity {
         profileFollowingFollowerAdapter.setOnItemClickListener(new ProfileFollowingFollowerAdapter.OnItemClickListener() {
             @Override
             public void onUserClick(int position) {
-                Users selectedUser = userProfiles.get(position);
-                String selectedUserId = selectedUser.getUserId();
-                navigateToProfileFragment(selectedUserId);
+
+
+                if (searchView.getQuery().toString().isEmpty()) {
+                    Users selectedUser = userProfiles.get(position);
+                    String selectedUserId = selectedUser.getUserId();
+                    navigateToProfileFragment(selectedUserId);
+                } else {
+                    // User is searching, use the position from filtered list
+                    Users selectedUser = filteredList.get(position);
+                    String selectedUserId = selectedUser.getUserId();
+                    navigateToProfileFragment(selectedUserId);
+                }
             }
         });
 
-        if(displayFollowersOrFollowingUsers.equals("following")) {
+        if (displayFollowersOrFollowingUsers.equals("following")) {
             fetchFollowingUserProfiles(profileId);
-        }else {
+        } else {
             fetchFollowersUserProfiles(profileId);
         }
         progressBar.setVisibility(View.GONE);
@@ -143,8 +153,9 @@ public class FollowersFollowingActivity extends AppCompatActivity {
         finish();
     }
 
+
     private void filterList(String newText) {
-        List<Users> filteredList = new ArrayList<>();
+        filteredList = new ArrayList<>();
         for (Users user : userProfiles) {
             if (user.getName().toLowerCase().contains(newText.toLowerCase())) {
                 filteredList.add(user);
@@ -152,8 +163,7 @@ public class FollowersFollowingActivity extends AppCompatActivity {
         }
         if (filteredList.isEmpty()) {
             Toast.makeText(this, "No user found", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             profileFollowingFollowerAdapter.setFilteredList(filteredList);
         }
     }
@@ -260,5 +270,6 @@ public class FollowersFollowingActivity extends AppCompatActivity {
                     } else {
                         Log.e("Fetch User Profiles", "Error fetching user profiles");
                     }
-                });}
+                });
+    }
 }
