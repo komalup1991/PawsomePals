@@ -70,10 +70,9 @@ import edu.northeastern.pawsomepals.utils.FeedFilter;
 public class MapFragment extends Fragment implements OnMapReadyCallback, FirestoreDataLoader.FirestoreDataListener {
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-
+    private final Map<String, FeedItem> feedItemMap = new HashMap<>();
     private MapView mapView;
     private GoogleMap googleMap;
-
     private FusedLocationProviderClient fusedLocationClient;
     private Activity activity;
     private FeedItem selectedFeedItem;
@@ -81,7 +80,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
     private NavDirections action;
     private RadioButton radioButtonAll;
 
-    private final Map<String, FeedItem> feedItemMap = new HashMap<>();
+    public static int dpToPx(Context context, int dp) {
+        float density = context.getResources().getDisplayMetrics().density;
+        return (int) (dp * density + 0.5f); // Adding 0.5 for rounding to the nearest integer
+    }
 
     @Nullable
     @Override
@@ -148,7 +150,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         }
     }
 
-
     private void loadMarkersOnMapAll() {
         loadMarkersOnMap(null);
     }
@@ -204,31 +205,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
 
         MarkerOptions marker = new MarkerOptions();
-        //String snippet = username + "\n" + "Location: " + latLng.toString(); // Customize this formatting as needed
 
-        marker.position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-
-//        if (feedItem.getType() == 1) {
-//            marker.title(((PhotoVideo) feedItem).getCaption())
-//                    .icon(icon)
-//                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-//        } else if (feedItem.getType() == 2) {
-//            marker.title(((Services) feedItem).getServiceName())
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-//        } else if (feedItem.getType() == 3) {
-//            marker.title(((Event) feedItem).getEventName())
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-//        } else if (feedItem.getType() == 4) {
-//            marker.title(((Post) feedItem).getCaption())
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-//        }
+        marker.icon(icon).position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -248,9 +226,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
 
     private void showCustomInfoWithImageFetch(FeedItem feedItem, Marker marker) {
         if (feedItem instanceof FeedItemWithImage) {
-            Glide.with(mapView).load(((FeedItemWithImage) feedItem).getImg())
-                    .transform(new CenterCrop(), new GranularRoundedCorners(23, 23, 0, 0))
-                    .addListener(new RequestListener<Drawable>() {
+            Glide.with(mapView).load(((FeedItemWithImage) feedItem).getImg()).transform(new CenterCrop(), new GranularRoundedCorners(23, 23, 0, 0)).addListener(new RequestListener<Drawable>() {
                 @Override
                 public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
                     return false;
@@ -382,11 +358,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, Firesto
         intent.putExtra("feedId", marker.getTag().toString());
         activity.startActivity(intent);
         activity.finish();
-    }
-
-    public static int dpToPx(Context context, int dp) {
-        float density = context.getResources().getDisplayMetrics().density;
-        return (int) (dp * density + 0.5f); // Adding 0.5 for rounding to the nearest integer
     }
 
 }
