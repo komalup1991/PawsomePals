@@ -3,6 +3,8 @@ package edu.northeastern.pawsomepals.ui.search;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import static edu.northeastern.pawsomepals.network.PawsomePalWebService.BASE_URL;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -268,12 +270,15 @@ public class SearchFragment extends Fragment {
             ImageView breedImage = getView().findViewById(R.id.breed_image);
             TextView breedName = getView().findViewById(R.id.breed_name);
 
-            String imageUrl = randomBreed.getImage().getUrl();
-            Log.d("image", imageUrl);
+            String imageRef = randomBreed.getReference_image_id();
+            String imageUrl = "https://cdn2.thedogapi.com/images/" + imageRef +".jpg";
+            Log.d("imageId",imageRef);
+            Log.d("imageID",randomBreed.getImage().getUrl());
+            Log.d("image",imageUrl);
 
             breedName.setText(randomBreed.getName());
             Glide.with(requireContext())
-                    .load(randomBreed.getImage().getUrl())
+                    .load(imageUrl)
                     .into(breedImage);
 
 

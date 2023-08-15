@@ -63,51 +63,14 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private String getTitle() {
         if (feedItem.getType() == 1) {
             return ((PhotoVideo) feedItem).getCaption();
-//                    .icon(icon)
-//                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 2) {
             return ((Services) feedItem).getServiceName();
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 3) {
             return (((Event) feedItem).getEventName());
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         } else if (feedItem.getType() == 4) {
             return (((Post) feedItem).getCaption());
-//            marker.title(((Post) feedItem).getCaption())
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
         }
         return "";
     }
 
-//    private String getSnippet() {
-//        return feedItem.getLocationTagged();
-////        if (feedItem.getType() == 1) {
-////            return ((PhotoVideo) feedItem).getCaption();
-//                    .icon(icon)
-//                    .snippet("By: "+ feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-////        } else if (feedItem.getType() == 2) {
-////            return ((Services) feedItem).getServiceName();
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-////        } else if (feedItem.getType() == 3) {
-////            return (((Event) feedItem).getEventName());
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-////        } else if (feedItem.getType() == 4) {
-////            return (((Post) feedItem).getCaption());
-//            marker.title(((Post) feedItem).getCaption())
-//                    .icon(icon)
-//                    .snippet("By: "+feedItem.getUsername()+"\n"+feedItem.getLocationTagged())
-//                    .position(new LatLng(feedItem.getLatLng().getLatitude(), feedItem.getLatLng().getLongitude()));
-////        }
-//        return "";
-//    }
 }

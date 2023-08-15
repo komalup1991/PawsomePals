@@ -121,7 +121,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
     }
 
     public class ProfileAllDogBreedsViewHolder extends RecyclerView.ViewHolder {
-        //private final ImageView dogImage;
+        private final ImageView dogImage;
         private final TextView breedName;
         private final TextView breedDescription;
         private final ConstraintLayout constraintLayout;
@@ -130,7 +130,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
         public ProfileAllDogBreedsViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            //dogImage = itemView.findViewById(R.id.dogImage);
+            dogImage = itemView.findViewById(R.id.dogImage);
             breedName = itemView.findViewById(R.id.breedName);
             breedDescription = itemView.findViewById(R.id.breedDesc);
             constraintLayout = itemView.findViewById(R.id.constraintLayout);
@@ -141,12 +141,21 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
 
             breedName.setText(breedDetail.getName());
 
+            StringBuilder imageUrl = null;
+            if(!breedDetail.getReference_image_id().equals(""))
+            {
+                imageUrl = new StringBuilder();
+                imageUrl.append("https://cdn2.thedogapi.com/images/");
+                imageUrl.append(breedDetail.getReference_image_id());
+                imageUrl.append(".jpg");
+            }
+
             //String imageUrl = breedDetail.getImage().getUrl();
 
-            /*if (!Objects.isNull(imageUrl)) {
+            if (!Objects.isNull(imageUrl)) {
                 if (!imageUrl.equals("") && !imageUrl.equals("null")) {
                     Glide.with(context)
-                            .load(imageUrl)
+                            .load(imageUrl.toString())
                             .into(dogImage);
                 } else {
                     Glide.with(context)
@@ -157,7 +166,7 @@ public class ProfileAllDogBreedsAdapter extends RecyclerView.Adapter<ProfileAllD
                 Glide.with(context)
                         .load(R.drawable.dog)
                         .into(dogImage);
-            }*/
+            }
 
             StringBuilder breedDesc = new StringBuilder();
 
