@@ -12,8 +12,8 @@ import edu.northeastern.pawsomepals.ui.profile.RecipesFragment;
 public class ProfileFragmentAdapter extends FragmentStateAdapter {
     private static final int NUM_TABS = 3;
 
-    private String profileId;
-    private Boolean isUserProfile;
+    private final String profileId;
+    private final Boolean isUserProfile;
 
     public ProfileFragmentAdapter(@NonNull FragmentActivity fragmentActivity, String profileId, Boolean isUserProfile) {
         super(fragmentActivity);

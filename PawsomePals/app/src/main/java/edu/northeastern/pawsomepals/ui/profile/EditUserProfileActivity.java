@@ -1,9 +1,6 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -30,16 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import android.Manifest;
-
-import androidx.appcompat.widget.Toolbar;
-
-import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Users;
-import edu.northeastern.pawsomepals.utils.DialogHelper;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -61,6 +54,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.models.Users;
+import edu.northeastern.pawsomepals.utils.DialogHelper;
+
 public class EditUserProfileActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_IMAGE_GALLERY = 2;
@@ -68,7 +65,7 @@ public class EditUserProfileActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_CAMERA = 3;
     private static final int PERMISSIONS_REQUEST_STORAGE = 4;
     private boolean shouldShowDatePicker = false;
-    private boolean datePickerOpened = false;
+    private final boolean datePickerOpened = false;
     private boolean isGenderSelected = false;
 
     private ImageView imageProfile;

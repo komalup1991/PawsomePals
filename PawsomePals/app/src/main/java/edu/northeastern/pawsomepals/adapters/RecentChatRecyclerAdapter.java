@@ -14,6 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatRoomModel;
@@ -23,20 +30,12 @@ import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
 import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
 import edu.northeastern.pawsomepals.ui.chat.ChatRoomActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class RecentChatRecyclerAdapter extends FirestoreRecyclerAdapter<ChatRoomModel, RecentChatRecyclerAdapter.ChatRoomModelViewHolder> {
 
-    private Context context;
-    private ChatFragment.ProfilePicClickListener listener;
-    private DataUpdateListener dataUpdateListener;
+    private final Context context;
+    private final ChatFragment.ProfilePicClickListener listener;
+    private final DataUpdateListener dataUpdateListener;
     public interface DataUpdateListener {
         void onDataUpdated();
     }

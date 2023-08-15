@@ -2,8 +2,6 @@ package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
 import android.content.Intent;
-import android.transition.AutoTransition;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,9 +31,9 @@ import edu.northeastern.pawsomepals.ui.profile.EditDogUserActivity;
 
 public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.DogProfileViewHolder> {
     private List<Dogs> dogProfiles;
-    private Context context;
-    private FirebaseFirestore firebaseFirestore;
-    private Boolean isUserProfile;
+    private final Context context;
+    private final FirebaseFirestore firebaseFirestore;
+    private final Boolean isUserProfile;
     private static final int VIEW_TYPE_DOG_PROFILE = 1;
     private static final int VIEW_TYPE_EMPTY = 2;
 
@@ -177,17 +174,17 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
     }
 
     public class DogProfileViewHolder extends RecyclerView.ViewHolder {
-        private ImageView imageDog;
-        private TextView nameTextView;
-        private TextView breedTextView;
-        private ImageButton editButton;
-        private ImageButton deleteButton;
-        private LinearLayout layoutDogInfo;
-        private ConstraintLayout expandableLayout;
-        private TextView textDogDobValue;
-        private TextView textDogGenderValue;
-        private TextView textDogSizeValue;
-        private MaterialCardView materialCardView;
+        private final ImageView imageDog;
+        private final TextView nameTextView;
+        private final TextView breedTextView;
+        private final ImageButton editButton;
+        private final ImageButton deleteButton;
+        private final LinearLayout layoutDogInfo;
+        private final ConstraintLayout expandableLayout;
+        private final TextView textDogDobValue;
+        private final TextView textDogGenderValue;
+        private final TextView textDogSizeValue;
+        private final MaterialCardView materialCardView;
 
         public DogProfileViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -212,7 +209,7 @@ public class ProfileDogAdapter extends RecyclerView.Adapter<ProfileDogAdapter.Do
 
             String breed = "";
             if (dogProfile.getIsMixedBreed()) {
-                breed = (new StringBuilder()).append(dogProfile.getBreed()).append(" + ").append(dogProfile.getMixedBreed()).toString();
+                breed = dogProfile.getBreed() + " + " + dogProfile.getMixedBreed();
             } else {
                 breed = dogProfile.getBreed();
             }

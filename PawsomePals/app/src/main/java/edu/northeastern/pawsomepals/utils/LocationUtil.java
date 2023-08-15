@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,16 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LocationUtil {
     private static final int REQUEST_CODE_LOCATION_PERMISSIONS = 1001;
@@ -43,10 +35,10 @@ public class LocationUtil {
 
     private static final String API = "AIzaSyDwYaHCpseu3nk2grk4WpwSNN3jNBQW4eY";
 
-    private Activity activity;
-    private Context context;
-    private Geocoder geocoder;
-    private TextView locationTaggedTextView;
+    private final Activity activity;
+    private final Context context;
+    private final Geocoder geocoder;
+    private final TextView locationTaggedTextView;
 
 
     public LocationUtil(Activity activity, TextView locationTaggedTextView) {
@@ -62,11 +54,8 @@ public class LocationUtil {
     }
 
     private boolean checkLocationPermissions() {
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return false;
-        }
-        return true;
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     public static void makeLocationRequest(String location) {

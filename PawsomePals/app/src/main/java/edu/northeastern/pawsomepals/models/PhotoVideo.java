@@ -1,7 +1,5 @@
 package edu.northeastern.pawsomepals.models;
 
-import androidx.annotation.Nullable;
-
 public class PhotoVideo extends FeedItemWithImage  {
     private String caption;
 

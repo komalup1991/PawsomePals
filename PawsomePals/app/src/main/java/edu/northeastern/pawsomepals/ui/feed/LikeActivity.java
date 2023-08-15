@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.collection.ArraySet;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +46,7 @@ public class LikeActivity extends AppCompatActivity implements OnItemActionListe
     private Object createdBy;
     private List<Like> likeList;
     private FirebaseFirestore firebaseFirestore;
-    private Set<String> followListSet = new HashSet<>();
+    private final Set<String> followListSet = new HashSet<>();
 
 
     @Override

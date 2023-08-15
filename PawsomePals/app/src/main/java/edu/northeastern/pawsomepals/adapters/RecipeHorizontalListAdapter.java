@@ -7,8 +7,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.List;
 
 import edu.northeastern.pawsomepals.R;
@@ -19,7 +17,7 @@ import edu.northeastern.pawsomepals.utils.OnItemActionListener;
 
 public class RecipeHorizontalListAdapter extends RecyclerView.Adapter<RecipeHorizontalFeedViewHolder> {
     private List<Recipe> recipes;
-    private OnItemActionListener onItemActionListener;
+    private final OnItemActionListener onItemActionListener;
 
 
     public RecipeHorizontalListAdapter(List<Recipe> recipes, List<Users> user, OnItemActionListener onItemActionListener) {

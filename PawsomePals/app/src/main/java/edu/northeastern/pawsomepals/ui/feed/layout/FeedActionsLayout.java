@@ -5,12 +5,7 @@ import static edu.northeastern.pawsomepals.ui.login.HomeActivity.PROFILE_ACTIVIT
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.util.Linkify;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageButton;

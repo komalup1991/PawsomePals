@@ -3,7 +3,6 @@ package edu.northeastern.pawsomepals.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +24,13 @@ import java.util.Locale;
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatMessageModel;
 import edu.northeastern.pawsomepals.ui.chat.ChatFirebaseUtil;
-import edu.northeastern.pawsomepals.ui.chat.ChatImgUtil;
 
 
 public class ChatMessageRecyclerAdapter extends FirestoreRecyclerAdapter<ChatMessageModel, RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_TEXT_MESSAGE = 0;
     private static final int VIEW_TYPE_IMAGE_MESSAGE = 1;
     private static final int VIEW_TYPE_LOCATION_MESSAGE = 2;
-    private Context context;
+    private final Context context;
     private FirestoreRecyclerOptions<ChatMessageModel> options;
     private ChatMessageRecyclerAdapter.OnImgItemClickListener mListener;
 

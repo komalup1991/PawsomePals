@@ -1,19 +1,12 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
-
 import static edu.northeastern.pawsomepals.ui.login.HomeActivity.PROFILE_ACTIVITY_REQUEST_CODE;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,18 +16,13 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
@@ -43,15 +31,13 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,10 +45,8 @@ import java.util.Objects;
 
 import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.adapters.ProfileFragmentAdapter;
-import edu.northeastern.pawsomepals.models.FeedItem;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.FeedCollectionType;
-import edu.northeastern.pawsomepals.ui.feed.FeedFragment;
 import edu.northeastern.pawsomepals.ui.feed.FeedFragmentViewType;
 import edu.northeastern.pawsomepals.ui.feed.FirestoreDataLoader;
 
@@ -385,7 +369,7 @@ public class ProfileFragment extends Fragment {
                                                 } else {
                                                     // Document does not exist, create it and set the "followers" field
                                                     Map<String, Object> profileData = new HashMap<>();
-                                                    profileData.put("followers", Arrays.asList(userId));
+                                                    profileData.put("followers", Collections.singletonList(userId));
 
                                                     firebaseFirestore.collection("follow")
                                                             .document(profileId)
@@ -417,7 +401,7 @@ public class ProfileFragment extends Fragment {
                     } else {
                         // Document does not exist, create it and set the "following" field
                         Map<String, Object> data = new HashMap<>();
-                        data.put("following", Arrays.asList(profileId));
+                        data.put("following", Collections.singletonList(profileId));
                         firebaseFirestore.collection("follow")
                                 .document(userId)
                                 .set(data)
@@ -454,7 +438,7 @@ public class ProfileFragment extends Fragment {
                                                 } else {
                                                     // Document does not exist, create it and set the "followers" field
                                                     Map<String, Object> profileData = new HashMap<>();
-                                                    profileData.put("followers", Arrays.asList(userId));
+                                                    profileData.put("followers", Collections.singletonList(userId));
                                                     firebaseFirestore.collection("follow")
                                                             .document(profileId)
                                                             .set(profileData)

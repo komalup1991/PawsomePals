@@ -1,8 +1,5 @@
 package edu.northeastern.pawsomepals.models;
 
-import com.google.firebase.firestore.DocumentSnapshot;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class Users {

@@ -1,32 +1,27 @@
 package edu.northeastern.pawsomepals.adapters;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-
-
-import android.widget.ImageView;
-import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 
-import edu.northeastern.pawsomepals.R;
+import java.util.List;
 
+import edu.northeastern.pawsomepals.R;
 import edu.northeastern.pawsomepals.models.ChatUserCardViewModel;
-import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.chat.ChatFragment;
 
 public class ChatGroupMemberViewsAdapter extends RecyclerView.Adapter<ChatGroupMemberViewsAdapter.GroupMemberViewsHolder> {
-    private Context context;
-    private List<ChatUserCardViewModel> usersList;
-    private ChatFragment.ProfilePicClickListener onItemActionListener;
+    private final Context context;
+    private final List<ChatUserCardViewModel> usersList;
+    private final ChatFragment.ProfilePicClickListener onItemActionListener;
 
 
     public ChatGroupMemberViewsAdapter(Context context, List<ChatUserCardViewModel> usersList, ChatFragment.ProfilePicClickListener onItemActionListener) {
@@ -67,8 +62,8 @@ public class ChatGroupMemberViewsAdapter extends RecyclerView.Adapter<ChatGroupM
     }
 
     class GroupMemberViewsHolder extends RecyclerView.ViewHolder {
-        private ImageView profileImg;
-        private TextView userName;
+        private final ImageView profileImg;
+        private final TextView userName;
 
         public GroupMemberViewsHolder(@NonNull View itemView) {
             super(itemView);

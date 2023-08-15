@@ -1,7 +1,6 @@
 package edu.northeastern.pawsomepals.ui.feed;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -31,7 +30,6 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import edu.northeastern.pawsomepals.R;
-import edu.northeastern.pawsomepals.models.Event;
 import edu.northeastern.pawsomepals.models.Post;
 import edu.northeastern.pawsomepals.models.Users;
 import edu.northeastern.pawsomepals.ui.feed.layout.TaggingOptionsLayout;

@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -366,7 +365,7 @@ public class CreateEventsActivity extends AppCompatActivity {
             if (selectedDateTime.before(currentDateTime)) {
                 Toast.makeText(getApplicationContext(), "Date and time should not be a past value.", Toast.LENGTH_SHORT).show();
                 return;
-            };
+            }
 
             SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
             String formattedTime = sdf.format(selectedDateTime.getTime()); // Format in local time zone
@@ -395,13 +394,11 @@ public class CreateEventsActivity extends AppCompatActivity {
         picker.show(getSupportFragmentManager(), "DATE_PICKER");
 
         picker.addOnPositiveButtonClickListener(selection -> {
-            Log.d("yoo", "selectedDatefefff " + selection);
             Calendar selectedCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")); // Set to UTC
             selectedCalendar.setTimeInMillis(selection);
 
             selectedDate = selectedCalendar.getTimeInMillis();
 
-            Log.d("yoo", "selectedDate " + selectedCalendar);
             SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
             String date = sdf.format(selectedDate);
