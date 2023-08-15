@@ -1,6 +1,7 @@
 package edu.northeastern.pawsomepals.ui.profile;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -31,6 +32,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -47,7 +49,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import edu.northeastern.pawsomepals.R;
+import edu.northeastern.pawsomepals.ui.feed.CreateEventsActivity;
 import edu.northeastern.pawsomepals.utils.DialogHelper;
+import edu.northeastern.pawsomepals.utils.ImageUtil;
 
 public class NewUserProfileActivity extends AppCompatActivity {
 
@@ -96,7 +100,6 @@ public class NewUserProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-
             actionBar.setTitle("Create your Profile");
         }
 
@@ -119,7 +122,7 @@ public class NewUserProfileActivity extends AppCompatActivity {
         imageProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openImageChooserDialog();
+                ImageUtil.showPhotoSelectionDialog(NewUserProfileActivity.this);
             }
         });
 
@@ -138,29 +141,19 @@ public class NewUserProfileActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAMERA:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Camera permissions granted, proceed with image capture
-                    handleImageCaptureFromCamera();
+        if (requestCode == PERMISSIONS_REQUEST_CAMERA) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (ImageUtil.checkCameraPermission(NewUserProfileActivity.this)) {
+                    ImageUtil.openCamera(NewUserProfileActivity.this);
                 } else {
-                    // Camera permissions denied, show a message or handle accordingly
-                    Toast.makeText(this, "Camera permissions denied.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
                 }
-                break;
-            case PERMISSIONS_REQUEST_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Storage permissions granted, proceed with image pick
-                    handleImagePickFromGallery();
-                } else {
-                    // Storage permissions denied, show a message or handle accordingly
-                    Toast.makeText(this, "Storage permissions denied.", Toast.LENGTH_SHORT).show();
-                }
-                break;
+            } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -415,32 +408,25 @@ public class NewUserProfileActivity extends AppCompatActivity {
         //datePickerDialog.show();
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                // Handle image capture from the camera
-                if (data != null && data.getExtras() != null) {
-                    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                    imageProfile.setImageBitmap(bitmap);
+                photoUri = ImageUtil.saveCameraImageToFile(data, this);
 
-                    // Convert the Bitmap to a URI and set it to the photoUri
-                    photoUri = getImageUriFromBitmap(bitmap);
-                } else {
-                    // Handle the case when data is null or the image capture failed
-                    Toast.makeText(this, "Failed to capture image from camera.", Toast.LENGTH_SHORT).show();
-                }
+                Glide.with(this).load(photoUri).centerCrop().into(imageProfile);
+
             } else if (requestCode == REQUEST_IMAGE_GALLERY) {
-                // Handle image pick from the gallery
-                Uri selectedImageUri = data.getData();
-                if (selectedImageUri != null) {
-                    photoUri = selectedImageUri;
-                    imageProfile.setImageURI(photoUri);
-                }
+                photoUri = data.getData();
+
+                Glide.with(this).load(photoUri).centerCrop().into(imageProfile);
+
             }
         }
     }
+
 
     private Uri getImageUriFromBitmap(Bitmap bitmap) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
