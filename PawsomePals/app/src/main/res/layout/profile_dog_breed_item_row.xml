@@ -7,7 +7,7 @@
     app:cardUseCompatPadding="true"
     android:layout_marginHorizontal="8dp"
     app:cardBackgroundColor="@color/white"
-    android:backgroundTint="@color/pastelPeachLight"
+    android:backgroundTint="@color/pastelBlue"
     app:cardElevation="5dp"
     android:id="@+id/materialCardView">
 
@@ -66,7 +66,7 @@
             android:padding="8dp"
             android:text="Breed Desc"
             android:visibility="gone"
-            android:textColor="@color/darkPink"
+            android:textColor="@color/pastelBlue"
             android:background="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
