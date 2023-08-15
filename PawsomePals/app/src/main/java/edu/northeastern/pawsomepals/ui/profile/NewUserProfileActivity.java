@@ -151,11 +151,15 @@ public class NewUserProfileActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
                 }
-            } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+            } } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Storage permissions granted, proceed with image pick
+                handleImagePickFromGallery();
+            } else {
+                // Storage permissions denied, show a message or handle accordingly
+                Toast.makeText(this, "Storage permissions denied.", Toast.LENGTH_SHORT).show();
             }
         }
-    }
+
 
     private void handleImagePickFromGallery() {
         // Check if storage permissions are granted
