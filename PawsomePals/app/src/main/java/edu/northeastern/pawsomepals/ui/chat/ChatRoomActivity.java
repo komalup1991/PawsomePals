@@ -228,6 +228,8 @@ public class ChatRoomActivity extends AppCompatActivity {
             chatRoomModel.setLastMessage("<Location>");
             ChatFirebaseUtil.getChatroomReference(chatRoomId).set(chatRoomModel);
             uploadLocation(location);
+            locationPreviewTextView.setText("");
+            location = null;
             chat_location_preview_container.setVisibility(View.INVISIBLE);
         }
     }
@@ -243,6 +245,7 @@ public class ChatRoomActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             messageInput.setText("");
                             sendNotification("You receive a <location>");
+
                         }
                     });
         }
